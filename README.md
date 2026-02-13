@@ -14,58 +14,58 @@
 
 ## About
 
-`marry.fun` は、**pump.fun の fee sharing 機能を実装した**オンチェーン恋愛ゲームです。  
-AI動画時代の新しい物語IPとトークン流動性を接続し、「語れるミーム」を「取引できる資産」に変換します。
+`marry.fun` is an **on-chain romance game** with **pump.fun fee sharing** integration.  
+It connects narrative IP with token liquidity in the AI video era, turning “shareable memes” into “tradable assets.”
 
-コア体験は以下です。
+Core experience:
 
-- `$MARRY` を発行し、初日から Solana 上で売買可能
-- AI girl と会話して親密度（intimacy）を獲得
-- その日の Boyfriend がクリエイター手数料の 60% を受け取る
-- 最終的に Husband が選出され、Jackpot（蓄積プール 10%）を獲得
+- Launch `$MARRY` and trade on Solana from day one
+- Chat with AI girls to earn intimacy points
+- That day’s Boyfriend receives 60% of creator fees
+- A Husband is chosen and wins the Jackpot (10% of the accumulated pool)
 
 ## Problem Statement
 
-ミームコインはストーリーテリングですが、AIによる AAA コンテンツ制作コストの大幅低下で高品質クリエイターが急増する一方、資本形成と注目維持の仕組みは不足しています。  
-degen トレーダーは次のナラティブを探し続けていますが、高密度な物語とトークン流動性の間に大きな断絶があります。  
-`marry.fun` はこの断絶を埋め、バイラルな AI ナラティブを流動性のあるトレード可能資産に変えます。
+Meme coins are storytelling, but as AI drastically lowers the cost of high-quality content creation, capital formation and attention retention mechanisms are lagging behind.  
+Degen traders keep hunting for the next narrative, yet there’s a gap between rich storytelling and token liquidity.  
+`marry.fun` bridges this gap by turning viral AI narratives into liquid, tradable assets.
 
 ## How It Works
 
-- **$MARRY token**: チャット参加に必要。1人の AI girl と会話し、親密度ポイントを獲得。
-- **Boyfriend**: 日次で親密度トップのユーザーが選出され、creator fee の 60% を受領。
-- **Marriage**: 元 Boyfriend 群からポイント + RNG で Husband を選出し、Jackpot を付与。
-- **Points**: チャット、トークン保有、SNS（X follow / RT）、buy & hold で加点。
+- **$MARRY token**: Required to participate in chat. Talk to one AI girl and earn intimacy points.
+- **Boyfriend**: Daily selection of the top intimacy user; they receive 60% of creator fees.
+- **Marriage**: Husband chosen from former Boyfriends via points + RNG; they receive the Jackpot.
+- **Points**: Earned from chat, token holdings, SNS (X follow/RT), buy & hold.
 
 ## Technical Approach
 
-- **Token Launch**: `$MARRY` を Solana 上でローンチし、初日から自由に取引可能。
-- **Creator Fee Sharing**: `pump.fun` モデルをベースにした fee-sharing スマートコントラクトで取引手数料を蓄積・分配。
-- **Narrative-Linked Claims**: 物語上の勝者（Husband）が、蓄積された creator fee を直接 claim 可能。
-- **AI x Onchain Infra**: AI agent のプロンプト設計とオンチェーン実装を接続し、ストーリー進行に金融インセンティブを同期。
+- **Token Launch**: Launch `$MARRY` on Solana for free trading from day one.
+- **Creator Fee Sharing**: Fee-sharing smart contract built on the `pump.fun` model to accrue and distribute trading fees.
+- **Narrative-Linked Claims**: Story winners (Husband) can directly claim accrued creator fees.
+- **AI x Onchain Infra**: Connect AI agent prompt design with on-chain implementation to sync story progress with financial incentives.
 
 ## Target Audience
 
-- **GenAI ネイティブ動画クリエイター（X）**: バイラルな AAA 風トレーラーを作れるが、従来のマネタイズ導線を持たない層。
-- **Solana degen トレーダー**: 高ロア（high-lore）トークンに早期参加し、注目経済の勝者にベットしたい層。
+- **GenAI-native video creators (X)**: Capable of viral, AAA-style trailers but lacking traditional monetization paths.
+- **Solana degen traders**: Early participants seeking high-lore tokens and betting on attention economy winners.
 
 ## Business Model
 
-- **Transaction Fees**: プラットフォーム上の取引ごとに 0.5% を徴収（pump.fun の成功モデルを踏襲）。
-- **AI Tool Revenue**: クリエイター向け自動 AI 動画生成・エージェントツールを従量課金で提供。
-- **Creator Fee Pool Share**: creator fee プールの一部を運営収益化し、次世代 AI ストーリー制作へ再投資。
+- **Transaction Fees**: 0.5% fee per platform transaction (following the pump.fun model).
+- **AI Tool Revenue**: Usage-based pricing for creator-facing AI video generation and agent tools.
+- **Creator Fee Pool Share**: Monetize a share of the creator fee pool and reinvest in next-gen AI story production.
 
 ## Competitive Landscape
 
-- **vs. Zora / 10k**: 新しいソーシャル島を作るのではなく、`X-native` に徹して既存アテンション上で拡散。
-- **vs. Story Protocol**: 法務・L1 レイヤー中心ではなく、Solana の DeFi 合成可能性を使って即時流動性と娯楽性を提供。
+- **vs. Zora / 10k**: Rather than building new social islands, we focus on X-native distribution on existing attention.
+- **vs. Story Protocol**: Instead of legal and L1-heavy design, we use Solana’s DeFi composability for instant liquidity and entertainment.
 
-IP を登録するだけではなく、IP を「取引できて楽しい」状態にすることを重視します。
+We emphasize making IP not only registrable but also **tradable and fun**.
 
 ## Future Vision
 
-`$MARRY` の成功後は、`AI Superpower` スタジオツールを一般クリエイターに開放し、任意のナラティブを permissionless に即時トークン化できる基盤を目指します。  
-長期的には、コミュニティ主導のトークン管理型 IP ライセンシングへ拡張し、ゲーム・マーチャンダイズ・メディア展開の価値分配をクリエイターとコミュニティの双方で担える世界を作ります。
+After `$MARRY` succeeds, we aim to open the `AI Superpower` studio tools to all creators, enabling permissionless, instant tokenization of any narrative.  
+Long term, we target community-led, token-governed IP licensing and value sharing across games, merchandise, and media.
 
 ## Tech
 
@@ -78,11 +78,11 @@ IP を登録するだけではなく、IP を「取引できて楽しい」状�
   <img src="https://img.shields.io/badge/Zustand-5-764ABC" alt="Zustand" />
 </p>
 
-- **Core**: `pump.fun` fee sharing 機能を活用した creator fee 分配設計（Boyfriend/Husband claim）
+- **Core**: Creator fee distribution (Boyfriend/Husband claims) built on pump.fun fee sharing
 - Next.js 16 / React 19 / TypeScript
 - Bun, OpenNext (`@opennextjs/cloudflare`) + Cloudflare Workers
 - Solana smart contract + fee-sharing distribution
-- Moltworker, OpenClaw（AI chat）
+- Moltworker, OpenClaw (AI chat)
 - `@react-three/fiber` / `@react-three/drei` (3D), `next-intl` (i18n)
 
 ## Getting Started

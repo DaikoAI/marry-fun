@@ -22,7 +22,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "marry-fun"
-database_id = "9d1dcd9e-c826-49c1-9966-660541ae90f3"
+database_id = "9e9f0f61-390c-4b14-850e-dbb496087d01"
 migrations_dir = "migrations"
 
 [[services]]
