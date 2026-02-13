@@ -1,4 +1,11 @@
 {
   "placeholder": "Enter your name",
-  "submit": "Play Now"
+  "next": "Next",
+  "submit": "Play Now",
+  "connectWallet": "Connect Wallet",
+  "connecting": "Connecting...",
+  "signing": "Signing...",
+  "saving": "Saving...",
+  "profileError": "Failed to save username. Please try again.",
+  "initError": "Connection timed out. Please try again."
 }

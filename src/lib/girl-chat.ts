@@ -9,13 +9,28 @@ export interface InitGameResult {
   greeting: GirlResponse;
 }
 
-export async function initGameSession(username: string, locale: string): Promise<InitGameResult> {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ isInit: true, username, locale }),
-  });
+const INIT_SESSION_TIMEOUT_MS = 60_000;
 
+export async function initGameSession(username: string, locale: string): Promise<InitGameResult> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, INIT_SESSION_TIMEOUT_MS);
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isInit: true, username, locale }),
+      signal: controller.signal,
+    });
+    return await parseInitResponse(res);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function parseInitResponse(res: Response): Promise<InitGameResult> {
   if (!res.ok) throw new Error("Failed to initialize game session");
 
   const json: unknown = await res.json();
@@ -34,6 +49,7 @@ export async function initGameSession(username: string, locale: string): Promise
 // --- Fetch Girl Response ---
 
 export interface ExtendedGirlResponse extends GirlResponse {
+  balance?: number;
   isGameOver?: boolean;
   hitWord?: string;
 }
@@ -47,7 +63,13 @@ export async function fetchGirlResponse(
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ isInit: false, sessionId, message: userMessage, locale }),
+    body: JSON.stringify({
+      isInit: false,
+      sessionId,
+      message: userMessage,
+      locale,
+      clientMessageId: crypto.randomUUID(),
+    }),
     signal,
   });
 
@@ -71,6 +93,7 @@ export async function fetchGirlResponse(
   return {
     content: message.reply,
     points: message.score.adjusted,
+    balance: message.balance,
     emotion: message.emotion,
   };
 }

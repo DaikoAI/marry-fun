@@ -20,7 +20,7 @@ export function ChatInput() {
   const locale = useLocale();
 
   const isGirlTyping = useGameStore(s => s.isGirlTyping);
-  const isGoalPopupOpen = useGameStore(s => s.points > 0 && !s.hasSeenGoalPopup);
+  const isGoalPopupOpen = useGameStore(s => s.hasEarnedAnyPoint && !s.hasSeenGoalPopup);
   const remainingChats = useGameStore(s => s.remainingChats);
   const isGameOver = useGameStore(s => s.isGameOver);
   const noChatsLeft = useGameStore(s => s.remainingChats <= 0 || s.isGameOver);
@@ -57,7 +57,7 @@ export function ChatInput() {
       if (response.isGameOver && response.hitWord) {
         store.setGameOver(response.hitWord, response.content);
       } else {
-        store.addPoints(response.points);
+        store.addPoints(response.points, response.balance);
       }
     } catch (err) {
       if (!controller.signal.aborted) throw err;

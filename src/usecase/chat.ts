@@ -8,6 +8,7 @@ import type { Emotion } from "@/domain/values/emotion";
 import type { Locale } from "@/domain/values/locale";
 import { NgWord } from "@/domain/values/ng-word";
 import { Score } from "@/domain/values/score";
+import { logger } from "@/utils/logger";
 
 export interface StartGameResult {
   sessionId: string;
@@ -50,7 +51,7 @@ export class GameSessionUseCase {
         }
       })
       .catch((err: unknown) => {
-        console.warn("[startGame] NG word generation failed, continuing without NG words:", err);
+        logger.warn("[startGame] NG word generation failed, continuing without NG words:", err);
       });
 
     return { sessionId, characterType, greeting, backgroundTask: bgTask };

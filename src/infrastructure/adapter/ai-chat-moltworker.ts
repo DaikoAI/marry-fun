@@ -4,7 +4,9 @@ import { EMOTIONS, isEmotion } from "@/domain/values/emotion";
 import type { Emotion } from "@/domain/values/emotion";
 import type { Locale } from "@/domain/values/locale";
 import { CHAT_SYSTEM_PROMPT } from "@/lib/soul-prompt.generated";
+import { extractJson } from "@/lib/extract-json";
 import { NGWORD_SYSTEM_PROMPT } from "@/infrastructure/prompts/openclaw-prompts";
+import { logger } from "@/utils/logger";
 import OpenAI from "openai";
 import { z } from "zod";
 
@@ -67,21 +69,68 @@ const NGWORDS_RESPONSE_FORMAT = {
   },
 } as const;
 
-/** Strip markdown code fences (```json ... ```) that LLMs sometimes wrap around JSON. */
-function stripCodeFence(text: string): string {
-  return text
-    .replace(/^```(?:json)?\s*\n?/i, "")
-    .replace(/\n?```\s*$/i, "")
-    .trim();
+function extractBalancedJsonLike(text: string): string | null {
+  const starts = [text.indexOf("{"), text.indexOf("[")].filter(index => index >= 0).sort((a, b) => a - b);
+
+  for (const start of starts) {
+    const open = text[start];
+    const close = open === "{" ? "}" : "]";
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+
+    for (let i = start; i < text.length; i += 1) {
+      const ch = text[i];
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (ch === "\\") {
+          escaped = true;
+          continue;
+        }
+        if (ch === '"') {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (ch === '"') {
+        inString = true;
+        continue;
+      }
+      if (ch === open) {
+        depth += 1;
+      } else if (ch === close) {
+        depth -= 1;
+        if (depth === 0) {
+          return text.slice(start, i + 1).trim();
+        }
+      }
+    }
+  }
+
+  return null;
 }
 
 /** Safely parse JSON, returning null on failure. */
 function safeJsonParse(text: string): unknown {
-  try {
-    return JSON.parse(stripCodeFence(text));
-  } catch {
-    return null;
+  const candidates = [text.trim(), extractJson(text)].filter(Boolean);
+  const balanced = extractBalancedJsonLike(text);
+  if (balanced) {
+    candidates.push(balanced);
   }
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
 
 function toErrorMessage(error: unknown): string {
@@ -110,6 +159,7 @@ export class AiChatMoltworker implements AiChatAdapter {
     label: string,
     request: () => Promise<OpenAI.Chat.Completions.ChatCompletion>,
     schema: z.ZodSchema<T>,
+    options?: { finalLogLevel?: "warn" | "error" },
   ): Promise<T> {
     let lastError: unknown = new Error(`${label} failed`);
 
@@ -144,11 +194,16 @@ export class AiChatMoltworker implements AiChatAdapter {
             `${error.constructor.name}: ${error.message}${error.cause ? ` | cause: ${toErrorMessage(error.cause)}` : ""}`
           : String(error);
         if (attempt < MAX_STRUCTURED_ATTEMPTS) {
-          console.warn(
+          logger.warn(
             `[AiChatMoltworker] ${label} validation failed (attempt ${String(attempt)}/${String(MAX_STRUCTURED_ATTEMPTS)}): ${errorDetail}`,
           );
         } else {
-          console.error(`[AiChatMoltworker] ${label} final failure: ${errorDetail}`);
+          const finalLogLevel = options?.finalLogLevel ?? "error";
+          if (finalLogLevel === "warn") {
+            logger.warn(`[AiChatMoltworker] ${label} final failure: ${errorDetail}`);
+          } else {
+            logger.error(`[AiChatMoltworker] ${label} final failure: ${errorDetail}`);
+          }
         }
       }
     }
@@ -176,6 +231,7 @@ export class AiChatMoltworker implements AiChatAdapter {
           ],
         }),
       ngWordsResponseSchema,
+      { finalLogLevel: "warn" },
     );
 
     return parsed.words;
@@ -239,7 +295,7 @@ export class AiChatMoltworker implements AiChatAdapter {
 
       return completion.choices[0]?.message?.content ?? fallback;
     } catch (error) {
-      console.warn(
+      logger.warn(
         `[AiChatMoltworker] getShockResponse failed: ${error instanceof Error ? error.message : String(error)}`,
       );
       return fallback;

@@ -10,7 +10,13 @@
   "header": {
     "pts": "Points",
     "leaderboardTitle": "リーダーボード",
-    "leaderboardComingSoon": "リーダーボードは近日公開！",
+    "leaderboardTotalLabel": "Total",
+    "leaderboardDailyLabel": "Daily (UTC)",
+    "leaderboardLoading": "ランキングを読み込み中...",
+    "leaderboardError": "ランキングの取得に失敗しました",
+    "leaderboardRetry": "再試行",
+    "leaderboardEmpty": "データがありません",
+    "leaderboardDailyWindow": "daily は UTC 00:00-24:00 で集計されます",
     "leaderboardClose": "閉じる"
   },
   "speechBubble": {

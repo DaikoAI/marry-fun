@@ -16,9 +16,6 @@ function easeOut(t: number) {
 export function ChatHeader() {
   const points = useGameStore(s => s.points);
   const tokenBonus = useGameStore(s => s.tokenBonus);
-  const lastPointsEarned = useGameStore(s => s.lastPointsEarned);
-  const floatKeySeed = useGameStore(s => s.floatKeySeed);
-  const clearLastPoints = useGameStore(s => s.clearLastPoints);
   const t = useTranslations("chat.header");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -34,7 +31,7 @@ export function ChatHeader() {
     if (prev === points) return;
 
     const start = performance.now();
-    const duration = 1200;
+    const duration = 320;
 
     const animate = (now: number) => {
       const elapsed = now - start;
@@ -52,9 +49,6 @@ export function ChatHeader() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [points]);
-
-  // Unique key for re-mounting the floating +N element
-  const floatKey = lastPointsEarned != null ? `${String(lastPointsEarned)}-${String(floatKeySeed)}` : null;
 
   return (
     <>
@@ -79,6 +73,7 @@ export function ChatHeader() {
           className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[10px] text-white/40 ring-1 ring-white/10"
         >
           <span className="tracking-wider uppercase">soon</span>
+          <span className="font-semibold text-pink-200/80">$MARRY</span>
           <PumpFunIcon className="h-3.5 w-3.5" />
         </span>
 
@@ -87,17 +82,6 @@ export function ChatHeader() {
 
         {/* Right: Points with bonus badge (when tokenBonus > 1) */}
         <div className="relative">
-          {/* Floating +N animation — rendered outside button to avoid overflow clipping */}
-          {floatKey != null && (
-            <span
-              key={floatKey}
-              className="pointer-events-none absolute right-2 bottom-full z-50 mb-1 text-sm font-bold text-yellow-300 drop-shadow-[0_0_6px_rgba(250,204,21,0.5)]"
-              style={{ animation: "pointsFloat 1s ease-out forwards" }}
-              onAnimationEnd={clearLastPoints}
-            >
-              +{lastPointsEarned}
-            </span>
-          )}
           <button
             type="button"
             onClick={() => {
@@ -105,18 +89,18 @@ export function ChatHeader() {
             }}
             className="relative flex cursor-pointer items-center gap-1.5 rounded-full border border-pink-200/25 bg-white/10 px-4 py-1.5 backdrop-blur-sm transition-colors hover:bg-white/15"
           >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 text-yellow-300/70" aria-hidden="true">
+              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+            </svg>
+            <span className="text-xs tracking-wider text-white/50 uppercase">{t("pts")}</span>
             {tokenBonus > 1 && (
               <span
-                className="absolute -top-1 -right-1 rounded-full bg-linear-to-r from-pink-500 to-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white shadow-sm"
+                className="shrink-0 rounded-full bg-linear-to-r from-pink-500 to-rose-500 px-1.5 py-0.5 text-[9px] leading-none font-bold text-white shadow-sm"
                 aria-label={`Bonus ${String(tokenBonus)}x`}
               >
                 {tokenBonus}x
               </span>
             )}
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 text-yellow-300/70" aria-hidden="true">
-              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
-            </svg>
-            <span className="text-xs tracking-wider text-white/50 uppercase">{t("pts")}</span>
             <span className="text-sm font-(--font-tokimeki) font-bold text-white tabular-nums">
               {displayPoints.toLocaleString()}
             </span>

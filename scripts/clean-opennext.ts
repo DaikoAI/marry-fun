@@ -6,6 +6,7 @@
 import { rmSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { logger } from "../src/utils/logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -15,6 +16,6 @@ if (existsSync(OPEN_NEXT_DIR)) {
   try {
     rmSync(OPEN_NEXT_DIR, { recursive: true, force: true });
   } catch (err) {
-    console.warn(`Non-fatal: could not fully remove ${OPEN_NEXT_DIR}:`, err);
+    logger.warn(`Non-fatal: could not fully remove ${OPEN_NEXT_DIR}:`, err);
   }
 }

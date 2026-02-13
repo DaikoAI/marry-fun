@@ -7,6 +7,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { logger } from "../src/utils/logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -25,5 +26,5 @@ export const CHAT_SYSTEM_PROMPT = \`${escaped}\`;
 const existing = existsSync(OUT_PATH) ? readFileSync(OUT_PATH, "utf-8") : null;
 if (existing !== output) {
   writeFileSync(OUT_PATH, output, "utf-8");
-  console.log("synced openclaw/SOUL.md → src/lib/soul-prompt.generated.ts");
+  logger.log("synced openclaw/SOUL.md → src/lib/soul-prompt.generated.ts");
 }

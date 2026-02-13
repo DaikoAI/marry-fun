@@ -7,9 +7,11 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Shippori_Mincho, Yuji_Syuku } from "next/font/google";
 
 import { APP_DESCRIPTION, APP_NAME } from "@/constants";
+import { SolanaWalletProvider } from "@/components/providers/solana-wallet-provider";
 import { routing } from "@/i18n/routing";
 
 import "../globals.css";
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -76,7 +78,9 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${shipporiMincho.variable} ${yujiSyuku.variable} h-full antialiased`}
       >
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
+          <SolanaWalletProvider>{children}</SolanaWalletProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

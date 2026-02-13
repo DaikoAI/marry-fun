@@ -1,4 +1,5 @@
 import { DomainError } from "@/domain/errors/domain-error";
+import { logger } from "@/utils/logger";
 import { ZodError } from "zod";
 import type { ErrorResponse } from "../schemas/chat";
 
@@ -25,7 +26,7 @@ export function handleApiError(error: unknown): { status: number; body: ErrorRes
     };
   }
 
-  console.error("Unexpected error:", error);
+  logger.error("Unexpected error:", error);
   return {
     status: 500,
     body: {

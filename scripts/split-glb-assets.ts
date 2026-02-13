@@ -13,6 +13,7 @@ import path from "node:path";
 import { NodeIO } from "@gltf-transform/core";
 import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";
 import { prune } from "@gltf-transform/functions";
+import { logger } from "../src/utils/logger";
 
 const io = new NodeIO().registerExtensions(KHRONOS_EXTENSIONS);
 const base = path.join(process.cwd(), "public/3d/girl");
@@ -21,14 +22,14 @@ const animDir = path.join(base, "animations");
 await mkdir(animDir, { recursive: true });
 
 // 1. Extract base rigged mesh (no animations)
-console.log("Extracting rigged-mesh.glb...");
+logger.log("Extracting rigged-mesh.glb...");
 const meshDoc = await io.read(path.join(base, "Animation_Idle_7_withSkin.glb"));
 for (const anim of meshDoc.getRoot().listAnimations()) {
   anim.dispose();
 }
 await meshDoc.transform(prune());
 await io.write(path.join(base, "rigged-mesh.glb"), meshDoc);
-console.log("  -> rigged-mesh.glb written");
+logger.log("  -> rigged-mesh.glb written");
 
 // 2. Extract animation-only files (skeleton + keyframes, no mesh/textures)
 const animSources: [string, string][] = [
@@ -38,7 +39,7 @@ const animSources: [string, string][] = [
 ];
 
 for (const [src, out] of animSources) {
-  console.log(`Extracting animations/${out} from ${src}...`);
+  logger.log(`Extracting animations/${out} from ${src}...`);
   const doc = await io.read(path.join(base, src));
 
   // Remove mesh references from all nodes so prune() can clean up meshes/textures
@@ -48,7 +49,7 @@ for (const [src, out] of animSources) {
 
   await doc.transform(prune());
   await io.write(path.join(animDir, out), doc);
-  console.log(`  -> animations/${out} written`);
+  logger.log(`  -> animations/${out} written`);
 }
 
-console.log("\nDone! Asset split complete.");
+logger.log("\nDone! Asset split complete.");

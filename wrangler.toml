@@ -19,6 +19,12 @@ build.command = "bun run build:cf"
 directory = ".open-next/assets"
 binding = "ASSETS"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "marry-fun"
+database_id = "9d1dcd9e-c826-49c1-9966-660541ae90f3"
+migrations_dir = "migrations"
+
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
 service = "marry-fun"

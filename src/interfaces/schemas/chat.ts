@@ -21,6 +21,7 @@ const messageSchema = z.object({
   sessionId: z.string().uuid(),
   message: z.string().min(1).max(500),
   locale: localeSchema,
+  clientMessageId: z.string().uuid(),
 });
 
 export const chatRequestSchema = z.discriminatedUnion("isInit", [startSchema, messageSchema]);
@@ -45,6 +46,7 @@ export const messageResponseSchema = z.object({
     raw: z.number().int().min(1).max(10),
     adjusted: z.number().int(),
   }),
+  balance: z.number().int(),
   emotion: z.enum(EMOTIONS),
 });
 

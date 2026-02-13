@@ -8,10 +8,6 @@ import { useMemo, useState } from "react";
 
 import { SpeechBubble } from "./speech-bubble";
 
-// TODO: Issue #7 でサーバーから取得予定
-const DUMMY_MARRY_HOLDING = "25.5k";
-const DUMMY_HODL_DAYS = 6;
-
 /** Map emotion to available image path. Falls back to default for missing assets. */
 const EMOTION_IMAGES: Record<Emotion, string> = {
   default: "/girl/default.png",
@@ -65,16 +61,6 @@ export function GirlView() {
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center">
-      {/* $MARRY info — top right */}
-      <div className="absolute top-2 right-3 flex flex-col items-end gap-0.5 text-[11px] font-(--font-tokimeki) text-white/50">
-        <span>
-          <span className="font-semibold text-white/70">{DUMMY_MARRY_HOLDING}</span> $MARRY
-        </span>
-        <span>
-          <span className="font-semibold text-white/70">{DUMMY_HODL_DAYS}d</span> HODL
-        </span>
-      </div>
-
       {/* Speech bubble — above character */}
       <div className="w-full px-4">
         {isGirlTyping ?

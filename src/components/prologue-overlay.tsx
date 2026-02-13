@@ -12,11 +12,13 @@ const noop = () => {};
 interface PrologueOverlayProps {
   isVisible: boolean;
   onComplete: () => void;
+  canSkip?: boolean;
+  onSkip?: () => void;
 }
 
-const STEP_KEYS = ["step1", "step2", "step3", "step4", "step5"] as const;
-const TYPE_INTERVAL_MS = 80;
-const STEP_PAUSE_MS = 2000;
+const STEP_KEYS = ["step1", "step2"] as const;
+const TYPE_INTERVAL_MS = 50;
+const STEP_PAUSE_MS = 800;
 const FADE_OUT_MS = 500;
 
 interface PrologueState {
@@ -65,7 +67,7 @@ const initialState: PrologueState = {
   stepsFinished: false,
 };
 
-export function PrologueOverlay({ isVisible, onComplete }: PrologueOverlayProps) {
+export function PrologueOverlay({ isVisible, onComplete, canSkip = false, onSkip }: PrologueOverlayProps) {
   const t = useTranslations("prologue");
   const reducedMotion = usePrefersReducedMotion();
   const dialogRef = useModalA11y(noop);
@@ -182,6 +184,21 @@ export function PrologueOverlay({ isVisible, onComplete }: PrologueOverlayProps)
           }
         </p>
       </div>
+
+      {canSkip && (
+        <button
+          type="button"
+          onClick={onSkip ?? onComplete}
+          className="absolute right-4 bottom-4 z-20 rounded-full border border-white/35 bg-black/35 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-white/90 backdrop-blur-sm transition-colors hover:bg-black/50 focus-visible:ring-2 focus-visible:ring-pink-300 focus-visible:outline-none"
+          style={{
+            right: "max(1rem, env(safe-area-inset-right))",
+            bottom: "max(1rem, env(safe-area-inset-bottom))",
+          }}
+          aria-label={t("skip")}
+        >
+          {t("skip")}
+        </button>
+      )}
     </div>
   );
 }

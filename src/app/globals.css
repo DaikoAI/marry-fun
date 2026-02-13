@@ -95,20 +95,49 @@ body {
   animation: marrySparkles 16s linear infinite;
 }
 
-/* ── Points float animation ── */
+/* ── Point gain toast animation ── */
 
-@keyframes pointsFloat {
+@keyframes pointGainToastFloat {
   0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    filter: blur(2px);
+  }
+  22% {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0);
   }
-  70% {
+  78% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(1.01);
+    filter: blur(1px);
+  }
+}
+
+@keyframes pointGainToastFade {
+  0% {
+    opacity: 0;
+  }
+  20% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translateY(-28px) scale(1.3);
   }
+}
+
+.point-gain-toast {
+  animation: pointGainToastFloat 1.25s ease-in-out forwards;
+}
+
+.point-gain-toast-reduced {
+  animation: pointGainToastFade 0.7s ease-out forwards;
 }
 
 /* ── Girl emotion animations ── */
@@ -364,6 +393,114 @@ body {
   animation: prologueTextFadeOut 500ms ease-in both;
 }
 
+/* ── Wallet Adapter: marry.fun theme overrides ── */
+
+.solana-auth-panel .wallet-adapter-dropdown {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.solana-auth-panel .wallet-adapter-dropdown .wallet-adapter-button-trigger {
+  flex: 1;
+  justify-content: center;
+}
+
+.wallet-adapter-button,
+.wallet-adapter-button-trigger {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 2px solid rgba(251, 207, 232, 0.4) !important;
+  color: rgba(255, 241, 242, 0.9) !important;
+  font-family: var(--font-ephemeral), var(--font-geist-sans), sans-serif !important;
+  transition: all 150ms ease-out !important;
+}
+
+.wallet-adapter-button:not([disabled]):hover,
+.wallet-adapter-button-trigger:not([disabled]):hover {
+  background: rgba(251, 207, 232, 0.2) !important;
+  border-color: rgba(251, 207, 232, 0.6) !important;
+  color: rgba(255, 241, 242, 1) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: linear-gradient(135deg, rgba(30, 20, 35, 0.95) 0%, rgba(45, 25, 50, 0.92) 100%) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(255, 105, 180, 0.08) !important;
+  padding: 1.5rem !important;
+}
+
+.wallet-adapter-modal-title {
+  color: rgba(255, 241, 242, 0.95) !important;
+  font-family: var(--font-ephemeral), var(--font-geist-sans), sans-serif !important;
+  text-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+}
+
+.wallet-adapter-modal-list {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: rgba(255, 241, 242, 0.9) !important;
+  margin-bottom: 8px;
+  width: auto !important;
+  min-width: 140px;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background: rgba(251, 207, 232, 0.15) !important;
+  border-color: rgba(251, 207, 232, 0.35) !important;
+}
+
+.wallet-adapter-modal-button-close {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.wallet-adapter-modal-button-close:hover {
+  background: rgba(251, 207, 232, 0.2) !important;
+}
+
+.wallet-adapter-modal-button-close svg {
+  fill: rgba(255, 241, 242, 0.8) !important;
+}
+
+.wallet-adapter-modal-button-close:hover svg {
+  fill: rgba(255, 241, 242, 1) !important;
+}
+
+.wallet-adapter-modal-middle-button {
+  background: linear-gradient(135deg, rgba(251, 207, 232, 0.25) 0%, rgba(255, 182, 193, 0.2) 100%) !important;
+  border: 2px solid rgba(251, 207, 232, 0.4) !important;
+  color: rgba(255, 241, 242, 0.95) !important;
+  font-family: var(--font-ephemeral), var(--font-geist-sans), sans-serif !important;
+}
+
+.wallet-adapter-modal-middle-button:hover {
+  background: linear-gradient(135deg, rgba(251, 207, 232, 0.35) 0%, rgba(255, 182, 193, 0.3) 100%) !important;
+  border-color: rgba(251, 207, 232, 0.6) !important;
+}
+
+.wallet-adapter-dropdown-list {
+  background: linear-gradient(135deg, rgba(30, 20, 35, 0.98) 0%, rgba(45, 25, 50, 0.95) 100%) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 105, 180, 0.06) !important;
+}
+
+.wallet-adapter-dropdown-list-item:hover {
+  background: rgba(251, 207, 232, 0.15) !important;
+}
+
 /* ── Motion-reduce: disable all girl animations ── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -374,7 +511,6 @@ body {
   .girl-emotion-sad,
   .girl-crossfade-out,
   .heart-particle,
-  [style*="pointsFloat"],
   .game-over-overlay,
   .game-over-flash,
   .game-over-text,

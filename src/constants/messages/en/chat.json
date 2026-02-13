@@ -10,7 +10,13 @@
   "header": {
     "pts": "Points",
     "leaderboardTitle": "Leaderboard",
-    "leaderboardComingSoon": "Leaderboard is coming soon!",
+    "leaderboardTotalLabel": "Total",
+    "leaderboardDailyLabel": "Daily (UTC)",
+    "leaderboardLoading": "Loading leaderboard...",
+    "leaderboardError": "Failed to load leaderboard",
+    "leaderboardRetry": "Retry",
+    "leaderboardEmpty": "No data available",
+    "leaderboardDailyWindow": "Daily is calculated for UTC 00:00-24:00",
     "leaderboardClose": "Close"
   },
   "speechBubble": {

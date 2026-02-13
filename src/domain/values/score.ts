@@ -1,10 +1,12 @@
-const BONUS_MULTIPLIER = 1.2;
+const BASE_MULTIPLIER = 1.2;
+const TOKEN_BONUS_MULTIPLIER = 1.5;
 
 export class Score {
   readonly adjusted: number;
 
   private constructor(readonly raw: number) {
-    this.adjusted = Math.round(raw * BONUS_MULTIPLIER);
+    const baseAdjusted = Math.round(raw * BASE_MULTIPLIER);
+    this.adjusted = Math.round(baseAdjusted * TOKEN_BONUS_MULTIPLIER);
   }
 
   static fromRaw(raw: number): Score {

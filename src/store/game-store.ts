@@ -18,18 +18,20 @@ interface GameState {
   isGirlTyping: boolean;
   currentEmotion: Emotion;
   hasSeenGoalPopup: boolean;
+  hasEarnedAnyPoint: boolean;
   remainingChats: number;
   isGameOver: boolean;
   hitWord: string | null;
   shockMessage: string | null;
   lastPointsEarned: number | null;
-  floatKeySeed: number;
+  pointGainEventId: number;
 }
 
 interface GameActions {
   setUsername: (username: string) => void;
   setSessionId: (sessionId: string) => void;
-  addPoints: (amount: number) => void;
+  addPoints: (amount: number, balance?: number) => void;
+  setPoints: (points: number) => void;
   addMessage: (message: Omit<ChatMessage, "id" | "timestamp">) => void;
   setGirlTyping: (isTyping: boolean) => void;
   setEmotion: (emotion: Emotion) => void;
@@ -50,12 +52,13 @@ const initialState: GameState = {
   isGirlTyping: false,
   currentEmotion: "default" satisfies Emotion,
   hasSeenGoalPopup: false,
+  hasEarnedAnyPoint: false,
   remainingChats: 20,
   isGameOver: false,
   hitWord: null,
   shockMessage: null,
   lastPointsEarned: null,
-  floatKeySeed: 0,
+  pointGainEventId: 0,
 };
 
 export const useGameStore = create<GameState & GameActions>()(set => ({
@@ -69,16 +72,20 @@ export const useGameStore = create<GameState & GameActions>()(set => ({
     set({ sessionId });
   },
 
-  addPoints: amount => {
+  addPoints: (amount, balance) => {
     set(state => {
-      const boosted = Math.round(amount * state.tokenBonus);
       return {
-        points: state.points + boosted,
-        jackpot: state.jackpot + Math.round(boosted * 0.1),
-        lastPointsEarned: boosted,
-        floatKeySeed: state.floatKeySeed + 1,
+        points: balance ?? state.points + amount,
+        jackpot: state.jackpot + Math.round(amount * 0.1),
+        hasEarnedAnyPoint: state.hasEarnedAnyPoint || amount > 0,
+        lastPointsEarned: amount,
+        pointGainEventId: state.pointGainEventId + 1,
       };
     });
+  },
+
+  setPoints: points => {
+    set({ points });
   },
 
   addMessage: message => {
