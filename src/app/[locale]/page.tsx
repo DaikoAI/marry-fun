@@ -4,8 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { Background } from "@/components/background";
 import { BgmController } from "@/components/bgm-controller";
 import { FooterLinks } from "@/components/footer-links";
+import { HomeCtaLink } from "@/components/home-cta-link";
 import { ThreeViewer } from "@/components/three-viewer";
-import { Link } from "@/i18n/navigation";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -48,12 +48,7 @@ export default async function Home({ params, searchParams }: HomePageProps) {
           {/* Spacer for layout */}
           <div className="min-h-0 flex-1" />
 
-          <Link
-            href="/start"
-            className="shrink-0 rounded-full border-2 border-pink-200/40 bg-white/10 px-6 py-2.5 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-transform duration-150 ease-out hover:scale-105 active:scale-95 sm:px-8 sm:py-3"
-          >
-            {t("cta")}
-          </Link>
+          <HomeCtaLink label={t("cta")} />
         </main>
 
         <FooterLinks />

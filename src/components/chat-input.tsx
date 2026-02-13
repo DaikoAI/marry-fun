@@ -35,7 +35,6 @@ export function ChatInput() {
     const state = useGameStore.getState();
     if (!trimmed || state.isGirlTyping || state.remainingChats <= 0 || state.isGameOver) return;
 
-    triggerHaptic();
     state.addMessage({ role: "user", content: trimmed });
     state.decrementRemainingChats();
     setText("");
@@ -71,6 +70,10 @@ export function ChatInput() {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
+    const state = useGameStore.getState();
+    if (text.trim() && !state.isGirlTyping && state.remainingChats > 0 && !state.isGameOver) {
+      triggerHaptic();
+    }
     void send();
   };
 
@@ -80,6 +83,10 @@ export function ChatInput() {
     // Enter → send, Shift+Enter → newline
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      const state = useGameStore.getState();
+      if (text.trim() && !state.isGirlTyping && state.remainingChats > 0 && !state.isGameOver) {
+        triggerHaptic();
+      }
       void send();
     }
   };
