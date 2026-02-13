@@ -11,7 +11,7 @@ const mockState = {
 };
 
 vi.mock("@/store/game-store", () => ({
-  useGameStore: (selector: (state: typeof mockState) => unknown) => selector(mockState),
+  useGameStore: vi.fn((selector: (state: typeof mockState) => unknown) => selector(mockState)),
 }));
 
 describe("PointGainToast", () => {

@@ -10,14 +10,14 @@ const mockState = {
 };
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => {
+  useTranslations: vi.fn(() => (key: string) => {
     if (key === "pts") return "Points";
     return key;
-  },
+  }),
 }));
 
 vi.mock("@/store/game-store", () => ({
-  useGameStore: (selector: (state: typeof mockState) => unknown) => selector(mockState),
+  useGameStore: vi.fn((selector: (state: typeof mockState) => unknown) => selector(mockState)),
 }));
 
 vi.mock("@/components/bgm-controller", () => ({

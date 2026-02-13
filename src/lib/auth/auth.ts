@@ -48,7 +48,7 @@ async function buildAuth() {
       "http://127.0.0.1:*",
       "http://192.168.*.*:*",
       "https://marry.fun",
-      "https://marry-fun.yamadaasuma.workers.dev",
+      "https://marry-fun-dev.yamadaasuma.workers.dev",
     ],
     database: drizzleAdapter(db, {
       provider: "sqlite",

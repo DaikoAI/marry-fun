@@ -1,7 +1,7 @@
 import type { GameSession } from "@/domain/entities/game-session";
 import type { GameSessionRepository } from "@/domain/repositories/game-session-repository";
 
-const STORE_KEY = Symbol.for("marry-fun.game-sessions");
+const STORE_KEY = Symbol.for("marry-fun-dev.game-sessions");
 
 function getStore(): Map<string, GameSession> {
   const g = globalThis as Record<symbol, Map<string, GameSession> | undefined>;
