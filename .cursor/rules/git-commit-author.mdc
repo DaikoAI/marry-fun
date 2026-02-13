@@ -1,0 +1,27 @@
+---
+alwaysApply: true
+---
+
+# Git Commit Author (Cursor Agent)
+
+When Cursor agent commits changes on behalf of the user (not as the user), use the following author so that GitHub correctly resolves the Cursor Agent avatar:
+
+- **Author Name**: `Cursor Agent`
+- **Author Email**: `199161495+cursoragent@users.noreply.github.com`
+
+This uses GitHub's noreply format (`ID+USERNAME@users.noreply.github.com`) linking to the official [cursoragent](https://github.com/cursoragent) user, ensuring the commit shows the correct icon on GitHub.
+
+## Usage
+
+```bash
+GIT_AUTHOR_NAME="Cursor Agent" \
+GIT_AUTHOR_EMAIL="199161495+cursoragent@users.noreply.github.com" \
+GIT_COMMITTER_NAME="Cursor Agent" \
+GIT_COMMITTER_EMAIL="199161495+cursoragent@users.noreply.github.com" \
+git commit -m "message"
+```
+
+## Do NOT use
+
+- `cursor@users.noreply.github.com` — invalid format, avatar won't resolve
+- `cursoragent@users.noreply.github.com` — may work for older accounts, but ID-prefixed form is recommended
