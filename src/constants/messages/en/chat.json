@@ -1,0 +1,27 @@
+{
+  "input": {
+    "helpAriaLabel": "Game rules",
+    "placeholder": "Type a message…",
+    "inputAriaLabel": "Message input",
+    "sendAriaLabel": "Send",
+    "chatsLeft": "{count} Chats Left",
+    "noChatsLeft": "No chats left"
+  },
+  "header": {
+    "pts": "Points",
+    "leaderboardTitle": "Leaderboard",
+    "leaderboardComingSoon": "Leaderboard is coming soon!",
+    "leaderboardClose": "Close"
+  },
+  "speechBubble": {
+    "typingAriaLabel": "Typing"
+  },
+  "girl": {
+    "initialGreeting": "Hi there! Say something to me♪"
+  },
+  "gameOver": {
+    "title": "GAME OVER",
+    "tabooWord": "Taboo word",
+    "retry": "Play Again"
+  }
+}

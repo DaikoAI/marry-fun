@@ -1,40 +1,56 @@
 # CLAUDE.md
 
+## Game Overview
+
+marry.fun is an AI-powered dating simulation game built for the OpenClaw Hackathon.
+Players chat with "Claw-chan," an AI heroine powered by OpenClaw (Moltworker on Cloudflare Workers),
+and compete for the highest score to win her heart — and real prizes.
+
+### How It Works
+
+1. **Enter your username** and start a chat session with Claw-chan
+2. **Each session, Claw-chan is randomly assigned one of 5 personality types**
+   (tsundere, airhead, cool, clingy, energetic) — the player doesn't know which one
+3. **Send messages to Claw-chan** and earn points (score 1–10) based on how well
+   your words match her hidden personality type
+4. **$MARRY token holders get a score bonus** — holding more tokens = higher multiplier
+5. **Beware of NG words** — Claw-chan secretly generates 20 forbidden words at the start
+   of each session. Say one, and she gets angry → instant Game Over
+
+### Winning Conditions
+
+- **Daily Top Player** becomes Claw-chan's "boyfriend" and earns 70% of that day's
+  $MARRY creator fees for the following day
+- **Marriage Partner** is chosen from past boyfriends on the final day.
+  The chosen player wins 10% of all-time $MARRY creator fees as a jackpot prize
+
+### Session Mechanics
+
+- Each session has 20 chat turns (remainingChats)
+- Points are calculated as: `score × tokenBonus` (default bonus: 1.5x)
+- 10% of earned points are added to the jackpot pool
+- Claw-chan expresses emotions (joy, embarrassed, angry, sad, default)
+  that change her visual expression in real-time
+
 ## Project Context
 
-marry.fun は **OpenClaw ハッカソン** に提出する恋愛シミュレーションゲーム。
-OpenClaw（Moltworker on Cloudflare Workers）を使った AI チャット機能が中核。
-
-- **提出期限**: 2025年2月13日
-- **必須インフラ**: Cloudflare Workers Paid + Moltworker + OpenClaw エージェント
-- **アーキテクチャ**: Next.js (Vercel) → OpenAI SDK → Moltworker (CF Workers) → Anthropic API
-- **主要機能**: 5種キャラタイプとのチャット、NGワードによるゲームオーバー、スコアリング
+- **Hackathon**: OpenClaw Hackathon
+- **Required Infra**: Cloudflare Workers Paid + Moltworker + OpenClaw agent
+- **Architecture**: Next.js (Cloudflare) → OpenAI SDK → Moltworker (CF Workers) → Anthropic API
+- **Core Features**: 5 character types, NG word game over, scoring system
 
 ## Post-Implementation Review
 
-実装が完了した後は、必ず以下の3つのスキルを使ってレビューを行うこと：
+After completing an implementation, always run the following 3 skills for review:
 
-1. **UI UX Pro Max** (`ui-ux-pro-max`) - UI/UXデザインの品質レビュー
-2. **Vercel React Best Practices** (`vercel-react-best-practices`) - React/Next.jsのパフォーマンス最適化レビュー
-3. **Web Design Guidelines** (`web-design-guidelines`) - Webインターフェースガイドラインへの準拠チェック
-
-## Git Commit Rules
-
-ハッカソン提出要件上、全てのコミットはエージェント名義にすること。人間（posaune0423 / Asuma Yamada）の Author・Committer 情報を含めてはいけない。
-
-Claudeがコミットする場合は以下のように環境変数を明示設定し、グローバル git config の混入を防ぐこと：
-
-```bash
-GIT_AUTHOR_NAME="Claude" \
-GIT_AUTHOR_EMAIL="noreply@anthropic.com" \
-GIT_COMMITTER_NAME="Claude" \
-GIT_COMMITTER_EMAIL="noreply@anthropic.com" \
-git commit -m "message"
-```
+1. **UI UX Pro Max** (`ui-ux-pro-max`) — UI/UX design quality review
+2. **Vercel React Best Practices** (`vercel-react-best-practices`) — React/Next.js performance optimization review
+3. **Web Design Guidelines** (`web-design-guidelines`) — Web interface guidelines compliance check
 
 ## Documentation-First Rules
 
-インフラ設定や OpenClaw 関連の作業では、実装や変更前に必ず既存ドキュメントを参照すること。
+For infra setup and OpenClaw-related work, always refer to existing docs before making changes.
 
-- インフラ設定: `openclaw/README.md` を一次参照として扱う
-- Moltworker / コンテナ関連: `.moltworker/README.md` と `.moltworker/AGENTS.md` を参照する
+- Infra setup: treat `openclaw/README.md` as the primary reference
+- Moltworker / container: refer to `.moltworker/README.md` and `.moltworker/AGENTS.md`
+- **Server development**: follow `docs/development/server.md` for architecture, layer rules, and conventions

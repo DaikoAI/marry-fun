@@ -1,0 +1,388 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes logoIn {
+  0% {
+    opacity: 0;
+    transform: translateY(48px) scale(0.97);
+    filter: blur(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@keyframes marrySparkles {
+  0% {
+    background-position:
+      0% 0%,
+      40% 20%,
+      80% 60%;
+  }
+  100% {
+    background-position:
+      110% 80%,
+      -40% 70%,
+      20% -20%;
+  }
+}
+
+.marry-sparkles {
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.25) 0 1px, transparent 2px);
+  background-size:
+    220px 220px,
+    160px 160px,
+    120px 120px;
+  mix-blend-mode: screen;
+  filter: blur(0.2px);
+  animation: marrySparkles 16s linear infinite;
+}
+
+/* ── Points float animation ── */
+
+@keyframes pointsFloat {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-28px) scale(1.3);
+  }
+}
+
+/* ── Girl emotion animations ── */
+
+@keyframes girlBreathing {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes girlBounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-8px) scale(1.02);
+  }
+  50% {
+    transform: translateY(-3px) scale(1);
+  }
+}
+
+@keyframes girlEmbarrassed {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  30% {
+    transform: rotate(-3deg) translateY(-2px);
+  }
+  70% {
+    transform: rotate(2deg) translateY(-2px);
+  }
+}
+
+@keyframes girlAngry {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60% {
+    transform: translateX(4px);
+  }
+  70% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes girlSad {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
+@keyframes girlLovePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.3));
+  }
+  50% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 16px rgba(255, 105, 180, 0.6));
+  }
+}
+
+@keyframes heartFloat {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.5);
+  }
+}
+
+/* Crossfade overlay: starts opaque, fades out to reveal new image underneath */
+@keyframes crossfadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ── Emotion classes ── */
+
+.girl-emotion-default {
+  animation: girlBreathing 3s ease-in-out infinite;
+}
+
+.girl-emotion-joy {
+  animation: girlBounce 1.2s ease-in-out;
+  filter: drop-shadow(0 0 12px rgba(255, 223, 100, 0.4));
+}
+
+.girl-emotion-embarrassed {
+  animation: girlEmbarrassed 2s ease-in-out;
+  filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.4));
+}
+
+.girl-emotion-angry {
+  animation: girlAngry 0.6s ease-in-out;
+  filter: drop-shadow(0 0 10px rgba(255, 80, 80, 0.5));
+}
+
+.girl-emotion-sad {
+  animation: girlSad 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(100, 150, 255, 0.3));
+}
+
+/* ── Crossfade overlay ── */
+
+.girl-crossfade-out {
+  animation: crossfadeOut var(--crossfade-duration, 280ms) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.heart-particle {
+  position: absolute;
+  pointer-events: none;
+  animation: heartFloat 1.5s ease-out forwards;
+}
+
+/* ── Game Over animations ── */
+
+@keyframes gameOverFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes redFlash {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes gameOverTextPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
+}
+
+.game-over-overlay {
+  animation: gameOverFadeIn 600ms ease-out both;
+}
+
+.game-over-flash {
+  background: radial-gradient(ellipse at center, rgba(239, 68, 68, 0.4) 0%, transparent 70%);
+  animation: redFlash 1.5s ease-out both;
+}
+
+.game-over-text {
+  text-shadow:
+    0 0 20px rgba(239, 68, 68, 0.8),
+    0 0 40px rgba(239, 68, 68, 0.4);
+  animation: gameOverTextPulse 2s ease-in-out infinite;
+}
+
+/* ── Prologue animations ── */
+
+@keyframes prologueFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blinkCursor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes prologueTextFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes prologueTextFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.prologue-overlay {
+  animation: prologueFadeIn 600ms ease-out both;
+}
+
+.prologue-cursor {
+  animation: blinkCursor 530ms step-end infinite;
+}
+
+.prologue-waiting-text {
+  animation: prologueFadeIn 400ms ease-out both;
+}
+
+.prologue-text-enter {
+  animation: prologueTextFadeIn 300ms ease-out both;
+}
+
+.prologue-text-exit {
+  animation: prologueTextFadeOut 500ms ease-in both;
+}
+
+/* ── Motion-reduce: disable all girl animations ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .girl-emotion-default,
+  .girl-emotion-joy,
+  .girl-emotion-embarrassed,
+  .girl-emotion-angry,
+  .girl-emotion-sad,
+  .girl-crossfade-out,
+  .heart-particle,
+  [style*="pointsFloat"],
+  .game-over-overlay,
+  .game-over-flash,
+  .game-over-text,
+  .prologue-overlay,
+  .prologue-cursor,
+  .prologue-waiting-text,
+  .prologue-text-enter,
+  .prologue-text-exit {
+    animation: none !important;
+  }
+}

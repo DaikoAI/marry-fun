@@ -1,0 +1,27 @@
+{
+  "input": {
+    "helpAriaLabel": "ゲームルール",
+    "placeholder": "メッセージを入力…",
+    "inputAriaLabel": "メッセージ入力",
+    "sendAriaLabel": "送信",
+    "chatsLeft": "残り{count}回",
+    "noChatsLeft": "チャット回数を使い切りました"
+  },
+  "header": {
+    "pts": "Points",
+    "leaderboardTitle": "リーダーボード",
+    "leaderboardComingSoon": "リーダーボードは近日公開！",
+    "leaderboardClose": "閉じる"
+  },
+  "speechBubble": {
+    "typingAriaLabel": "入力中"
+  },
+  "girl": {
+    "initialGreeting": "こんにちは！話しかけてみて♪"
+  },
+  "gameOver": {
+    "title": "GAME OVER",
+    "tabooWord": "NGワード",
+    "retry": "もう一度遊ぶ"
+  }
+}

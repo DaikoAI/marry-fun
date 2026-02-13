@@ -1,0 +1,88 @@
+{
+  "name": "marry-fun",
+  "version": "0.1.0",
+  "private": true,
+  "prettier": {
+    "printWidth": 120,
+    "arrowParens": "avoid",
+    "experimentalTernaries": true,
+    "plugins": [
+      "prettier-plugin-organize-imports",
+      "@prettier/plugin-oxc",
+      "prettier-plugin-tailwindcss"
+    ]
+  },
+  "packageManager": "bun@1.3.7",
+  "engines": {
+    "node": ">=24.13.1"
+  },
+  "scripts": {
+    "dev": "bun run sync:soul && dotenvx run -- next dev --turbopack",
+    "preview": "dotenvx run -- opennextjs-cloudflare preview",
+    "build": "bun run sync:soul && dotenvx run -- next build",
+    "build:cf": "bun run sync:soul && bun run clean:opennext && dotenvx run -- opennextjs-cloudflare build",
+    "clean:opennext": "bun run scripts/clean-opennext.ts",
+    "deploy": "bun run build:cf && opennextjs-cloudflare deploy",
+    "start": "dotenvx run -- next start",
+    "format": "prettier --check . --experimental-cli --experimental-ternaries",
+    "format:fix": "prettier --write . --experimental-cli --experimental-ternaries",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "bun run sync:soul && tsgo --noEmit",
+    "test": "bun run sync:soul && vitest",
+    "test:run": "bun run sync:soul && vitest run",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "sync:soul": "bun run scripts/sync-soul-prompt.ts",
+    "split:glb": "bun run scripts/split-glb-assets.ts"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.16.4",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "next": "16.1.6",
+    "next-intl": "^4.8.2",
+    "openai": "^4.103.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "three": "^0.182.0",
+    "use-haptic": "^1.1.13",
+    "use-sound": "^5.0.0",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@dotenvx/dotenvx": "^1.52.0",
+    "@gltf-transform/core": "^4.3.0",
+    "@gltf-transform/extensions": "^4.3.0",
+    "@gltf-transform/functions": "^4.3.0",
+    "@parcel/watcher": "^2.5.6",
+    "@posaune0423/eslint-config": "^1.3.0",
+    "@prettier/plugin-oxc": "^0.1.3",
+    "@t3-oss/env-nextjs": "^0.13.10",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^20.19.33",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.182.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260211.1",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "16.1.6",
+    "prettier": "^3.8.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.64.0"
+  },
+  "ignoreScripts": [
+    "sharp",
+    "unrs-resolver"
+  ],
+  "trustedDependencies": [
+    "sharp",
+    "unrs-resolver"
+  ]
+}
