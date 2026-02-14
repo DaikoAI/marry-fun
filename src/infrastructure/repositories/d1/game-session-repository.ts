@@ -79,7 +79,7 @@ export class D1GameSessionRepository implements GameSessionRepository {
     return rows.map(row => this.toDomain(row));
   }
 
-  async updateStatus(id: string, status: string, messageCount: number): Promise<void> {
+  async updateStatus(id: string, status: GameSessionStatus, messageCount: number): Promise<void> {
     const db = await getDb();
     await db.update(gameSessions).set({ status, messageCount, updatedAt: new Date() }).where(eq(gameSessions.id, id));
   }

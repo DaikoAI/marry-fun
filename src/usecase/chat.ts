@@ -49,11 +49,25 @@ export class GameSessionUseCase {
     const activeSession = todaySessions.find(s => s.status === "active");
     if (activeSession) {
       // Resume existing active session — no greeting, just return remaining chats
+      // Re-generate NG words if cache was cleared
+      let backgroundTask: Promise<void> | undefined;
+      if (!this.ngWordCache.get(activeSession.id)) {
+        backgroundTask = this.ai
+          .generateNgWords(activeSession.id, activeSession.characterType, locale)
+          .then(rawNgWords => {
+            const ngWords = rawNgWords.map(w => new NgWord(w));
+            this.ngWordCache.set(activeSession.id, ngWords);
+          })
+          .catch((err: unknown) => {
+            logger.warn("[startGame:resume] NG word regeneration failed:", err);
+          });
+      }
       return {
         sessionId: activeSession.id,
         characterType: activeSession.characterType,
         greeting: "",
         remainingChats: activeSession.remainingChats,
+        backgroundTask,
       };
     }
 
