@@ -32,6 +32,7 @@ const config = defineConfig([
       "drizzle.config.ts",
       "next-env.d.ts",
       "eslint.config.ts",
+      ".agents/**",
       ".codex/**",
       ".moltworker/**",
       ".open-next/**",
