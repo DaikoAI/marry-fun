@@ -49,14 +49,6 @@ export async function POST(request: Request) {
     }
     const body = chatRequestSchema.parse(json);
 
-    if (body.isInit) {
-      const { response, backgroundTask } = await handleStartGame(body.username, body.locale);
-      if (backgroundTask) {
-        after(backgroundTask);
-      }
-      return NextResponse.json(chatSuccessResponseSchema.parse(response));
-    }
-
     const session = await getServerSession();
     const userId = session?.user.id;
     if (!userId) {
@@ -66,6 +58,14 @@ export async function POST(request: Request) {
           status: 401,
         },
       );
+    }
+
+    if (body.isInit) {
+      const { response, backgroundTask } = await handleStartGame(userId, body.username, body.locale);
+      if (backgroundTask) {
+        after(backgroundTask);
+      }
+      return NextResponse.json(chatSuccessResponseSchema.parse(response));
     }
 
     const response = await handleSendMessage(body.sessionId, body.message, body.locale);
