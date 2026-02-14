@@ -1,6 +1,9 @@
 pre-commit:
   parallel: true
   commands:
+    check-author:
+      run: ./scripts/check-commit-author.sh
+      stage_fixed: false
     format:
       run: bun run format
     lint:
