@@ -120,6 +120,7 @@ export class GameSessionUseCase {
         hitNgWord.word,
         locale,
       );
+      session.incrementMessageCount();
       session.markGameOver();
       await this.repo.updateStatus(sessionId, session.status, session.messageCount);
       this.ngWordCache.delete(sessionId);
