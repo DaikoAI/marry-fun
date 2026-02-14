@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="public/logo.png" alt="marry.fun" width="320" />
+  <img src="public/logo.png" alt="marry.fun" width="240" />
+</p>
+
+<p align="center">
+  <img src="public/girl/default.png" alt="Claw-chan" width="360" />
 </p>
 
 <p align="center" style="font-size: 1.2em">
