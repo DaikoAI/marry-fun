@@ -12,12 +12,16 @@ set -euo pipefail
 
 [[ "${COMMIT_AUTHOR_CHECK:-1}" == "0" ]] && exit 0
 
-# Allowed coding agent emails (exact or suffix *@domain)
+# Allowed coding agent emails (exact match or suffix *suffix)
+# cursor: *@cursor.com | claude: *@anthropic.com | devin: *[bot]@users.noreply.github.com | coderabbit: *@coderabbit.ai
 readonly AGENT_EMAILS=(
   noreply@anthropic.com
+  noreply@cursor.com
   cursoragent@cursor.com
+  agent@cursor.com
   "*devin-ai-integration[bot]@users.noreply.github.com"
   "*[bot]@users.noreply.github.com"
+  "*cursoragent@users.noreply.github.com"
   "*@cursor.com"
   "*@anthropic.com"
   "*@coderabbit.ai"

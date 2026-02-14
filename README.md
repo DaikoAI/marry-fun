@@ -1,14 +1,14 @@
-<p align="center">
-  <img src="public/logo.png" alt="marry.fun" width="240" />
-</p>
-
-<p align="center">
+<p align="center" style="line-height: 0.5; margin-bottom: 0.5em">
+  <img src="public/logo.png" alt="marry.fun" width="240" /><br/>
   <img src="public/girl/default.png" alt="Claw-chan" width="360" />
 </p>
 
 <p align="center" style="font-size: 1.2em">
-  <a href="https://x.com/Marrydotfun"><img src="https://img.shields.io/badge/X-@Marrydotfun-000000?style=for-the-badge&logo=x&logoColor=white" alt="X @Marrydotfun" height="28" /></a><br/>
-  <a href="https://colosseum.com/agent-hackathon/projects/marry-fun"><img src="https://preview.redd.it/colosseum-introduces-solanas-first-hackathon-for-ai-agents-v0-vqtgfsfck5hg1.png?width=680&format=png&auto=webp&s=cafd1d53d828fd9a25491993491302f2ba79c92e" alt="Colosseum Agent Hackathon" height="50" /></a>
+  <a href="https://marry.fun"><img src="https://img.shields.io/badge/Live_Demo-marry.fun-00C851?style=for-the-badge" alt="Live Demo" height="28" style="vertical-align: middle" /></a>
+  &nbsp;
+  <a href="https://x.com/Marrydotfun"><img src="https://img.shields.io/badge/X-@Marrydotfun-000000?style=for-the-badge&logo=x&logoColor=white" alt="X @Marrydotfun" height="28" style="vertical-align: middle" /></a>
+  &nbsp;
+  <a href="https://colosseum.com/agent-hackathon/projects/marry-fun"><img src="https://preview.redd.it/colosseum-introduces-solanas-first-hackathon-for-ai-agents-v0-vqtgfsfck5hg1.png?width=680&format=png&auto=webp&s=cafd1d53d828fd9a25491993491302f2ba79c92e" alt="Colosseum Agent Hackathon" height="36" style="vertical-align: middle" /></a>
 </p>
 
 ## About
