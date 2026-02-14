@@ -44,6 +44,7 @@ export function StartPageClient() {
   const [phase, setPhase] = useState<"form" | "prologue">("form");
   const [hasInitResponse, setHasInitResponse] = useState(false);
   const [initError, setInitError] = useState(false);
+  const [gameOverBlocked, setGameOverBlocked] = useState(false);
   const t = useTranslations("start");
   const locale = useLocale();
 
@@ -77,7 +78,7 @@ export function StartPageClient() {
     isWalletAuthenticated,
     requiresUsername: isWalletAuthenticated && !hasStoredUsername,
   });
-  const canStart = isValid && isWalletAuthenticated && !isSubmitting && phase === "form";
+  const canStart = isValid && isWalletAuthenticated && !isSubmitting && phase === "form" && !gameOverBlocked;
   const canSubmitUsername = isValid && onboardingStep === "name" && !isSavingUsername;
   const canSkipPrologue = shouldShowPrologueSkip({ phase, hasInitResponse });
 
@@ -86,7 +87,10 @@ export function StartPageClient() {
     store.resetGame();
     store.setUsername(effectiveUsername);
     store.setSessionId(result.sessionId);
-    store.addMessage({ role: "girl", content: result.greeting.content });
+    store.setRemainingChats(result.remainingChats);
+    if (result.greeting.content) {
+      store.addMessage({ role: "girl", content: result.greeting.content });
+    }
     router.push("/chat");
   };
 
@@ -108,7 +112,13 @@ export function StartPageClient() {
         const { initGameSession } = await import("@/lib/girl-chat");
         apiResultRef.current = await initGameSession(nameToUse, locale);
         setHasInitResponse(true);
-      } catch {
+      } catch (err) {
+        if ((err as Error & { code?: string }).code === "GAME_OVER_BLOCKED") {
+          setGameOverBlocked(true);
+          setIsSubmitting(false);
+          setPhase("form");
+          return;
+        }
         apiErrorRef.current = true;
         setHasInitResponse(false);
       }
@@ -248,6 +258,11 @@ export function StartPageClient() {
           {onboardingStep === "wallet" && <SolanaAuthPanel variant="onboarding" />}
           {onboardingStep === "start" && (
             <>
+              {gameOverBlocked && (
+                <p className="text-sm text-red-200" role="alert">
+                  {t("gameOverBlocked")}
+                </p>
+              )}
               {initError && (
                 <p className="text-sm text-red-200" role="alert">
                   {t("initError")}
