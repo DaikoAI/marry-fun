@@ -7,7 +7,7 @@ private projects.  It is intended to be used as part of the
 `scrapbox-private-pages` skill.  See the `SKILL.md` file in the
 parent directory for usage instructions.
 
-The functions defined here wrap the internal REST‑style APIs exposed
+The functions defined here wrap the internal REST-style APIs exposed
 by Scrapbox and hide the details of authentication and URL encoding.
 
 **Important notes**
@@ -15,20 +15,18 @@ by Scrapbox and hide the details of authentication and URL encoding.
 1. These functions require a valid `connect.sid` cookie when the target
    project is private.  You can retrieve the value of this cookie
    manually from your browser via the developer tools (Application
-   → Cookies → `https://scrapbox.io` → `connect.sid`).  Do not commit
+   -> Cookies -> `https://scrapbox.io` -> `connect.sid`).  Do not commit
    the cookie to version control.
-2. Cosense officially documents read‑only REST endpoints for listing
-   pages and fetching their content【262805452486776†L8-L29】.  Page
-   creation is not provided as a traditional REST API.  Instead the
-   Scrapbox UI accepts a URL of the form
-   ``/projectName/pageTitle?body=encodedBody`` to create a new page
-   with the provided content【816266854850144†L52-L64】.  The
-   ``create_page`` function below automates this by issuing a GET
-   request to that URL with your session cookie attached.  It will
-   succeed only when the cookie represents a logged‑in user.
+2. Cosense officially documents read-only REST endpoints for listing
+   pages and fetching their content.  Page creation is not provided as
+   a traditional REST API.  The ``create_page`` function below uses
+   the ``/api/page-data/import/{project}.json`` endpoint, which accepts
+   a multipart file upload containing a JSON payload with pages and
+   their lines.  This requires a valid ``connect.sid`` cookie **and**
+   a CSRF token, which is obtained automatically from ``/api/users/me``.
 
 The functions defined here are deliberately simple so that they can
-serve as building blocks for higher‑level workflows.  They return
+serve as building blocks for higher-level workflows.  They return
 Python dictionaries rather than bespoke classes, making them easy to
 serialize to JSON if necessary.
 """
@@ -46,25 +44,42 @@ logger = logging.getLogger(__name__)
 
 
 def _build_base_headers(sid_cookie: Optional[str] = None) -> Dict[str, str]:
-    """Return a headers dictionary with the cookie when provided.
-
-    Args:
-        sid_cookie: The value of the `connect.sid` cookie (decoded).  If
-            supplied, the cookie is added to the request headers.  If
-            None, no Cookie header is set – only public projects can be
-            accessed in this case.
-
-    Returns:
-        A dictionary of HTTP headers.
-    """
+    """Return a headers dictionary with the cookie when provided."""
     headers: Dict[str, str] = {
         "User-Agent": "scrapbox-private-pages/1.0 (+https://scrapbox.io)"
     }
     if sid_cookie:
-        # Note: The cookie name must be "connect.sid" exactly.  The
-        # cookie value should not be URL‑encoded.
         headers["Cookie"] = f"connect.sid={sid_cookie}"
     return headers
+
+
+def _get_csrf_token(sid_cookie: str) -> str:
+    """Fetch the CSRF token from /api/users/me.
+
+    The Scrapbox import API requires a CSRF token sent via the
+    ``X-CSRF-TOKEN`` header.  This token is available in the
+    ``csrfToken`` field of the ``/api/users/me`` response.
+
+    Args:
+        sid_cookie: A valid ``connect.sid`` cookie.
+
+    Returns:
+        The CSRF token string.
+
+    Raises:
+        RuntimeError: If the token cannot be retrieved.
+    """
+    headers = _build_base_headers(sid_cookie)
+    resp = requests.get("https://scrapbox.io/api/users/me", headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+    token = data.get("csrfToken")
+    if not token:
+        raise RuntimeError(
+            "Could not retrieve CSRF token from /api/users/me. "
+            "Is the connect.sid cookie valid?"
+        )
+    return token
 
 
 def list_pages(
@@ -75,21 +90,15 @@ def list_pages(
 ) -> Dict[str, Any]:
     """Fetch a list of pages from a Scrapbox project.
 
-    This function calls the documented REST endpoint
-    ``/api/pages/:projectName``【262805452486776†L8-L29】.  For public
-    projects a cookie is not required.  For private projects you must
-    pass a valid `sid_cookie` obtained from your browser.
-
     Args:
         project_name: The name of the Scrapbox project to query.
         sid_cookie: Optional `connect.sid` cookie for authentication.
         skip: How many pages to skip (default 0).
-        limit: How many pages to fetch (default 100).  The server
-            defaults to 100 and may cap the value.
+        limit: How many pages to fetch (default 100).
 
     Returns:
         The parsed JSON response from Scrapbox.  On success the
-        top‑level keys include ``count`` and ``pages`` where
+        top-level keys include ``count`` and ``pages`` where
         ``pages`` is a list of page metadata dictionaries.
     """
     base_url = f"https://scrapbox.io/api/pages/{project_name}"
@@ -109,22 +118,15 @@ def get_page(
 ) -> Dict[str, Any]:
     """Retrieve metadata and optionally the full text of a Scrapbox page.
 
-    This function calls ``/api/pages/:projectName/:pageTitle``
-    to fetch page metadata【262805452486776†L8-L29】.  If ``include_text``
-    is True it also calls ``/api/pages/:projectName/:pageTitle/text``
-    to fetch the page body and attaches it to the returned dictionary.
-
     Args:
         project_name: Name of the project.
-        page_title: Title of the page to retrieve.  Spaces are allowed
-            and will be URL‑encoded automatically.
+        page_title: Title of the page to retrieve.
         sid_cookie: Optional `connect.sid` cookie for authentication.
         include_text: Whether to fetch the page body as plain text.
 
     Returns:
         A dictionary with the keys ``meta`` containing metadata and
-        optionally ``text`` containing the page body.  If the page is
-        not found a ``requests.HTTPError`` is raised.
+        optionally ``text`` containing the page body.
     """
     import urllib.parse as _urlparse
 
@@ -151,68 +153,74 @@ def create_page(
     body: str = "",
     sid_cookie: str | None = None,
 ) -> Dict[str, Any]:
-    """Create a new page in a Scrapbox project.
+    """Create a new page in a Scrapbox project via the import API.
 
-    Scrapbox does not expose a conventional REST endpoint for creating
-    pages.  Instead, the web UI interprets a URL of the form
-    ``/projectName/pageTitle?body=encodedBody``【816266854850144†L52-L64】
-    and creates the page automatically.  This helper function
-    programmatically calls that URL.  For private projects you must
-    provide a valid ``sid_cookie``.
+    Uses the ``/api/page-data/import/{project}.json`` endpoint with
+    multipart file upload.  This is the reliable server-side method
+    for creating pages with content.  The old ``?body=`` GET approach
+    only works in a browser context and does not write the body when
+    called from a plain HTTP client.
 
-    The body text can include newlines (``\n``) and should be plain
-    Scrapbox markup.  The helper function will URL‑encode the title and
-    body.  If the page already exists the body will be appended to the
-    existing page【816266854850144†L54-L58】.
+    The body text can include newlines (``\\n``) and should be plain
+    Scrapbox markup.  If the page already exists, the content will be
+    merged/appended by Scrapbox.
 
     Args:
         project_name: Target project name.
-        title: Title of the new page.  It may contain spaces and
-            punctuation.
+        title: Title of the new page.
         body: Optional body text (Scrapbox markup).  Defaults to empty.
         sid_cookie: `connect.sid` cookie for authentication; required
             when creating pages in private projects.
 
     Returns:
-        A dictionary containing the URL used and the HTTP status
-        returned.  On success, Scrapbox typically responds with a 200
-        and returns HTML content.  The caller may ignore the body,
-        since the page creation side effect is what matters.
-
-    Warning:
-        This method relies on undocumented behaviour.  Cosense/Scrapbox
-        may change the mechanism without notice.  For more robust
-        integration consider running the open‑source ``scrapbox-
-        cosense-mcp`` server which exposes tool functions such as
-        ``create_page`` via WebSockets【334427009481422†L684-L690】.
+        A dictionary containing the ``message`` from Scrapbox and
+        the HTTP ``status`` code.
     """
-    import urllib.parse as _urlparse
-
     if not sid_cookie:
         raise ValueError(
-            "A valid connect.sid cookie is required to create pages in "
-            "private projects.  Obtain the cookie from your browser's "
-            "developer tools."
+            "A valid connect.sid cookie is required to create pages. "
+            "Obtain the cookie from your browser's developer tools."
         )
 
-    encoded_title = _urlparse.quote(title)
-    encoded_body = _urlparse.quote(body)
-    url = f"https://scrapbox.io/{project_name}/{encoded_title}?body={encoded_body}"
+    csrf_token = _get_csrf_token(sid_cookie)
+
+    # Build the lines array: first line is always the title
+    lines = [title]
+    if body:
+        lines.extend(body.split("\n"))
+
+    import_data = {
+        "pages": [
+            {
+                "title": title,
+                "lines": lines,
+            }
+        ]
+    }
+
     headers = _build_base_headers(sid_cookie)
-    logger.debug("Creating page via GET %s", url)
-    resp = requests.get(url, headers=headers)
+    headers["X-CSRF-TOKEN"] = csrf_token
+
+    json_str = json.dumps(import_data, ensure_ascii=False)
+    files = {
+        "import-file": ("import.json", json_str, "application/json"),
+    }
+
+    url = f"https://scrapbox.io/api/page-data/import/{project_name}.json"
+    logger.debug("Creating page via import API: %s", url)
+    resp = requests.post(url, headers=headers, files=files)
     resp.raise_for_status()
-    return {"url": url, "status": resp.status_code}
+
+    return {"message": resp.json().get("message", ""), "status": resp.status_code}
 
 
 def main() -> None:
     """Small command line utility for manual testing.
 
-    You can run this module as a script to list pages or create a new
-    page.  It reads the `SCRAPBOX_PROJECT`, `SCRAPBOX_TITLE`,
-    `SCRAPBOX_BODY`, and `SCRAPBOX_SID` environment variables.  If
-    ``SCRAPBOX_TITLE`` is provided it will create a new page; otherwise
-    it will list the first 10 pages of the project.
+    Reads `SCRAPBOX_PROJECT`, `SCRAPBOX_TITLE`, `SCRAPBOX_BODY`, and
+    `SCRAPBOX_SID` environment variables.  If ``SCRAPBOX_TITLE`` is
+    provided it will create a new page; otherwise it will list the
+    first 10 pages of the project.
     """
     project = os.environ.get("SCRAPBOX_PROJECT")
     title = os.environ.get("SCRAPBOX_TITLE")
