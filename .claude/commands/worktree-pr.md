@@ -133,52 +133,7 @@ rm -f /tmp/worktree-pr.patch /tmp/worktree-pr-untracked.tar.gz
 
 ### 4. Commit in Logical Groups
 
-Based on the analysis from Step 2, commit changes in logical groups.
-
-#### Commit Message Format
-
-```
-${emoji} ${type}(${scope}): ${summary}
-
-- ${change_detail_1}
-- ${change_detail_2}
-```
-
-#### Type → Emoji Mapping
-
-| type     | emoji | usage                       |
-| -------- | ----- | --------------------------- |
-| chore    | 🍱    | config, dependencies, build |
-| docs     | 📝    | documentation               |
-| style    | 💄    | formatting, UI              |
-| refactor | ♻️    | refactoring                 |
-| perf     | 🚀    | performance improvement     |
-| feat     | ✨    | new feature                 |
-| fix      | 🐛    | bug fix                     |
-| test     | 💚    | tests                       |
-
-#### Commit Order
-
-`chore → docs → style → refactor → perf → feat → fix → test`
-
-#### Commit Commands
-
-```bash
-git add -A -- ${file1} ${file2} ${fileN}
-git commit --no-verify --no-gpg-sign -m "${emoji} ${type}(${scope}): ${summary}" -m "- ${detail1}\n- ${detail2}"
-```
-
-#### Scope Guidelines
-
-- `db` — packages/db/\*\* (schema, migrations)
-- `api` or `server` — apps/server/\*\*
-- `web` — apps/web/\*\*
-- `ext` — apps/chrome-extension/\*\*
-- `bot` — apps/telegram-bot/\*\*
-- `dsl` — packages/conditions-dsl/\*\*
-- `infra` — docker/\*\*, .github/\*\*, docker-compose.yaml, turbo.json
-- `deps` — package.json, bun.lock
-- When changes span multiple scopes: pick the most impactful scope, or use `core`
+Based on the analysis from Step 2, commit changes in logical groups. **Follow `.cursor/rules/commit-style.mdc`** for format, type/emoji, order, scope, and commands.
 
 ### 5. Push
 
