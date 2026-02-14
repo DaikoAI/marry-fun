@@ -27,6 +27,18 @@ readonly AGENT_EMAILS=(
   "*@coderabbit.ai"
 )
 
+# Allowed coding agent names / account IDs (case-insensitive, exact or *suffix)
+readonly AGENT_NAMES=(
+  cursoragent
+  cursor
+  claude
+  devin
+  coderabbit
+  "github-actions[bot]"
+  "*-ai-integration[bot]"
+  "*[bot]"
+)
+
 MODE="${COMMIT_AUTHOR_CHECK_MODE:-block}"
 
 AUTHOR_NAME="${GIT_AUTHOR_NAME:-$(git config user.name 2>/dev/null || true)}"
@@ -38,8 +50,9 @@ if [[ -z "$AUTHOR_EMAIL" ]]; then
 fi
 
 AUTHOR_EMAIL_LC="$(echo "$AUTHOR_EMAIL" | tr '[:upper:]' '[:lower:]')"
+AUTHOR_NAME_LC="$(echo "$AUTHOR_NAME" | tr '[:upper:]' '[:lower:]')"
 
-is_agent_author() {
+is_agent_email() {
   local pattern
   for pattern in "${AGENT_EMAILS[@]}"; do
     pattern="$(echo "$pattern" | tr '[:upper:]' '[:lower:]')"
@@ -53,7 +66,21 @@ is_agent_author() {
   return 1
 }
 
-if is_agent_author; then
+is_agent_name() {
+  local pattern
+  for pattern in "${AGENT_NAMES[@]}"; do
+    pattern="$(echo "$pattern" | tr '[:upper:]' '[:lower:]')"
+    if [[ "$pattern" == \** ]]; then
+      local suffix="${pattern#\*}"
+      [[ "$AUTHOR_NAME_LC" == *"$suffix" ]] && return 0
+    elif [[ "$AUTHOR_NAME_LC" == "$pattern" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+if is_agent_email || is_agent_name; then
   exit 0
 fi
 
