@@ -217,15 +217,15 @@ erDiagram
 
 ### `game_sessions`
 
-| Column           | Type                    | NULL | PK  | FK        | Index/Constraint                                                          |
-| ---------------- | ----------------------- | ---- | --- | --------- | ------------------------------------------------------------------------- |
-| `id`             | `text`                  | NO   | YES | -         | -                                                                         |
-| `user_id`        | `text`                  | NO   | -   | `user.id` | `INDEX game_sessions_user_idx`                                            |
-| `character_type` | `text`                  | NO   | -   | -         | -                                                                         |
+| Column           | Type                    | NULL | PK  | FK        | Index/Constraint                                                                         |
+| ---------------- | ----------------------- | ---- | --- | --------- | ---------------------------------------------------------------------------------------- |
+| `id`             | `text`                  | NO   | YES | -         | -                                                                                        |
+| `user_id`        | `text`                  | NO   | -   | `user.id` | `INDEX game_sessions_user_idx`                                                           |
+| `character_type` | `text`                  | NO   | -   | -         | -                                                                                        |
 | `status`         | `text`                  | NO   | -   | -         | `DEFAULT 'active'`, `CHECK game_sessions_status_valid`, `INDEX game_sessions_status_idx` |
-| `message_count`  | `integer`               | NO   | -   | -         | `DEFAULT 0`                                                               |
-| `created_at`     | `integer(timestamp_ms)` | NO   | -   | -         | `INDEX game_sessions_user_created_idx`                                    |
-| `updated_at`     | `integer(timestamp_ms)` | NO   | -   | -         | -                                                                         |
+| `message_count`  | `integer`               | NO   | -   | -         | `DEFAULT 0`                                                                              |
+| `created_at`     | `integer(timestamp_ms)` | NO   | -   | -         | `INDEX game_sessions_user_created_idx`                                                   |
+| `updated_at`     | `integer(timestamp_ms)` | NO   | -   | -         | -                                                                                        |
 
 ### `user_point_balance`
 
