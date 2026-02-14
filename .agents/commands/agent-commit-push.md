@@ -17,10 +17,12 @@ For each group, commit with your agent identity:
 
 ```bash
 git add -A -- ${file1} ${file2} ${fileN}
-GIT_AUTHOR_NAME="Cursor" GIT_AUTHOR_EMAIL="noreply@cursor.com" GIT_COMMITTER_NAME="Cursor" GIT_COMMITTER_EMAIL="noreply@cursor.com" git commit -m "${commit_title}" -m "${commit_body}"
+GIT_AUTHOR_NAME="Cursor Agent" GIT_AUTHOR_EMAIL="cursoragent@cursor.com" GIT_COMMITTER_NAME="Cursor Agent" GIT_COMMITTER_EMAIL="cursoragent@cursor.com" git commit -m "${commit_title}" -m "${commit_body}"
 ```
 
-Other agents: Claude `noreply@anthropic.com`, Devin `devin-ai-integration[bot]@users.noreply.github.com`, CodeRabbit `*@coderabbit.ai`. Must match `scripts/check-commit-author.sh` allowlist.
+Other agents: Claude `noreply@anthropic.com`, Devin `devin-ai-integration[bot]@users.noreply.github.com`, CodeRabbit `*@coderabbit.ai`.
+
+> **Important**: Cursor agents MUST use `cursoragent@cursor.com` (NOT `noreply@cursor.com`). The `noreply@cursor.com` email is not linked to any GitHub account, causing GitHub to attribute the commit to the human who pushed it.
 
 ### 3. Push
 
