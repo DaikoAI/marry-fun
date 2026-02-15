@@ -59,3 +59,5 @@ src/lib/soul-prompt.generated.ts
 
 # archived 3d assets (large GLBs)
 public/3d/girl/archive/
+
+.cursor/*.log
