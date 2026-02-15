@@ -18,6 +18,9 @@ Next.js App Router をベースとした SPA/SSR ハイブリッド。Cloudflare
 - **zustand**: クライアント状態管理
 - **use-sound**: オーディオ再生（BGM ループ）
 - **Tailwind CSS 4**: スタイリング
+- **better-auth + Solana Web3**: ウォレット認証（Web3 サインアップ）
+- **Drizzle + Cloudflare D1**: ORM と SQLite 互換 DB
+- **Moltworker + OpenClaw**: AI チャット（Anthropic API 経由）
 
 ## Development Standards
 
@@ -30,6 +33,7 @@ Next.js App Router をベースとした SPA/SSR ハイブリッド。Cloudflare
 
 - ESLint: `@posaune0423/eslint-config` + Next.js plugin
 - Prettier: organize-imports, OXC, Tailwind プラグイン
+- React Compiler: `babel-plugin-react-compiler` による自動最適化
 
 ### Environment Variables
 
@@ -58,7 +62,10 @@ Next.js App Router をベースとした SPA/SSR ハイブリッド。Cloudflare
 - **OpenNext + Cloudflare**: Next.js を Workers 上で動かすため OpenNext を使用
 - **localePrefix: "always"**: URL に常にロケールを含める方針
 - **Zustand**: チャット・ゲーム状態をシンプルに管理
+- **Clean Architecture**: domain → usecase → interfaces/infrastructure の依存方向（`docs/development/server.md` 準拠）
 
 ---
 
 _Document standards and patterns, not every dependency_
+
+<!-- updated_at: 2025-02-14 | Sync: Drizzle/D1, better-auth/Solana, Moltworker, React Compiler, Clean Architecture -->

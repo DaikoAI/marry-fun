@@ -3,6 +3,7 @@
 対象スキーマ:
 
 - `src/infrastructure/db/schema/auth.ts`
+- `src/infrastructure/db/schema/game-session.ts`
 - `src/infrastructure/db/schema/message.ts`
 - `src/infrastructure/db/schema/point.ts`
 
@@ -10,7 +11,7 @@
 
 - 以下は `better-auth` の基本テーブルです: `user`, `session`, `account`, `verification`
 - `walletAddress` は `better-auth-web3` の default schema テーブルです（Mermaid 図では `wallet_address` 表記）
-- 以下はアプリ独自テーブルです: `messages`, `user_point_balance`, `point_transaction`
+- 以下はアプリ独自テーブルです: `game_sessions`, `messages`, `user_point_balance`, `point_transaction`
 - `user.email` はアプリ表示用ではなく、`better-auth` / `better-auth-web3` の内部互換のため保持します（削除しない）
 
 ### `better-auth-web3` 運用ルール（重要）
@@ -22,10 +23,23 @@
 
 ### チャット保存ルール（重要）
 
-- `POST /api/chat` は `isInit:false` の場合のみ認証必須（未ログインは `401`）
+- `POST /api/chat` は `isInit` / `isInit:false` の両方で認証必須（未ログインは `401`）
+- `isInit:true` の成功時、`game_sessions` に新規レコードを作成する（同日の active セッションがあれば resume）
+- `isInit:true` で同日に `game_over` セッションがある場合は `403 GAME_OVER_BLOCKED` を返す
 - `isInit:false` の成功時、`messages` に user/ai の2行を保存する
+- `isInit:false` で `session.canChat` が false の場合は `403 CHAT_LIMIT_EXCEEDED` を返す
 - `type: "message"` の場合、`point_transaction` に `reason="chat"` で加算記録する
 - `messages` / `point` のDB保存失敗時はチャット応答を継続し、サーバーログへ出力する
+
+### ゲームセッション管理ルール（重要）
+
+- 各セッションは最大20メッセージ（`MAX_CHATS_PER_SESSION`）
+- メッセージ処理時はまず `game_sessions.message_count` をインクリメントしてから NG ワード判定を行う
+- NGワードヒット時は `status = 'game_over'` を設定し、これは `MAX_CHATS_PER_SESSION` 到達による `status = 'completed'` より優先する
+- NGワード非ヒット時のみ、`game_sessions.message_count >= MAX_CHATS_PER_SESSION` なら `status = 'completed'`
+- `status = 'game_over'` になった同日は新規セッション開始不可
+- NGワードは `game_sessions` テーブルには保存せず、in-memory キャッシュ（`NgWordCache`）で管理
+- 日付境界は UTC 基準
 
 ## ER図
 
@@ -103,6 +117,16 @@ erDiagram
         timestamp_ms created_at "point_transaction_created_at_idx"
     }
 
+    game_sessions {
+        text id PK
+        text user_id FK "game_sessions_user_idx"
+        text character_type
+        text status "CHECK: status in (active, completed, game_over)"
+        int message_count "DEFAULT 0"
+        timestamp_ms created_at "game_sessions_user_created_idx"
+        timestamp_ms updated_at
+    }
+
     messages {
         text id PK
         text user_id FK "messages_user_idx"
@@ -120,6 +144,7 @@ erDiagram
     account ||--o{ wallet_address : accountId
     user ||--o| user_point_balance : user_id
     user ||--o{ point_transaction : user_id
+    user ||--o{ game_sessions : user_id
     user ||--o{ messages : user_id
 ```
 
@@ -192,6 +217,18 @@ erDiagram
 | `isPrimary` | `integer(boolean)`      | NO   | -   | -            | `DEFAULT false`                    |
 | `createdAt` | `integer(timestamp_ms)` | NO   | -   | -            | -                                  |
 
+### `game_sessions`
+
+| Column           | Type                    | NULL | PK  | FK        | Index/Constraint                                                                         |
+| ---------------- | ----------------------- | ---- | --- | --------- | ---------------------------------------------------------------------------------------- |
+| `id`             | `text`                  | NO   | YES | -         | -                                                                                        |
+| `user_id`        | `text`                  | NO   | -   | `user.id` | `INDEX game_sessions_user_idx`                                                           |
+| `character_type` | `text`                  | NO   | -   | -         | -                                                                                        |
+| `status`         | `text`                  | NO   | -   | -         | `DEFAULT 'active'`, `CHECK game_sessions_status_valid`, `INDEX game_sessions_status_idx` |
+| `message_count`  | `integer`               | NO   | -   | -         | `DEFAULT 0`                                                                              |
+| `created_at`     | `integer(timestamp_ms)` | NO   | -   | -         | `INDEX game_sessions_user_created_idx`                                                   |
+| `updated_at`     | `integer(timestamp_ms)` | NO   | -   | -         | -                                                                                        |
+
 ### `user_point_balance`
 
 | Column       | Type                    | NULL | PK  | FK        | Index/Constraint |
@@ -236,6 +273,9 @@ erDiagram
 | `verification`      | `verification_identifier_idx`              | INDEX  | `identifier`                          |
 | `walletAddress`     | `wallet_address_unique`                    | UNIQUE | `address`, `type`, `chainId`          |
 | `walletAddress`     | `wallet_address_user_id_idx`               | INDEX  | `userId`                              |
+| `game_sessions`     | `game_sessions_user_idx`                   | INDEX  | `user_id`                             |
+| `game_sessions`     | `game_sessions_user_created_idx`           | INDEX  | `user_id`, `created_at`               |
+| `game_sessions`     | `game_sessions_status_idx`                 | INDEX  | `status`                              |
 | `messages`          | `messages_user_idx`                        | INDEX  | `user_id`                             |
 | `messages`          | `messages_session_idx`                     | INDEX  | `session_id`                          |
 | `messages`          | `messages_created_at_idx`                  | INDEX  | `created_at`                          |

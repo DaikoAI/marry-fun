@@ -7,6 +7,7 @@ export interface InitGameResult {
   sessionId: string;
   characterType: string;
   greeting: GirlResponse;
+  remainingChats: number;
 }
 
 const INIT_SESSION_TIMEOUT_MS = 60_000;
@@ -31,7 +32,15 @@ export async function initGameSession(username: string, locale: string): Promise
 }
 
 async function parseInitResponse(res: Response): Promise<InitGameResult> {
-  if (!res.ok) throw new Error("Failed to initialize game session");
+  if (!res.ok) {
+    const json: unknown = await res.json().catch(() => null);
+    const error = json as { code?: string } | null;
+    const err = new Error("Failed to initialize game session");
+    if (error?.code) {
+      (err as Error & { code?: string }).code = error.code;
+    }
+    throw err;
+  }
 
   const json: unknown = await res.json();
   const parsed = startResponseSchema.parse(json);
@@ -43,6 +52,7 @@ async function parseInitResponse(res: Response): Promise<InitGameResult> {
       points: 0,
       emotion: "joy",
     },
+    remainingChats: parsed.remainingChats,
   };
 }
 
@@ -52,6 +62,7 @@ export interface ExtendedGirlResponse extends GirlResponse {
   balance?: number;
   isGameOver?: boolean;
   hitWord?: string;
+  remainingChats: number;
 }
 
 export async function fetchGirlResponse(
@@ -85,6 +96,7 @@ export async function fetchGirlResponse(
       emotion: "sad",
       isGameOver: true,
       hitWord: gameOver.data.hitWord,
+      remainingChats: 0,
     };
   }
 
@@ -95,5 +107,6 @@ export async function fetchGirlResponse(
     points: message.score.adjusted,
     balance: message.balance,
     emotion: message.emotion,
+    remainingChats: message.remainingChats,
   };
 }

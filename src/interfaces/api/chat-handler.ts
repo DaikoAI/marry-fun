@@ -12,14 +12,19 @@ export interface StartGameHandlerResult {
 type MessageResponseWithoutBalance = Omit<MessageResponse, "balance">;
 type SendMessageHandlerResponse = MessageResponseWithoutBalance | GameOverResponse;
 
-export async function handleStartGame(username: string, locale: Locale): Promise<StartGameHandlerResult> {
-  const result = await gameSessionUseCase.startGame(username, locale);
+export async function handleStartGame(
+  userId: string,
+  username: string,
+  locale: Locale,
+): Promise<StartGameHandlerResult> {
+  const result = await gameSessionUseCase.startGame(userId, username, locale);
   return {
     response: {
       type: "start",
       sessionId: result.sessionId,
       characterType: result.characterType,
       greeting: result.greeting,
+      remainingChats: result.remainingChats,
     },
     backgroundTask: result.backgroundTask,
   };
@@ -37,6 +42,7 @@ export async function handleSendMessage(
       type: "game_over",
       reply: result.reply,
       hitWord: result.hitWord,
+      remainingChats: 0,
     };
   }
 
@@ -56,5 +62,6 @@ export async function handleSendMessage(
       adjusted: result.score.adjusted,
     },
     emotion,
+    remainingChats: result.remainingChats,
   };
 }

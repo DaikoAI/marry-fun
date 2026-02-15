@@ -37,6 +37,7 @@ export const startResponseSchema = z.object({
   sessionId: z.string().uuid(),
   characterType: z.enum(CHARACTER_TYPES),
   greeting: z.string(),
+  remainingChats: z.number().int().min(0),
 });
 
 export const messageResponseSchema = z.object({
@@ -48,12 +49,14 @@ export const messageResponseSchema = z.object({
   }),
   balance: z.number().int(),
   emotion: z.enum(EMOTIONS),
+  remainingChats: z.number().int().min(0),
 });
 
 export const gameOverResponseSchema = z.object({
   type: z.literal("game_over"),
   reply: z.string(),
   hitWord: z.string().min(1),
+  remainingChats: z.literal(0),
 });
 
 export const errorResponseSchema = z.object({

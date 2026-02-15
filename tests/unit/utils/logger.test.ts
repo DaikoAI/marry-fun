@@ -58,4 +58,25 @@ describe("logger (logger.ts)", () => {
     expect(logSpy).toHaveBeenCalledTimes(1);
     expect(infoSpy).toHaveBeenCalledTimes(1);
   });
+
+  it("LOG_LEVEL=DEBUG のとき debug/info/warn/error を出力する", async () => {
+    vi.stubEnv("LOG_LEVEL", "DEBUG");
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const { logger } = await import("@/utils/logger");
+
+    logger.debug("debug");
+    logger.info("info");
+    logger.warn("warn");
+    logger.error("error");
+
+    expect(logSpy).toHaveBeenCalledTimes(1);
+    expect(infoSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+  });
 });
