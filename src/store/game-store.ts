@@ -36,7 +36,7 @@ interface GameActions {
   setGirlTyping: (isTyping: boolean) => void;
   setEmotion: (emotion: Emotion) => void;
   setHasSeenGoalPopup: (value: boolean) => void;
-  decrementRemainingChats: () => void;
+  setRemainingChats: (count: number) => void;
   setGameOver: (hitWord: string, shockMessage?: string) => void;
   clearLastPoints: () => void;
   resetGame: () => void;
@@ -106,8 +106,8 @@ export const useGameStore = create<GameState & GameActions>()(set => ({
     set({ hasSeenGoalPopup });
   },
 
-  decrementRemainingChats: () => {
-    set(state => ({ remainingChats: Math.max(0, state.remainingChats - 1) }));
+  setRemainingChats: (count: number) => {
+    set({ remainingChats: count });
   },
 
   setGameOver: (hitWord, shockMessage) => {

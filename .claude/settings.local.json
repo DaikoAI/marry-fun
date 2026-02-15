@@ -8,7 +8,28 @@
       "Bash(git gc:*)",
       "Bash(git push:*)",
       "Bash(git add:*)",
-      "Bash(GIT_AUTHOR_NAME=\"Claude\" GIT_AUTHOR_EMAIL=\"noreply@anthropic.com\" GIT_COMMITTER_NAME=\"Claude\" GIT_COMMITTER_EMAIL=\"noreply@anthropic.com\" git commit:*)"
+      "Bash(GIT_AUTHOR_NAME=\"Claude\" GIT_AUTHOR_EMAIL=\"noreply@anthropic.com\" GIT_COMMITTER_NAME=\"Claude\" GIT_COMMITTER_EMAIL=\"noreply@anthropic.com\" git commit:*)",
+      "Bash(while read ref)",
+      "Bash(do git update-ref -d \"$ref\")",
+      "Bash(done)",
+      "Bash(git stash pop:*)",
+      "WebFetch(domain:www.blacksmith.sh)",
+      "WebFetch(domain:docs.blacksmith.sh)",
+      "Bash(git commit:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(git pull:*)",
+      "Bash(bunx prettier --write:*)",
+      "Bash(SCRAPBOX_PROJECT=daikolabs SCRAPBOX_SID='s%3A2osJj9xIxjdLSGqlDBgFR5JM7EhwynT8.NCXtQO1LBj4vKZTxC%2BhTKCJXqyN6XQEoktZ9kG67uPc' python:*)",
+      "Bash(python3:*)",
+      "Bash(cwebp:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(ln -s:*)",
+      "Bash(bun run:*)",
+      "Bash(bunx drizzle-kit generate:*)",
+      "Bash(bunx drizzle-kit push:*)",
+      "Bash(coderabbit:*)"
     ]
   }
 }

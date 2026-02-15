@@ -36,7 +36,6 @@ export function ChatInput() {
     if (!trimmed || state.isGirlTyping || state.remainingChats <= 0 || state.isGameOver) return;
 
     state.addMessage({ role: "user", content: trimmed });
-    state.decrementRemainingChats();
     setText("");
     state.setGirlTyping(true);
 
@@ -52,6 +51,7 @@ export function ChatInput() {
       const store = useGameStore.getState();
       store.addMessage({ role: "girl", content: response.content });
       store.setEmotion(response.emotion);
+      store.setRemainingChats(response.remainingChats);
 
       if (response.isGameOver && response.hitWord) {
         store.setGameOver(response.hitWord, response.content);
@@ -112,8 +112,7 @@ export function ChatInput() {
 
       <form
         onSubmit={handleSubmit}
-        className="flex items-end gap-2 border-t border-pink-200/20 bg-white/5 px-3 py-2 backdrop-blur-md"
-        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+        className="pb-safe flex items-end gap-2 border-t border-pink-200/20 bg-white/5 px-3 pt-2 backdrop-blur-md"
       >
         {/* Help button */}
         <button

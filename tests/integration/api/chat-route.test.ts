@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AiChatAdapter } from "@/domain/adapter/ai-chat";
 import { GameSessionUseCase } from "@/usecase/chat";
-import { GameSessionRepositoryImpl } from "@/infrastructure/repositories/game-session";
+import type { GameSession } from "@/domain/entities/game-session";
+import type { NgWord } from "@/domain/values/ng-word";
 
 interface ApiResponse {
   type?: string;
@@ -76,16 +77,57 @@ vi.mock("@/infrastructure/messages-container", () => ({
   },
 }));
 
+// Shared test store that can be cleared between tests
+const testSessionStore = new Map<string, GameSession>();
+const testNgWordStore = new Map<string, NgWord[]>();
+
+/* eslint-disable @typescript-eslint/require-await */
+function createTestRepo() {
+  return {
+    save: async (session: GameSession) => {
+      testSessionStore.set(session.id, session);
+    },
+    findById: async (id: string) => testSessionStore.get(id),
+    findTodayByUserId: async (userId: string) => {
+      return [...testSessionStore.values()].filter(s => s.userId === userId);
+    },
+    updateStatus: async (id: string, status: string, messageCount: number) => {
+      const session = testSessionStore.get(id);
+      if (session) {
+        session.status = status as GameSession["status"];
+        session.messageCount = messageCount;
+      }
+    },
+    delete: async (id: string) => {
+      testSessionStore.delete(id);
+    },
+  };
+}
+/* eslint-enable @typescript-eslint/require-await */
+
+function createTestNgWordCache() {
+  return {
+    set: (sessionId: string, ngWords: NgWord[]) => {
+      testNgWordStore.set(sessionId, ngWords);
+    },
+    get: (sessionId: string) => testNgWordStore.get(sessionId),
+    delete: (sessionId: string) => {
+      testNgWordStore.delete(sessionId);
+    },
+  };
+}
+
 // Mock the container module to inject test dependencies
 vi.mock("@/infrastructure/container", () => {
-  const repo = new GameSessionRepositoryImpl();
+  const repo = createTestRepo();
+  const ngWordCache = createTestNgWordCache();
   const mockAi: AiChatAdapter = {
     generateNgWords: vi.fn().mockResolvedValue(["嫌い", "つまらない", "boring"]),
     sendMessage: vi.fn().mockResolvedValue({ message: "Hello! Nice to meet you!", score: 5, emotion: "joy" }),
     getShockResponse: vi.fn().mockResolvedValue("Why would you say that...! I can't believe it...!"),
   };
   return {
-    gameSessionUseCase: new GameSessionUseCase(repo, mockAi),
+    gameSessionUseCase: new GameSessionUseCase(repo, mockAi, ngWordCache),
   };
 });
 
@@ -107,6 +149,8 @@ function createClientMessageId(seed: number): string {
 describe("POST /api/chat", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    testSessionStore.clear();
+    testNgWordStore.clear();
     mockGetServerSession.mockResolvedValue({ user: { id: "u1" } });
     mockAddMyPoints.mockResolvedValue({
       userId: "u1",
