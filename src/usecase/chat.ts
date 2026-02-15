@@ -37,6 +37,27 @@ export class GameSessionUseCase {
     private readonly ngWordCache: NgWordCache,
   ) {}
 
+  private logNgWordsGenerated(params: {
+    sessionId: string;
+    characterType: CharacterType;
+    locale: Locale;
+    source: "start" | "resume";
+    words: string[];
+  }): void {
+    logger.info("[ng-word] generated", {
+      sessionId: params.sessionId,
+      characterType: params.characterType,
+      locale: params.locale,
+      source: params.source,
+      count: params.words.length,
+    });
+    logger.debug("[ng-word] generated words", {
+      sessionId: params.sessionId,
+      source: params.source,
+      words: params.words,
+    });
+  }
+
   async startGame(userId: string, username: string, locale: Locale): Promise<StartGameResult> {
     // Check today's sessions for game_over block or active resume
     const todaySessions = await this.repo.findTodayByUserId(userId);
@@ -48,15 +69,33 @@ export class GameSessionUseCase {
 
     const activeSession = todaySessions.find(s => s.status === "active");
     if (activeSession) {
+      logger.info("[startGame] resumed active session", {
+        sessionId: activeSession.id,
+        userId,
+        characterType: activeSession.characterType,
+        remainingChats: activeSession.remainingChats,
+      });
       // Resume existing active session — no greeting, just return remaining chats
       // Re-generate NG words if cache was cleared
       let backgroundTask: Promise<void> | undefined;
       if (!this.ngWordCache.get(activeSession.id)) {
+        logger.info("[startGame:resume] NG word cache missing, regenerating", {
+          sessionId: activeSession.id,
+          characterType: activeSession.characterType,
+          locale,
+        });
         backgroundTask = this.ai
           .generateNgWords(activeSession.id, activeSession.characterType, locale)
           .then(rawNgWords => {
             const ngWords = rawNgWords.map(w => new NgWord(w));
             this.ngWordCache.set(activeSession.id, ngWords);
+            this.logNgWordsGenerated({
+              sessionId: activeSession.id,
+              characterType: activeSession.characterType,
+              locale,
+              source: "resume",
+              words: rawNgWords,
+            });
           })
           .catch((err: unknown) => {
             logger.warn("[startGame:resume] NG word regeneration failed:", err);
@@ -79,6 +118,12 @@ export class GameSessionUseCase {
 
     const session = new GameSession(sessionId, userId, username, characterType);
     await this.repo.save(session);
+    logger.info("[startGame] created new session", {
+      sessionId,
+      userId,
+      characterType,
+      locale,
+    });
 
     // Fire NG word generation without awaiting
     const bgTask = this.ai
@@ -86,6 +131,7 @@ export class GameSessionUseCase {
       .then(rawNgWords => {
         const ngWords = rawNgWords.map(w => new NgWord(w));
         this.ngWordCache.set(sessionId, ngWords);
+        this.logNgWordsGenerated({ sessionId, characterType, locale, source: "start", words: rawNgWords });
       })
       .catch((err: unknown) => {
         logger.warn("[startGame] NG word generation failed, continuing without NG words:", err);
@@ -108,11 +154,16 @@ export class GameSessionUseCase {
     const cachedNgWords = this.ngWordCache.get(sessionId);
     if (cachedNgWords) {
       session.ngWords = cachedNgWords;
+      logger.debug("[chat] loaded cached NG words", {
+        sessionId,
+        count: cachedNgWords.length,
+      });
     }
 
     // Check NG words
     const hitNgWord = session.checkNgWord(message);
     if (hitNgWord) {
+      logger.info("[chat] NG word hit", { sessionId, hitWord: hitNgWord.word, messageCount: session.messageCount + 1 });
       const angryReply = await this.ai.getShockResponse(
         sessionId,
         session.characterType,
@@ -135,9 +186,18 @@ export class GameSessionUseCase {
     const score = Score.fromRaw(rawScore);
     session.incrementMessageCount();
     await this.repo.updateStatus(sessionId, session.status, session.messageCount);
+    logger.debug("[chat] message processed", {
+      sessionId,
+      scoreRaw: score.raw,
+      scoreAdjusted: score.adjusted,
+      remainingChats: session.remainingChats,
+      status: session.status,
+      emotion,
+    });
 
     if (session.status === "completed") {
       this.ngWordCache.delete(sessionId);
+      logger.info("[chat] session completed", { sessionId, totalMessages: session.messageCount });
     }
 
     return { reply, score, emotion, isGameOver: false, remainingChats: session.remainingChats };
