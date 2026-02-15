@@ -25,11 +25,13 @@ GIT_AUTHOR_NAME="Cursor Agent" GIT_AUTHOR_EMAIL="cursoragent@cursor.com" GIT_COM
 ```
 
 Other agents:
+
 - Claude: `noreply@anthropic.com`
 - Devin: `devin-ai-integration[bot]@users.noreply.github.com`
 - CodeRabbit: `*@coderabbit.ai`
 
 Important:
+
 - Cursor agent email must be `cursoragent@cursor.com` (not `noreply@cursor.com`).
 - If the latest commit is already created but author is wrong, use amend with `--reset-author`.
 
