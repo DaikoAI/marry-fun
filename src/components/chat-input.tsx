@@ -112,8 +112,7 @@ export function ChatInput() {
 
       <form
         onSubmit={handleSubmit}
-        className="flex items-end gap-2 border-t border-pink-200/20 bg-white/5 px-3 py-2 backdrop-blur-md"
-        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+        className="pb-safe flex items-end gap-2 border-t border-pink-200/20 bg-white/5 px-3 pt-2 backdrop-blur-md"
       >
         {/* Help button */}
         <button
