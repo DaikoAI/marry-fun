@@ -17,7 +17,7 @@
     "node": ">=24.13.1"
   },
   "scripts": {
-    "dev": "bun run sync:soul && dotenvx run --convention=nextjs -- next dev --turbopack",
+    "dev": "bun run sync:soul && dotenvx run --convention=nextjs -- next dev --turbopack --port 8787",
     "preview": "dotenvx run --convention=nextjs -- opennextjs-cloudflare preview",
     "build": "bun run sync:soul && dotenvx run --convention=nextjs -- next build",
     "build:cf": "bun run sync:soul && bun run clean:opennext && dotenvx run --convention=nextjs -- opennextjs-cloudflare build",
@@ -40,16 +40,17 @@
     "split:glb": "bun run scripts/split-glb-assets.ts"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.16.5",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
     "@solana/wallet-adapter-react": "^0.15.39",
     "@solana/wallet-adapter-react-ui": "^0.9.39",
     "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.98.4",
-    "@opennextjs/cloudflare": "^1.16.5",
+    "@tanstack/react-query": "^5.90.21",
     "better-auth": "^1.4.18",
     "better-auth-web3": "^1.0.0",
     "drizzle-orm": "^0.44.7",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
     "next": "16.1.6",
     "next-intl": "^4.8.2",
     "openai": "^4.104.0",

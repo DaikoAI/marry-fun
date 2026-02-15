@@ -29,7 +29,8 @@
       "Bash(bun run:*)",
       "Bash(bunx drizzle-kit generate:*)",
       "Bash(bunx drizzle-kit push:*)",
-      "Bash(coderabbit:*)"
+      "Bash(coderabbit:*)",
+      "Bash(gh pr checks:*)"
     ]
   }
 }

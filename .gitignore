@@ -61,3 +61,4 @@ src/lib/soul-prompt.generated.ts
 public/3d/girl/archive/
 
 .cursor/*.log
+.serena
