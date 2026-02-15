@@ -12,7 +12,7 @@ export function BgmController() {
   const triedAutoPlayRef = useRef(false);
   const t = useTranslations("common.bgm");
 
-  const [status, setStatus] = useState<BgmStatus>("trying");
+  const [status, setStatus] = useState<BgmStatus>("idle");
 
   const soundOptions = useMemo(
     () => ({
@@ -42,11 +42,20 @@ export function BgmController() {
 
   useEffect(() => {
     if (triedAutoPlayRef.current) return;
-    triedAutoPlayRef.current = true;
 
-    play();
+    const handleInteraction = () => {
+      triedAutoPlayRef.current = true;
+      play();
+      document.removeEventListener("click", handleInteraction);
+      document.removeEventListener("touchstart", handleInteraction);
+    };
+
+    document.addEventListener("click", handleInteraction, { once: true });
+    document.addEventListener("touchstart", handleInteraction, { once: true });
 
     return () => {
+      document.removeEventListener("click", handleInteraction);
+      document.removeEventListener("touchstart", handleInteraction);
       stop();
     };
   }, [play, stop]);
