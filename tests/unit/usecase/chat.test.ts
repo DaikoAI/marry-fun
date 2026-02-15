@@ -7,12 +7,12 @@ import { GameSessionUseCase } from "@/usecase/chat";
 import { createMockAi, createMockNgWordCache, createMockRepo } from "../../helpers/fixtures";
 import type { GameSessionRepository } from "@/domain/repositories/game-session-repository";
 import type { AiChatAdapter } from "@/domain/adapter/ai-chat";
-import type { NgWordCache } from "@/infrastructure/repositories/ng-word-cache";
+import type { NgWordCachePort } from "@/domain/repositories/ng-word-cache-port";
 
 describe("GameSessionUseCase", () => {
   let repo: GameSessionRepository;
   let ai: AiChatAdapter;
-  let cache: NgWordCache;
+  let cache: NgWordCachePort;
   let usecase: GameSessionUseCase;
 
   beforeEach(() => {
@@ -185,7 +185,7 @@ describe("GameSessionUseCase", () => {
       await expect(usecase.chat(sessionId, "もう一回", "ja")).rejects.toThrow(ChatLimitExceededError);
     });
 
-    it("NGワードキャッシュがない場合はNG判定をスキップ", async () => {
+    it("NGワードキャッシュがない場合は再生成してNG判定する", async () => {
       const { sessionId, backgroundTask } = await usecase.startGame("user-1", "テスト", "ja");
       await backgroundTask;
 
@@ -193,9 +193,28 @@ describe("GameSessionUseCase", () => {
       cache.delete(sessionId);
       const result = await usecase.chat(sessionId, "嫌い", "ja");
 
-      // NGワードキャッシュなし → 通常メッセージとして処理される
+      expect(result.isGameOver).toBe(true);
+      expect(result.hitWord).toBe("嫌い");
+      expect(result.remainingChats).toBe(0);
+      expect(cache.get(sessionId)).toBeUndefined();
+    });
+
+    it("NGワード再生成に失敗した場合はWARNログを出して継続する", async () => {
+      const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => undefined);
+      const { sessionId, backgroundTask } = await usecase.startGame("user-1", "テスト", "ja");
+      await backgroundTask;
+
+      cache.delete(sessionId);
+      vi.spyOn(ai, "generateNgWords").mockRejectedValueOnce(new Error("regenerate failed"));
+
+      const result = await usecase.chat(sessionId, "嫌い", "ja");
+
       expect(result.isGameOver).toBe(false);
       expect(result.remainingChats).toBe(19);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[chat] NG word cache miss regeneration failed, continuing with current session words:",
+        expect.any(Error),
+      );
     });
   });
 });

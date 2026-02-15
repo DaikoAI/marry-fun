@@ -1,8 +1,8 @@
 import { GameSession } from "@/domain/entities/game-session";
 import type { GameSessionRepository } from "@/domain/repositories/game-session-repository";
+import type { NgWordCachePort } from "@/domain/repositories/ng-word-cache-port";
 import { NgWord } from "@/domain/values/ng-word";
 import type { AiChatAdapter } from "@/domain/adapter/ai-chat";
-import type { NgWordCache } from "@/infrastructure/repositories/ng-word-cache";
 
 export function createMockRepo(): GameSessionRepository {
   const store = new Map<string, GameSession>();
@@ -29,7 +29,7 @@ export function createMockRepo(): GameSessionRepository {
   /* eslint-enable @typescript-eslint/require-await */
 }
 
-export function createMockNgWordCache(): NgWordCache {
+export function createMockNgWordCache(): NgWordCachePort {
   const store = new Map<string, NgWord[]>();
   return {
     set: (sessionId: string, ngWords: NgWord[]) => {

@@ -4,13 +4,13 @@ import { ChatLimitExceededError } from "@/domain/errors/chat-limit-exceeded-erro
 import { GameOverBlockedError } from "@/domain/errors/game-over-blocked-error";
 import { SessionNotFoundError } from "@/domain/errors/session-not-found-error";
 import type { GameSessionRepository } from "@/domain/repositories/game-session-repository";
+import type { NgWordCachePort } from "@/domain/repositories/ng-word-cache-port";
 import { randomCharacterType } from "@/domain/values/character-type";
 import type { CharacterType } from "@/domain/values/character-type";
 import type { Emotion } from "@/domain/values/emotion";
 import type { Locale } from "@/domain/values/locale";
 import { NgWord } from "@/domain/values/ng-word";
 import { Score } from "@/domain/values/score";
-import type { NgWordCache } from "@/infrastructure/repositories/ng-word-cache";
 import { logger } from "@/utils/logger";
 
 export interface StartGameResult {
@@ -34,14 +34,14 @@ export class GameSessionUseCase {
   constructor(
     private readonly repo: GameSessionRepository,
     private readonly ai: AiChatAdapter,
-    private readonly ngWordCache: NgWordCache,
+    private readonly ngWordCache: NgWordCachePort,
   ) {}
 
   private logNgWordsGenerated(params: {
     sessionId: string;
     characterType: CharacterType;
     locale: Locale;
-    source: "start" | "resume";
+    source: "start" | "resume" | "chat";
     words: string[];
   }): void {
     logger.info("[ng-word] generated", {
@@ -56,6 +56,19 @@ export class GameSessionUseCase {
       source: params.source,
       words: params.words,
     });
+  }
+
+  private async generateAndCacheNgWords(
+    sessionId: string,
+    characterType: CharacterType,
+    locale: Locale,
+    source: "start" | "resume" | "chat",
+  ): Promise<NgWord[]> {
+    const rawNgWords = await this.ai.generateNgWords(sessionId, characterType, locale);
+    const ngWords = rawNgWords.map(w => new NgWord(w));
+    this.ngWordCache.set(sessionId, ngWords);
+    this.logNgWordsGenerated({ sessionId, characterType, locale, source, words: rawNgWords });
+    return ngWords;
   }
 
   async startGame(userId: string, username: string, locale: Locale): Promise<StartGameResult> {
@@ -84,19 +97,8 @@ export class GameSessionUseCase {
           characterType: activeSession.characterType,
           locale,
         });
-        backgroundTask = this.ai
-          .generateNgWords(activeSession.id, activeSession.characterType, locale)
-          .then(rawNgWords => {
-            const ngWords = rawNgWords.map(w => new NgWord(w));
-            this.ngWordCache.set(activeSession.id, ngWords);
-            this.logNgWordsGenerated({
-              sessionId: activeSession.id,
-              characterType: activeSession.characterType,
-              locale,
-              source: "resume",
-              words: rawNgWords,
-            });
-          })
+        backgroundTask = this.generateAndCacheNgWords(activeSession.id, activeSession.characterType, locale, "resume")
+          .then(() => undefined)
           .catch((err: unknown) => {
             logger.warn("[startGame:resume] NG word regeneration failed:", err);
           });
@@ -126,13 +128,8 @@ export class GameSessionUseCase {
     });
 
     // Fire NG word generation without awaiting
-    const bgTask = this.ai
-      .generateNgWords(sessionId, characterType, locale)
-      .then(rawNgWords => {
-        const ngWords = rawNgWords.map(w => new NgWord(w));
-        this.ngWordCache.set(sessionId, ngWords);
-        this.logNgWordsGenerated({ sessionId, characterType, locale, source: "start", words: rawNgWords });
-      })
+    const bgTask = this.generateAndCacheNgWords(sessionId, characterType, locale, "start")
+      .then(() => undefined)
       .catch((err: unknown) => {
         logger.warn("[startGame] NG word generation failed, continuing without NG words:", err);
       });
@@ -158,6 +155,17 @@ export class GameSessionUseCase {
         sessionId,
         count: cachedNgWords.length,
       });
+    } else {
+      logger.info("[chat] NG word cache missing, regenerating", {
+        sessionId,
+        characterType: session.characterType,
+        locale,
+      });
+      try {
+        session.ngWords = await this.generateAndCacheNgWords(session.id, session.characterType, locale, "chat");
+      } catch (err: unknown) {
+        logger.warn("[chat] NG word cache miss regeneration failed, continuing with current session words:", err);
+      }
     }
 
     // Check NG words

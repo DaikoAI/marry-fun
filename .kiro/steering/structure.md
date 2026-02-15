@@ -14,34 +14,34 @@
 
 **Location**: `src/app/api/`  
 **Purpose**: Next.js API ルート。Route handler → schema 検証 → handler → use case の流れ  
-**Example**: `app/api/chat/route.ts`, `app/api/auth/[...all]/route.ts`
+**Example**: `src/app/api/chat/route.ts`, `src/app/api/auth/[...all]/route.ts`
 
 ### Domain (Clean Architecture)
 
 **Location**: `src/domain/`  
 **Purpose**: 純粋なビジネスロジック。entities, values, repositories(port), adapter(port), errors  
-**Example**: `domain/entities/game-session.ts`, `domain/values/character-type.ts`  
+**Example**: `src/domain/entities/game-session.ts`, `src/domain/values/character-type.ts`  
 **Rule**: 他レイヤーへの import 禁止
 
 ### UseCase
 
 **Location**: `src/usecase/`  
 **Purpose**: アプリケーションサービス。domain のポートを注入してオーケストレーション  
-**Example**: `usecase/chat.ts`, `usecase/points.ts`  
+**Example**: `src/usecase/chat.ts`, `src/usecase/points.ts`  
 **Rule**: domain の port のみ依存、HTTP の関心事なし
 
 ### Interface (API Layer)
 
 **Location**: `src/interfaces/`  
 **Purpose**: リクエスト/レスポンスの Zod スキーマ、ハンドラ、エラー→HTTP マッピング  
-**Example**: `interfaces/schemas/chat.ts`, `interfaces/api/chat-handler.ts`  
+**Example**: `src/interfaces/schemas/chat.ts`, `src/interfaces/api/chat-handler.ts`  
 **Rule**: ビジネスロジックなし、use case 経由でのみ呼び出し
 
 ### Infrastructure
 
 **Location**: `src/infrastructure/`  
 **Purpose**: domain ポートの実装。adapter（Moltworker 等）、repositories（D1）、container  
-**Example**: `infrastructure/adapter/ai-chat-moltworker.ts`, `infrastructure/repositories/d1/`  
+**Example**: `src/infrastructure/adapter/ai-chat-moltworker.ts`, `src/infrastructure/repositories/d1/`  
 **Rule**: domain の port を実装、use case からは注入で受け取る
 
 ### Components

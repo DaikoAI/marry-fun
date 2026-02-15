@@ -34,8 +34,10 @@
 ### ゲームセッション管理ルール（重要）
 
 - 各セッションは最大20メッセージ（`MAX_CHATS_PER_SESSION`）
-- メッセージ送信ごとに `game_sessions.message_count` をインクリメントし、20到達で `status = 'completed'`
-- NGワードヒットで `status = 'game_over'`。同日は新規セッション開始不可
+- メッセージ処理時はまず `game_sessions.message_count` をインクリメントしてから NG ワード判定を行う
+- NGワードヒット時は `status = 'game_over'` を設定し、これは `MAX_CHATS_PER_SESSION` 到達による `status = 'completed'` より優先する
+- NGワード非ヒット時のみ、`game_sessions.message_count >= MAX_CHATS_PER_SESSION` なら `status = 'completed'`
+- `status = 'game_over'` になった同日は新規セッション開始不可
 - NGワードは `game_sessions` テーブルには保存せず、in-memory キャッシュ（`NgWordCache`）で管理
 - 日付境界は UTC 基準
 

@@ -1,3 +1,4 @@
+import type { NgWordCachePort } from "@/domain/repositories/ng-word-cache-port";
 import type { NgWord } from "@/domain/values/ng-word";
 
 const STORE_KEY = Symbol.for("marry-fun-dev.ng-word-cache");
@@ -10,7 +11,7 @@ function getStore(): Map<string, NgWord[]> {
   return g[STORE_KEY];
 }
 
-export class NgWordCache {
+export class NgWordCache implements NgWordCachePort {
   set(sessionId: string, ngWords: NgWord[]): void {
     getStore().set(sessionId, ngWords);
   }
