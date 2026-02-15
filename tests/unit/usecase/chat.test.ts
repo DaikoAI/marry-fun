@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ChatLimitExceededError } from "@/domain/errors/chat-limit-exceeded-error";
 import { GameOverBlockedError } from "@/domain/errors/game-over-blocked-error";
 import { SessionNotFoundError } from "@/domain/errors/session-not-found-error";
+import { logger } from "@/utils/logger";
 import { GameSessionUseCase } from "@/usecase/chat";
 import { createMockAi, createMockNgWordCache, createMockRepo } from "../../helpers/fixtures";
 import type { GameSessionRepository } from "@/domain/repositories/game-session-repository";
@@ -15,6 +16,7 @@ describe("GameSessionUseCase", () => {
   let usecase: GameSessionUseCase;
 
   beforeEach(() => {
+    vi.restoreAllMocks();
     repo = createMockRepo();
     ai = createMockAi();
     cache = createMockNgWordCache();
@@ -39,6 +41,27 @@ describe("GameSessionUseCase", () => {
       const cached = cache.get(result.sessionId);
       expect(cached).toBeDefined();
       expect(cached).toHaveLength(3);
+    });
+
+    it("NGワード生成時にINFO/DEBUGログを出力する", async () => {
+      const infoSpy = vi.spyOn(logger, "info").mockImplementation(() => undefined);
+      const debugSpy = vi.spyOn(logger, "debug").mockImplementation(() => undefined);
+
+      const result = await usecase.startGame("user-1", "テスト", "ja");
+      await result.backgroundTask;
+
+      expect(infoSpy).toHaveBeenCalledWith(
+        "[ng-word] generated",
+        expect.objectContaining({ sessionId: result.sessionId, source: "start", count: 3 }),
+      );
+      expect(debugSpy).toHaveBeenCalledWith(
+        "[ng-word] generated words",
+        expect.objectContaining({
+          sessionId: result.sessionId,
+          source: "start",
+          words: ["嫌い", "つまらない", "boring"],
+        }),
+      );
     });
 
     it("activeセッションがあればresumeしgreetingは空", async () => {
