@@ -101,19 +101,20 @@ export function ChatInput() {
 
   return (
     <>
-      {/* Remaining chats indicator */}
-      <div className="flex justify-center bg-white/30 px-3 py-1.5 backdrop-blur-xl">
-        <span
-          className={`text-xs font-(--font-tokimeki) drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] ${noChatsLeft ? "text-red-300" : "text-white/70"}`}
-        >
-          {noChatsLeft ? t("noChatsLeft") : t("chatsLeft", { count: remainingChats })}
-        </span>
-      </div>
+      <div className="pb-safe bg-white/5 backdrop-blur-md">
+        {/* Remaining chats indicator */}
+        <div className="flex justify-center bg-white/30 px-3 py-1.5 backdrop-blur-xl">
+          <span
+            className={`text-xs font-(--font-tokimeki) drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] ${noChatsLeft ? "text-red-300" : "text-white/70"}`}
+          >
+            {noChatsLeft ? t("noChatsLeft") : t("chatsLeft", { count: remainingChats })}
+          </span>
+        </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="pb-safe flex items-end gap-2 border-t border-pink-200/20 bg-white/5 px-3 pt-2 backdrop-blur-md"
-      >
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-end gap-2 border-t border-pink-200/20 px-3 pb-2 pt-2"
+        >
         {/* Help button */}
         <button
           type="button"
@@ -149,7 +150,8 @@ export function ChatInput() {
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
         </button>
-      </form>
+        </form>
+      </div>
 
       {showHelp && (
         <HelpModal
