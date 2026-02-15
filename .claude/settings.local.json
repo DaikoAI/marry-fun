@@ -30,7 +30,9 @@
       "Bash(bunx drizzle-kit generate:*)",
       "Bash(bunx drizzle-kit push:*)",
       "Bash(coderabbit:*)",
-      "Bash(gh pr checks:*)"
+      "Bash(gh pr checks:*)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
