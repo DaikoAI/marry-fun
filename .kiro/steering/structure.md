@@ -2,7 +2,7 @@
 
 ## Organization Philosophy
 
-機能ベースの配置と役割の分離。`src/` 配下で app、components、lib、store などを用途別に整理。
+機能ベースの配置と役割の分離。`src/` 配下で app、components、domain、usecase、interfaces、infrastructure などを用途別に整理。サーバーサイドは Clean Architecture（`docs/development/server.md`）に従う。
 
 ## Directory Patterns
 
@@ -11,6 +11,38 @@
 **Location**: `src/app/[locale]/`  
 **Purpose**: ロケール別ページ。`page.tsx` がルート、`layout.tsx` で共通レイアウト  
 **Example**: `src/app/[locale]/chat/page.tsx`, `src/app/[locale]/start/page.tsx`
+
+**Location**: `src/app/api/`  
+**Purpose**: Next.js API ルート。Route handler → schema 検証 → handler → use case の流れ  
+**Example**: `src/app/api/chat/route.ts`, `src/app/api/auth/[...all]/route.ts`
+
+### Domain (Clean Architecture)
+
+**Location**: `src/domain/`  
+**Purpose**: 純粋なビジネスロジック。entities, values, repositories(port), adapter(port), errors  
+**Example**: `src/domain/entities/game-session.ts`, `src/domain/values/character-type.ts`  
+**Rule**: 他レイヤーへの import 禁止
+
+### UseCase
+
+**Location**: `src/usecase/`  
+**Purpose**: アプリケーションサービス。domain のポートを注入してオーケストレーション  
+**Example**: `src/usecase/chat.ts`, `src/usecase/points.ts`  
+**Rule**: domain の port のみ依存、HTTP の関心事なし
+
+### Interface (API Layer)
+
+**Location**: `src/interfaces/`  
+**Purpose**: リクエスト/レスポンスの Zod スキーマ、ハンドラ、エラー→HTTP マッピング  
+**Example**: `src/interfaces/schemas/chat.ts`, `src/interfaces/api/chat-handler.ts`  
+**Rule**: ビジネスロジックなし、use case 経由でのみ呼び出し
+
+### Infrastructure
+
+**Location**: `src/infrastructure/`  
+**Purpose**: domain ポートの実装。adapter（Moltworker 等）、repositories（D1）、container  
+**Example**: `src/infrastructure/adapter/ai-chat-moltworker.ts`, `src/infrastructure/repositories/d1/`  
+**Rule**: domain の port を実装、use case からは注入で受け取る
 
 ### Components
 
@@ -37,7 +69,8 @@
 ### Lib
 
 **Location**: `src/lib/`  
-**Purpose**: ユーティリティ・ビジネスロジック（fetchGirlResponse など）
+**Purpose**: クライアント用ユーティリティ・AI チャットのオーケストレーション等  
+**Example**: `lib/girl-chat.ts`, `lib/auth/*`, `lib/result-share.ts`
 
 ### Hooks
 
@@ -74,3 +107,5 @@ import { routing } from "./routing";
 ---
 
 _Document patterns, not file trees. New files following patterns shouldn't require updates_
+
+<!-- updated_at: 2025-02-14 | Sync: domain, usecase, interfaces, infrastructure, app/api patterns -->

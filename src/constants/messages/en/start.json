@@ -7,5 +7,6 @@
   "signing": "Signing...",
   "saving": "Saving...",
   "profileError": "Failed to save username. Please try again.",
-  "initError": "Connection timed out. Please try again."
+  "initError": "Connection timed out. Please try again.",
+  "gameOverBlocked": "Game over! You can't play again today. Come back tomorrow!"
 }
