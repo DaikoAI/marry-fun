@@ -7,6 +7,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Shippori_Mincho, Yuji_Syuku } from "next/font/google";
 
 import { APP_DESCRIPTION, APP_NAME } from "@/constants";
+import { QueryClientProviderWrapper } from "@/components/providers/query-client-provider";
 import { SolanaWalletProvider } from "@/components/providers/solana-wallet-provider";
 import { routing } from "@/i18n/routing";
 
@@ -79,7 +80,9 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${shipporiMincho.variable} ${yujiSyuku.variable} h-full antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <SolanaWalletProvider>{children}</SolanaWalletProvider>
+          <QueryClientProviderWrapper>
+            <SolanaWalletProvider>{children}</SolanaWalletProvider>
+          </QueryClientProviderWrapper>
         </NextIntlClientProvider>
       </body>
     </html>

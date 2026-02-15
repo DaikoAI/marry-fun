@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import type { LeaderboardResponse } from "@/interfaces/schemas/points";
 import { leaderboardResponseSchema } from "@/interfaces/schemas/points";
@@ -42,58 +43,31 @@ function LeaderboardContent() {
   const t = useTranslations("chat.header");
   const requestClose = useModalClose();
   const [activeTab, setActiveTab] = useState<LeaderboardTab>("total");
-  const [data, setData] = useState<LeaderboardResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const fetchLeaderboard = useCallback(
-    async (signal?: AbortSignal) => {
-      setIsLoading(true);
-      setErrorMessage(null);
-
-      try {
-        const res = await fetch("/api/leaderboard", {
-          method: "GET",
-          cache: "no-store",
-          signal,
-        });
-        const payload: unknown = await res.json();
-
-        if (!res.ok) {
-          throw new Error(
-            payload && typeof payload === "object" && "message" in payload && typeof payload.message === "string" ?
-              payload.message
-            : "Failed to load leaderboard",
-          );
-        }
-
-        const parsed = leaderboardResponseSchema.safeParse(payload);
-        if (!parsed.success) {
-          throw new Error("Invalid leaderboard response");
-        }
-
-        setData(parsed.data);
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          return;
-        }
-        const message = error instanceof Error ? error.message : t("leaderboardError");
-        setErrorMessage(message);
-        setData(null);
-      } finally {
-        setIsLoading(false);
+  const { data, isPending, isError, error, refetch } = useQuery({
+    queryKey: ["leaderboard"],
+    queryFn: async ({ signal }) => {
+      const res = await fetch("/api/leaderboard", {
+        method: "GET",
+        cache: "no-store",
+        signal,
+      });
+      const payload: unknown = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          payload && typeof payload === "object" && "message" in payload ?
+            (payload.message as string)
+          : "Failed to load leaderboard",
+        );
       }
+      const parsed = leaderboardResponseSchema.safeParse(payload);
+      if (!parsed.success) {
+        throw new Error("Invalid leaderboard response");
+      }
+      return parsed.data;
     },
-    [t],
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchLeaderboard(controller.signal);
-    return () => {
-      controller.abort();
-    };
-  }, [fetchLeaderboard]);
+    staleTime: 30 * 1000,
+  });
 
   const tabEntries = activeTab === "total" ? (data?.total ?? []) : (data?.daily ?? []);
   const tabTitle = activeTab === "total" ? t("leaderboardTotalLabel") : t("leaderboardDailyLabel");
@@ -110,16 +84,18 @@ function LeaderboardContent() {
         {t("leaderboardTitle")}
       </h2>
 
-      {isLoading ?
+      {isPending ?
         <p className="py-8 text-center text-sm text-white/60">{t("leaderboardLoading")}</p>
-      : errorMessage ?
+      : isError ?
         <div className="py-4">
           <p className="text-center text-sm text-red-200">{t("leaderboardError")}</p>
-          <p className="mt-1 text-center text-xs text-white/60">{errorMessage}</p>
+          <p className="mt-1 text-center text-xs text-white/60">
+            {error instanceof Error ? error.message : t("leaderboardError")}
+          </p>
           <button
             type="button"
             onClick={() => {
-              void fetchLeaderboard();
+              void refetch();
             }}
             className="mt-3 w-full cursor-pointer rounded-full border border-pink-200/40 bg-white/10 py-2 text-sm text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-pink-300 focus-visible:outline-none"
           >
