@@ -193,7 +193,7 @@ export function StartPageClient() {
           className="flex w-full animate-[fadeIn_1200ms_cubic-bezier(0.22,1,0.36,1)_both] flex-col items-center gap-8 motion-reduce:animate-none"
         >
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="marry.fun"
             priority
             width={720}
@@ -207,7 +207,7 @@ export function StartPageClient() {
               return (
                 <Link
                   key={l}
-                  href="/start"
+                  href="/"
                   locale={l}
                   className={`flex items-center justify-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold backdrop-blur-md transition-colors ${
                     l === locale ?
@@ -223,6 +223,7 @@ export function StartPageClient() {
               );
             })}
           </div>
+          <SolanaAuthPanel variant="onboarding" />
           {onboardingStep === "name" && (
             <>
               <div className="w-full">
@@ -236,6 +237,8 @@ export function StartPageClient() {
                   }}
                   placeholder={t("placeholder")}
                   maxLength={20}
+                  autoComplete="off"
+                  spellCheck={false}
                   autoFocus
                   className="w-full rounded-xl border-2 border-pink-200/50 bg-white/20 px-5 py-3.5 text-center text-lg font-(--font-ephemeral) tracking-wider text-white shadow-[0_0_20px_rgba(255,255,255,0.08)] backdrop-blur-md transition-colors duration-200 placeholder:text-white/50 focus:border-pink-200/80 focus:bg-white/25 focus:outline-none"
                 />
@@ -249,13 +252,12 @@ export function StartPageClient() {
                 type="button"
                 onClick={handleNameStepSubmit}
                 disabled={!canSubmitUsername}
-                className="rounded-full border-2 border-pink-200/40 bg-white/10 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-150 ease-out hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                className="rounded-full border-2 border-pink-200/40 bg-white/10 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
               >
                 {isSavingUsername ? t("saving") : t("next")}
               </button>
             </>
           )}
-          {onboardingStep === "wallet" && <SolanaAuthPanel variant="onboarding" />}
           {onboardingStep === "start" && (
             <>
               {gameOverBlocked && (
@@ -271,7 +273,7 @@ export function StartPageClient() {
               <button
                 type="submit"
                 disabled={!canStart}
-                className="rounded-full border-2 border-pink-200/40 bg-white/10 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-150 ease-out hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                className="rounded-full border-2 border-pink-200/40 bg-white/10 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
               >
                 {t("submit")}
               </button>

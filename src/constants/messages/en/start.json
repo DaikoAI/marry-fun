@@ -3,10 +3,15 @@
   "next": "Next",
   "submit": "Play Now",
   "connectWallet": "Connect Wallet",
+  "connectX": "Connect X",
   "connecting": "Connecting...",
+  "connectingX": "Connecting X...",
+  "connectedX": "X Connected",
   "signing": "Signing...",
+  "connectWalletFirstForX": "Connect your wallet first to link X.",
   "saving": "Saving...",
   "profileError": "Failed to save username. Please try again.",
+  "xLinkError": "Failed to link X account. Please try again.",
   "initError": "Connection timed out. Please try again.",
   "gameOverBlocked": "Game over! You can't play again today. Come back tomorrow!"
 }

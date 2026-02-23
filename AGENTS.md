@@ -57,54 +57,75 @@ For infra setup and OpenClaw-related work, always refer to existing docs before 
 
 ---
 
-# AI-DLC and Spec-Driven Development
+# Agent Guidelines
 
-Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life Cycle)
+- Always prefer simplicity over pathological correctness. YAGNI, KISS, DRY. No backward-compat shims or fallback paths unless they come free without adding cyclomatic complexity.
 
-## Project Context
+## Steering (Project Context)
 
-### Paths
+Load `.kiro/steering/` as project memory at session start or when context is needed.
 
-- Steering: `.kiro/steering/`
-- Specs: `.kiro/specs/`
+- **Path**: `.kiro/steering/`
+- **Default files**: `product.md`, `tech.md`, `structure.md`
+- **Custom files**: Supported; add or manage as needed for the project
 
-### Steering vs Specification
+Use steering to align decisions with product goals, tech stack, and structure.
 
-**Steering** (`.kiro/steering/`) - Guide AI with project-wide rules and context
-**Specs** (`.kiro/specs/`) - Formalize development process for individual features
+## Workflow Orchestration
 
-### Active Specifications
+### 1. Plan Node Default
 
-- Check `.kiro/specs/` for active specifications
-- Use `/kiro/spec-status [feature-name]` to check progress
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
+- If something goes sideways, STOP and re-plan immediately - don't keep pushing
+- Use plan mode for verification steps, not just building
+- Write detailed specs upfront to reduce ambiguity
 
-## Development Guidelines
+### 2. Subagent Strategy
 
-- Think in English, generate responses in Japanese. All Markdown content written to project files (e.g., requirements.md, design.md, tasks.md, research.md, validation reports) MUST be written in the target language configured for this specification (see spec.json.language).
+- Use subagents liberally to keep main context window clean
+- Offload research, exploration, and parallel analysis to subagents
+- For complex problems, throw more compute at it via subagents
+- One tack per subagent for focused execution
 
-## Minimal Workflow
+### 3. Self-Improvement Loop
 
-- Phase 0 (optional): `/kiro/steering`, `/kiro/steering-custom`
-- Phase 1 (Specification):
-  - `/kiro/spec-init "description"`
-  - `/kiro/spec-requirements {feature}`
-  - `/kiro/validate-gap {feature}` (optional: for existing codebase)
-  - `/kiro/spec-design {feature} [-y]`
-  - `/kiro/validate-design {feature}` (optional: design review)
-  - `/kiro/spec-tasks {feature} [-y]`
-- Phase 2 (Implementation): `/kiro/spec-impl {feature} [tasks]`
-  - `/kiro/validate-impl {feature}` (optional: after implementation)
-- Progress check: `/kiro/spec-status {feature}` (use anytime)
+- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- Write rules for yourself that prevent the same mistake
+- Ruthlessly iterate on these lessons until mistake rate drops
+- Review lessons at session start for relevant project
 
-## Development Rules
+### 4. Verification Before Done
 
-- 3-phase approval workflow: Requirements → Design → Tasks → Implementation
-- Human review required each phase; use `-y` only for intentional fast-track
-- Keep steering current and verify alignment with `/kiro/spec-status`
-- Follow the user's instructions precisely, and within that scope act autonomously: gather the necessary context and complete the requested work end-to-end in this run, asking questions only when essential information is missing or the instructions are critically ambiguous.
+- Never mark a task complete without proving it works
+- Diff behavior between main and your changes when relevant
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness
 
-## Steering Configuration
+### 5. Demand Elegance (Balanced)
 
-- Load entire `.kiro/steering/` as project memory
-- Default files: `product.md`, `tech.md`, `structure.md`
-- Custom files are supported (managed via `/kiro/steering-custom`)
+- For non-trivial changes: pause and ask "is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
+- Skip this for simple, obvious fixes - don't over-engineer
+- Challenge your own work before presenting it
+
+### 6. Autonomous Bug Fixing
+
+- When given a bug report: just fix it. Don't ask for hand-holding
+- Point at logs, errors, failing tests - then resolve them
+- Zero context switching required from the user
+- Go fix failing CI tests without being told how
+
+## Task Management
+
+1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
+2. **Verify Plan**: Check in before starting implementation
+3. **Track Progress**: Mark items complete as you go
+4. **Explain Changes**: High-level summary at each step
+5. **Document Results**: Add review section to `tasks/todo.md`
+6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+
+## Core Principles
+
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
+- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
+- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.

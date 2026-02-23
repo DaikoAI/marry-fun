@@ -98,10 +98,34 @@ export const walletAddress = sqliteTable(
   ],
 );
 
+export const xAccount = sqliteTable(
+  "xAccount",
+  {
+    id: text("id").primaryKey(),
+    userId: text("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accountId: text("accountId")
+      .notNull()
+      .references(() => account.id, { onDelete: "cascade" }),
+    providerAccountId: text("providerAccountId").notNull(),
+    username: text("username"),
+    linkedAt: integer("linkedAt", { mode: "timestamp_ms" }).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
+    updatedAt: integer("updatedAt", { mode: "timestamp_ms" }).notNull(),
+  },
+  table => [
+    uniqueIndex("x_account_user_id_unique").on(table.userId),
+    uniqueIndex("x_account_account_id_unique").on(table.accountId),
+    index("x_account_provider_account_id_idx").on(table.providerAccountId),
+  ],
+);
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   walletAddresses: many(walletAddress),
+  xAccounts: many(xAccount),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -117,6 +141,7 @@ export const accountRelations = relations(account, ({ one, many }) => ({
     references: [user.id],
   }),
   walletAddresses: many(walletAddress),
+  xAccounts: many(xAccount),
 }));
 
 export const walletAddressRelations = relations(walletAddress, ({ one }) => ({
@@ -126,6 +151,17 @@ export const walletAddressRelations = relations(walletAddress, ({ one }) => ({
   }),
   account: one(account, {
     fields: [walletAddress.accountId],
+    references: [account.id],
+  }),
+}));
+
+export const xAccountRelations = relations(xAccount, ({ one }) => ({
+  user: one(user, {
+    fields: [xAccount.userId],
+    references: [user.id],
+  }),
+  account: one(account, {
+    fields: [xAccount.accountId],
     references: [account.id],
   }),
 }));

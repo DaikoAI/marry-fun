@@ -1,5 +1,5 @@
 <p align="center" style="line-height: 0.5; margin-bottom: 0.5em">
-  <img src="public/logo.png" alt="marry.fun" width="240" /><br/>
+  <img src="public/logo.webp" alt="marry.fun" width="240" /><br/>
   <img src="public/girl/default.png" alt="Claw-chan" width="360" />
 </p>
 
