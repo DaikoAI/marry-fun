@@ -8,20 +8,15 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { SolanaAuthPanel } from "@/components/auth/solana-auth-panel";
 import { Background } from "@/components/background";
+import { BgmController } from "@/components/bgm-controller";
 import { PrologueOverlay } from "@/components/prologue-overlay";
 import { Link, useRouter } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { routing } from "@/i18n/routing";
 import { authClient } from "@/lib/auth/auth-client";
 import type { InitGameResult } from "@/lib/girl-chat";
 import { getStartOnboardingStep } from "@/lib/start/onboarding-flow";
 import { shouldShowPrologueSkip } from "@/lib/start/prologue-skip";
 import { useGameStore } from "@/store/game-store";
-
-const localeConfig: Record<Locale, { flag: string; label: string }> = {
-  en: { flag: "\u{1F1FA}\u{1F1F8}", label: "EN" },
-  ja: { flag: "\u{1F1EF}\u{1F1F5}", label: "\u65E5\u672C\u8A9E" },
-};
 
 type FormSubmitEvent = Parameters<NonNullable<ComponentProps<"form">["onSubmit"]>>[0];
 
@@ -45,8 +40,12 @@ export function StartPageClient() {
   const [hasInitResponse, setHasInitResponse] = useState(false);
   const [initError, setInitError] = useState(false);
   const [gameOverBlocked, setGameOverBlocked] = useState(false);
+  const [isLocaleMenuOpen, setIsLocaleMenuOpen] = useState(false);
   const t = useTranslations("start");
   const locale = useLocale();
+  const nextLocale: Locale = locale === "ja" ? "en" : "ja";
+  const languageToggleLabel = nextLocale === "ja" ? t("switchLanguageToJa") : t("switchLanguageToEn");
+  const localeMenuRef = useRef<HTMLDivElement | null>(null);
 
   const effectiveUsername = hasStoredUsername ? storedName.trim() : username.trim();
   const isValid = isValidUsername(effectiveUsername);
@@ -72,6 +71,30 @@ export function StartPageClient() {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isLocaleMenuOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!localeMenuRef.current?.contains(event.target as Node)) {
+        setIsLocaleMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsLocaleMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isLocaleMenuOpen]);
 
   const isWalletAuthenticated = Boolean(session.data?.session);
   const onboardingStep = getStartOnboardingStep({
@@ -181,6 +204,62 @@ export function StartPageClient() {
   return (
     <div className="relative h-dvh overflow-hidden text-white">
       <Background />
+      <div className="absolute top-[max(env(safe-area-inset-top),1.5rem)] right-[max(env(safe-area-inset-right),1.5rem)] z-20 flex items-center gap-2">
+        <BgmController />
+        <div ref={localeMenuRef} className="relative">
+          <button
+            type="button"
+            aria-label={t("openLanguageMenu")}
+            aria-haspopup="menu"
+            aria-expanded={isLocaleMenuOpen}
+            aria-controls="language-menu"
+            onClick={() => {
+              setIsLocaleMenuOpen(prev => !prev);
+            }}
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/35 bg-white/10 text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md transition-colors hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18" />
+              <path d="M12 3a15 15 0 0 1 0 18" />
+              <path d="M12 3a15 15 0 0 0 0 18" />
+            </svg>
+          </button>
+          {isLocaleMenuOpen && (
+            <div
+              id="language-menu"
+              role="menu"
+              className="absolute top-10 right-0 flex min-w-[132px] flex-col gap-1 rounded-2xl border border-white/35 bg-black/45 p-1 shadow-[0_10px_28px_rgba(0,0,0,0.45)] backdrop-blur-md"
+            >
+              {(
+                [
+                  { locale: "en", label: "EN", emoji: "🇺🇸", title: t("switchLanguageToEn") },
+                  { locale: "ja", label: "日本語", emoji: "🇯🇵", title: t("switchLanguageToJa") },
+                ] as const satisfies ReadonlyArray<{ locale: Locale; label: string; emoji: string; title: string }>
+              ).map(item => (
+                <Link
+                  key={item.locale}
+                  href="/"
+                  locale={item.locale}
+                  role="menuitem"
+                  title={item.title}
+                  onClick={() => {
+                    setIsLocaleMenuOpen(false);
+                  }}
+                  className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
+                    locale === item.locale ?
+                      "bg-white/30 text-white"
+                    : "text-white/80 hover:bg-white/20 hover:text-white"
+                  }`}
+                >
+                  <span aria-hidden="true">{item.emoji}</span>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
       <PrologueOverlay
         isVisible={phase === "prologue"}
         onComplete={handlePrologueComplete}
@@ -190,7 +269,7 @@ export function StartPageClient() {
       <div className="relative z-10 mx-auto flex h-full max-w-md flex-col items-center justify-center px-6">
         <form
           onSubmit={handleSubmit}
-          className="flex w-full animate-[fadeIn_1200ms_cubic-bezier(0.22,1,0.36,1)_both] flex-col items-center gap-8 motion-reduce:animate-none"
+          className="flex h-full w-full animate-[fadeIn_1200ms_cubic-bezier(0.22,1,0.36,1)_both] flex-col items-center gap-8 motion-reduce:animate-none"
         >
           <Image
             src="/logo.webp"
@@ -198,32 +277,8 @@ export function StartPageClient() {
             priority
             width={720}
             height={240}
-            className="mb-4 h-auto w-[min(320px,65vw)] drop-shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
+            className="mt-[max(env(safe-area-inset-top),3.5rem)] mb-4 h-auto w-[min(320px,65vw)] drop-shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
           />
-          {/* Language Switcher */}
-          <div className="flex gap-2">
-            {routing.locales.map(l => {
-              const config = localeConfig[l];
-              return (
-                <Link
-                  key={l}
-                  href="/"
-                  locale={l}
-                  className={`flex items-center justify-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold backdrop-blur-md transition-colors ${
-                    l === locale ?
-                      "bg-white/25 text-white ring-1 ring-white/40"
-                    : "bg-white/10 text-white/50 hover:bg-white/20 hover:text-white/80"
-                  }`}
-                >
-                  <span className="text-base" aria-hidden="true">
-                    {config.flag}
-                  </span>
-                  {config.label}
-                </Link>
-              );
-            })}
-          </div>
-          <SolanaAuthPanel variant="onboarding" />
           {onboardingStep === "name" && (
             <>
               <div className="w-full">
@@ -279,6 +334,9 @@ export function StartPageClient() {
               </button>
             </>
           )}
+          <div className="mt-auto w-full pb-[max(env(safe-area-inset-bottom),1.5rem)]">
+            <SolanaAuthPanel variant="onboarding" />
+          </div>
         </form>
       </div>
     </div>

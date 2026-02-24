@@ -13,5 +13,8 @@
   "profileError": "ユーザー名の保存に失敗しました。もう一度お試しください。",
   "xLinkError": "Xアカウントの連携に失敗しました。もう一度お試しください。",
   "initError": "接続がタイムアウトしました。もう一度お試しください。",
-  "gameOverBlocked": "ゲームオーバー！今日はもうプレイできません。明日また来てね！"
+  "gameOverBlocked": "ゲームオーバー！今日はもうプレイできません。明日また来てね！",
+  "openLanguageMenu": "言語メニューを開く",
+  "switchLanguageToEn": "英語に切り替え",
+  "switchLanguageToJa": "日本語に切り替え"
 }

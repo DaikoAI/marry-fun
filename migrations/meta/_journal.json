@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1770992271089,
-      "tag": "0000_silly_mach_iv",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1771003683752,
-      "tag": "0001_steep_riptide",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1771005212358,
-      "tag": "0002_naive_anita_blake",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1771070086485,
-      "tag": "0003_unique_groot",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1771888945334,
-      "tag": "0004_whole_molecule_man",
+      "when": 1771919789273,
+      "tag": "0000_clear_punisher",
       "breakpoints": true
     }
   ]

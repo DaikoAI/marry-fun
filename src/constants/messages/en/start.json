@@ -13,5 +13,8 @@
   "profileError": "Failed to save username. Please try again.",
   "xLinkError": "Failed to link X account. Please try again.",
   "initError": "Connection timed out. Please try again.",
-  "gameOverBlocked": "Game over! You can't play again today. Come back tomorrow!"
+  "gameOverBlocked": "Game over! You can't play again today. Come back tomorrow!",
+  "openLanguageMenu": "Open language menu",
+  "switchLanguageToEn": "Switch language to English",
+  "switchLanguageToJa": "Switch language to Japanese"
 }

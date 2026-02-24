@@ -77,7 +77,7 @@ export const verification = sqliteTable(
 
 // better-auth-web3 default schema
 export const walletAddress = sqliteTable(
-  "walletAddress",
+  "wallet_address",
   {
     id: text("id").primaryKey(),
     userId: text("userId")
@@ -99,7 +99,7 @@ export const walletAddress = sqliteTable(
 );
 
 export const xAccount = sqliteTable(
-  "xAccount",
+  "x_account",
   {
     id: text("id").primaryKey(),
     userId: text("userId")
@@ -110,6 +110,7 @@ export const xAccount = sqliteTable(
       .references(() => account.id, { onDelete: "cascade" }),
     providerAccountId: text("providerAccountId").notNull(),
     username: text("username"),
+    profileImageUrl: text("profileImageUrl"),
     linkedAt: integer("linkedAt", { mode: "timestamp_ms" }).notNull(),
     createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updatedAt", { mode: "timestamp_ms" }).notNull(),

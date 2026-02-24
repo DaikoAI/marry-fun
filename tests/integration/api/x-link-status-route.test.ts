@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetServerSession = vi.fn();
 const hasWalletMock = vi.fn();
 const findTwitterAccountMock = vi.fn();
 const upsertFromTwitterAccountMock = vi.fn();
+const fetchMock = vi.fn();
 
 vi.mock("@/lib/auth/server-session", () => ({
   getServerSession: mockGetServerSession,
@@ -24,10 +25,20 @@ const { GET } = await import("@/app/api/auth/x/link-status/route");
 describe("GET /api/auth/x/link-status", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal("fetch", fetchMock);
     mockGetServerSession.mockResolvedValue({ user: { id: "u1" } });
     hasWalletMock.mockResolvedValue(true);
     findTwitterAccountMock.mockResolvedValue(null);
-    upsertFromTwitterAccountMock.mockResolvedValue({ providerAccountId: "x-acc-1", username: null });
+    upsertFromTwitterAccountMock.mockResolvedValue({
+      providerAccountId: "x-acc-1",
+      username: null,
+      profileImageUrl: null,
+    });
+    fetchMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("未ログインは 401 を返す", async () => {
@@ -65,10 +76,12 @@ describe("GET /api/auth/x/link-status", () => {
     findTwitterAccountMock.mockResolvedValueOnce({
       id: "acc-twitter-1",
       accountId: "x-provider-account-1",
+      accessToken: null,
     });
     upsertFromTwitterAccountMock.mockResolvedValueOnce({
       providerAccountId: "x-provider-account-1",
       username: "claw_chan_fan",
+      profileImageUrl: "https://pbs.twimg.com/profile_images/123/avatar_normal.jpg",
     });
 
     const res = await GET(new Request("http://localhost:8787/api/auth/x/link-status"));
@@ -79,11 +92,70 @@ describe("GET /api/auth/x/link-status", () => {
       linked: true,
       providerAccountId: "x-provider-account-1",
       username: "claw_chan_fan",
+      profileImageUrl: "https://pbs.twimg.com/profile_images/123/avatar_normal.jpg",
     });
     expect(upsertFromTwitterAccountMock).toHaveBeenCalledWith({
       userId: "u1",
       accountId: "acc-twitter-1",
       providerAccountId: "x-provider-account-1",
+    });
+  });
+
+  it("プロフィールが未保存なら X API から取得して保存する", async () => {
+    findTwitterAccountMock.mockResolvedValueOnce({
+      id: "acc-twitter-1",
+      accountId: "x-provider-account-1",
+      accessToken: "token-1",
+    });
+    upsertFromTwitterAccountMock
+      .mockResolvedValueOnce({
+        providerAccountId: "x-provider-account-1",
+        username: null,
+        profileImageUrl: null,
+      })
+      .mockResolvedValueOnce({
+        providerAccountId: "x-provider-account-1",
+        username: "claw_chan_fan",
+        profileImageUrl: "https://pbs.twimg.com/profile_images/123/avatar_normal.jpg",
+      });
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          data: {
+            username: "claw_chan_fan",
+            profile_image_url: "https://pbs.twimg.com/profile_images/123/avatar_normal.jpg",
+          },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const res = await GET(new Request("http://localhost:8787/api/auth/x/link-status"));
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.twitter.com/2/users/me?user.fields=username,profile_image_url",
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer token-1",
+        },
+        cache: "no-store",
+      },
+    );
+    expect(upsertFromTwitterAccountMock).toHaveBeenNthCalledWith(2, {
+      userId: "u1",
+      accountId: "acc-twitter-1",
+      providerAccountId: "x-provider-account-1",
+      username: "claw_chan_fan",
+      profileImageUrl: "https://pbs.twimg.com/profile_images/123/avatar_normal.jpg",
+    });
+    expect(json).toEqual({
+      linked: true,
+      providerAccountId: "x-provider-account-1",
+      username: "claw_chan_fan",
+      profileImageUrl: "https://pbs.twimg.com/profile_images/123/avatar_normal.jpg",
     });
   });
 });

@@ -42,6 +42,12 @@ async function buildAuth() {
   return betterAuth({
     baseURL: getAuthBaseUrl(),
     secret: getAuthSecret(),
+    account: {
+      accountLinking: {
+        enabled: true,
+        allowDifferentEmails: true,
+      },
+    },
     trustedOrigins: [
       getAuthBaseUrl(),
       "http://localhost:*",

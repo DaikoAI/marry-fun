@@ -6,17 +6,21 @@ import { account, walletAddress, xAccount } from "@/infrastructure/db/schema";
 interface TwitterAccountSummary {
   id: string;
   accountId: string;
+  accessToken: string | null;
 }
 
 interface UpsertXAccountInput {
   userId: string;
   accountId: string;
   providerAccountId: string;
+  username?: string | null;
+  profileImageUrl?: string | null;
 }
 
 interface XAccountSummary {
   providerAccountId: string;
   username: string | null;
+  profileImageUrl: string | null;
 }
 
 export class D1XAccountRepository {
@@ -37,6 +41,7 @@ export class D1XAccountRepository {
       .select({
         id: account.id,
         accountId: account.accountId,
+        accessToken: account.accessToken,
       })
       .from(account)
       .where(and(eq(account.userId, userId), eq(account.providerId, "twitter")))
@@ -48,33 +53,48 @@ export class D1XAccountRepository {
   async upsertFromTwitterAccount(input: UpsertXAccountInput): Promise<XAccountSummary> {
     const db = await getDb();
     const now = new Date();
+    const insertValues = {
+      id: crypto.randomUUID(),
+      userId: input.userId,
+      accountId: input.accountId,
+      providerAccountId: input.providerAccountId,
+      username: input.username ?? null,
+      profileImageUrl: input.profileImageUrl ?? null,
+      linkedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const updateSet: {
+      accountId: string;
+      providerAccountId: string;
+      username?: string | null;
+      profileImageUrl?: string | null;
+      linkedAt: Date;
+      updatedAt: Date;
+    } = {
+      accountId: input.accountId,
+      providerAccountId: input.providerAccountId,
+      linkedAt: now,
+      updatedAt: now,
+    };
 
-    await db
-      .insert(xAccount)
-      .values({
-        id: crypto.randomUUID(),
-        userId: input.userId,
-        accountId: input.accountId,
-        providerAccountId: input.providerAccountId,
-        username: null,
-        linkedAt: now,
-        createdAt: now,
-        updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: xAccount.userId,
-        set: {
-          accountId: input.accountId,
-          providerAccountId: input.providerAccountId,
-          linkedAt: now,
-          updatedAt: now,
-        },
-      });
+    if (input.username !== undefined) {
+      updateSet.username = input.username;
+    }
+    if (input.profileImageUrl !== undefined) {
+      updateSet.profileImageUrl = input.profileImageUrl;
+    }
+
+    await db.insert(xAccount).values(insertValues).onConflictDoUpdate({
+      target: xAccount.userId,
+      set: updateSet,
+    });
 
     const rows = await db
       .select({
         providerAccountId: xAccount.providerAccountId,
         username: xAccount.username,
+        profileImageUrl: xAccount.profileImageUrl,
       })
       .from(xAccount)
       .where(eq(xAccount.userId, input.userId))
@@ -87,6 +107,7 @@ export class D1XAccountRepository {
     return {
       providerAccountId: input.providerAccountId,
       username: null,
+      profileImageUrl: null,
     };
   }
 }

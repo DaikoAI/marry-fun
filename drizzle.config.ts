@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig } from "drizzle-kit";
 
@@ -12,11 +12,17 @@ function getLocalDb(): string {
 
   const d1Path = resolve(root, "state/v3/d1/miniflare-D1DatabaseObject");
   if (existsSync(d1Path)) {
-    const entries = readdirSync(d1Path, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isFile() && entry.name.endsWith(".sqlite")) {
-        return resolve(d1Path, entry.name);
-      }
+    const candidates = readdirSync(d1Path, { withFileTypes: true })
+      .filter(entry => entry.isFile() && entry.name.endsWith(".sqlite"))
+      .map(entry => resolve(d1Path, entry.name))
+      .sort((a, b) => {
+        const aMtime = statSync(a).mtimeMs;
+        const bMtime = statSync(b).mtimeMs;
+        return bMtime - aMtime;
+      });
+
+    if (candidates.length > 0) {
+      return candidates[0];
     }
   }
 
