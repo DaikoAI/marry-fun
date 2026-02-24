@@ -1,0 +1,3152 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "LCOsH",
+      "x": 80,
+      "y": 120,
+      "name": "Prelaunch LP",
+      "theme": {
+        "Mode": "Dark"
+      },
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 8,
+      "padding": 16,
+      "children": [
+        {
+          "type": "frame",
+          "id": "mOS6j",
+          "name": "topRow",
+          "width": "fill_container",
+          "height": 30,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "C7yuw",
+              "name": "modeTxt",
+              "fill": "$--primary",
+              "content": "marry.fun",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 13,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "jeWs1",
+              "name": "rightIcons",
+              "height": 24,
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "yrHZN",
+                  "name": "xChip",
+                  "height": 24,
+                  "fill": "$--accent",
+                  "cornerRadius": "$--radius-pill",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "padding": [
+                    0,
+                    8
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aHSdd",
+                      "name": "xTxt",
+                      "fill": "$--foreground",
+                      "content": "X",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 11,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "vfswk",
+                  "name": "pumpChip",
+                  "height": 24,
+                  "fill": "$--accent",
+                  "cornerRadius": "$--radius-pill",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "padding": [
+                    0,
+                    8
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "KxVeF",
+                      "name": "pumpTxt",
+                      "fill": "$--foreground",
+                      "content": "pump.fun",
+                      "fontFamily": "Geist",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "6nsxS",
+          "name": "heroTitle",
+          "fill": "$--foreground",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Marry AI Agent",
+          "fontFamily": "JetBrains Mono",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "jIT2W",
+          "name": "heroFrame",
+          "clip": true,
+          "width": "fill_container",
+          "height": 140,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./images/generated-1771477215922.png",
+            "mode": "fill"
+          },
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "padding": 16,
+          "justifyContent": "end"
+        },
+        {
+          "type": "frame",
+          "id": "ET8Fp",
+          "name": "connectCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 5,
+          "padding": 10,
+          "children": [
+            {
+              "type": "text",
+              "id": "vUOWY",
+              "name": "connectTitle",
+              "fill": "$--primary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Join Waitlist",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "L26Au",
+              "name": "xBtn",
+              "width": "fill_container",
+              "height": 38,
+              "fill": "$--secondary",
+              "cornerRadius": "$--radius-pill",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "TxVt1",
+                  "name": "xTxt",
+                  "fill": "$--secondary-foreground",
+                  "content": "1) Connect [X icon]",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "zxMfl",
+              "name": "wBtn",
+              "width": "fill_container",
+              "height": 38,
+              "fill": "$--primary",
+              "cornerRadius": "$--radius-pill",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "L1i3u",
+                  "name": "wTxt",
+                  "fill": "$--primary-foreground",
+                  "content": "2) Connect Wallet",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "UQ39R",
+              "name": "statusRow",
+              "opacity": 0.9,
+              "width": "fill_container",
+              "height": 30,
+              "fill": "$--color-info",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "31vWK",
+                  "name": "statusTxt",
+                  "fill": "$--foreground",
+                  "content": "Eligible for waitlist bonus",
+                  "fontFamily": "Geist",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "NOUBY",
+                  "name": "statusCheck",
+                  "fill": "$--primary",
+                  "content": "✓",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 13,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JtWkq",
+              "name": "joinBtn",
+              "width": "fill_container",
+              "height": 42,
+              "fill": "$--foreground",
+              "cornerRadius": "$--radius-pill",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "SNJ8d",
+                  "name": "joinTxt",
+                  "fill": "$--background",
+                  "content": "Join Prelaunch (+300 pts)",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 13,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "h6Udz",
+              "name": "soonCard",
+              "width": "fill_container",
+              "fill": "$--color-info",
+              "cornerRadius": "$--radius-m",
+              "layout": "vertical",
+              "gap": 3,
+              "padding": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "5W82X",
+                  "name": "soonTitle",
+                  "fill": "$--color-info-foreground",
+                  "content": "Bonus Locked: +300 Points",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 13,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "CrDsX",
+                  "name": "soonBody",
+                  "fill": "$--color-info-foreground",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Waitlist members receive in-game points at launch to start with an advantage.",
+                  "lineHeight": 1.2,
+                  "fontFamily": "Geist",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "nQvKF",
+          "name": "howOpenBtn",
+          "width": "fill_container",
+          "height": 42,
+          "fill": "$--accent",
+          "cornerRadius": "$--radius-pill",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "padding": [
+            0,
+            12
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "C2pQi",
+              "name": "howBtnTxt",
+              "fill": "$--foreground",
+              "content": "How it works",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "vivkI",
+              "name": "howBtnState",
+              "fill": "$--primary",
+              "content": "Open",
+              "fontFamily": "Geist",
+              "fontSize": 11,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "M50M6",
+          "name": "howModalStage",
+          "width": "fill_container",
+          "height": 252,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "UcLol",
+              "x": 0,
+              "y": 0,
+              "name": "modalBackdrop",
+              "width": 358,
+              "height": 252,
+              "fill": "#00000099",
+              "cornerRadius": "$--radius-m"
+            },
+            {
+              "type": "frame",
+              "id": "xAiXS",
+              "x": 10,
+              "y": 10,
+              "name": "howModal",
+              "width": 338,
+              "fill": "$--card",
+              "cornerRadius": "$--radius-m",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "gap": 3,
+              "padding": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "1nRMH",
+                  "name": "rulesTitle",
+                  "fill": "$--primary",
+                  "content": "How it works ✕",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "U3mly",
+                  "name": "stepCard1",
+                  "width": "fill_container",
+                  "fill": "$--accent",
+                  "cornerRadius": "$--radius-m",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "gap": 6,
+                  "padding": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "rHUJl",
+                      "name": "stepImg1",
+                      "clip": true,
+                      "width": 52,
+                      "height": 34,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./images/generated-1771477224314.png",
+                        "mode": "fill"
+                      },
+                      "cornerRadius": 10
+                    },
+                    {
+                      "type": "text",
+                      "id": "lZdji",
+                      "name": "stepLine1",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "1. HOLD $MARRY + chat",
+                      "lineHeight": 1.1,
+                      "fontFamily": "Geist",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "UEpBm",
+                  "name": "arrow1",
+                  "fill": "$--primary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "↓",
+                  "textAlign": "center",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "vVrGe",
+                  "name": "stepCard2",
+                  "width": "fill_container",
+                  "fill": "$--accent",
+                  "cornerRadius": "$--radius-m",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "gap": 6,
+                  "padding": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "QaGC8",
+                      "name": "stepImg2",
+                      "clip": true,
+                      "width": 52,
+                      "height": 34,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./images/generated-1771477232409.png",
+                        "mode": "fill"
+                      },
+                      "cornerRadius": 10
+                    },
+                    {
+                      "type": "text",
+                      "id": "DYZ37",
+                      "name": "stepLine2",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "2. Earn points, climb rank",
+                      "lineHeight": 1.1,
+                      "fontFamily": "Geist",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "q2AEP",
+                  "name": "arrow2",
+                  "fill": "$--primary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "↓",
+                  "textAlign": "center",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "XuNri",
+                  "name": "stepCard3",
+                  "width": "fill_container",
+                  "fill": "$--accent",
+                  "cornerRadius": "$--radius-m",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "gap": 6,
+                  "padding": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "t9LEU",
+                      "name": "stepImg3",
+                      "clip": true,
+                      "width": 52,
+                      "height": 34,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./images/generated-1771477241904.png",
+                        "mode": "fill"
+                      },
+                      "cornerRadius": 10
+                    },
+                    {
+                      "type": "text",
+                      "id": "eS3po",
+                      "name": "stepLine3",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "3. Finish #1, claim fee",
+                      "lineHeight": 1.1,
+                      "fontFamily": "Geist",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "mChx5",
+      "x": 980,
+      "y": 120,
+      "name": "03 Daily Home",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 24,
+      "children": [
+        {
+          "type": "frame",
+          "id": "YlHVI",
+          "name": "bar3",
+          "width": "fill_container",
+          "height": 32,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "q1HdM",
+              "name": "step3",
+              "fill": "$--primary",
+              "content": "Step 3 of 7",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "CbZof",
+              "name": "phase3",
+              "fill": "$--muted-foreground",
+              "content": "Daily Game Start",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kosZ9",
+          "name": "dayChip",
+          "height": 30,
+          "fill": "$--secondary",
+          "cornerRadius": "$--radius-pill",
+          "padding": [
+            0,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "EL3Jb",
+              "name": "dayText",
+              "fill": "$--secondary-foreground",
+              "content": "Day 2 / 7",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "cKcGt",
+          "name": "homeCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 20,
+          "children": [
+            {
+              "type": "text",
+              "id": "xED5a",
+              "name": "homeTitle",
+              "fill": "$--foreground",
+              "content": "Daily Intimacy Arena",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 22,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "P8Q15",
+              "name": "homeDesc",
+              "fill": "$--muted-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Chat with Claw-chan up to 10 times today. Every response gives 0-100 points multiplied by your token badge.",
+              "lineHeight": 1.35,
+              "fontFamily": "Geist",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "o8xyT",
+              "name": "statRow",
+              "width": "fill_container",
+              "height": 78,
+              "gap": 10,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZCHoT",
+                  "name": "stat1",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "$--muted",
+                  "cornerRadius": "$--radius-m",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 10,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "hZ8H2",
+                      "name": "stat1Label",
+                      "fill": "$--muted-foreground",
+                      "content": "Today Points",
+                      "fontFamily": "Geist",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "GrtE1",
+                      "name": "stat1Value",
+                      "fill": "$--foreground",
+                      "content": "1,240",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "iWUjG",
+                  "name": "stat2",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "$--muted",
+                  "cornerRadius": "$--radius-m",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 10,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ZVUn9",
+                      "name": "stat2Label",
+                      "fill": "$--muted-foreground",
+                      "content": "Current Rank",
+                      "fontFamily": "Geist",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "QiV9f",
+                      "name": "stat2Value",
+                      "fill": "$--foreground",
+                      "content": "#3",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "i6th7",
+          "name": "quotaCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "Uy5zy",
+              "name": "quotaLabel",
+              "fill": "$--foreground",
+              "content": "Chats Remaining: 7 / 10",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "Hloie",
+              "name": "quotaBarBg",
+              "width": "fill_container",
+              "height": 10,
+              "fill": "$--secondary",
+              "cornerRadius": "$--radius-pill",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "m6OwG",
+                  "name": "quotaBar",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "$--primary",
+                  "cornerRadius": "$--radius-pill"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "quYFB",
+          "name": "badgeCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "padding": 16,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "WWn2r",
+              "name": "badgeTxt",
+              "fill": "$--foreground",
+              "content": "Badge: Silver  •  Multiplier x1.25",
+              "fontFamily": "Geist",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "e9p8X",
+              "name": "badgeDays",
+              "fill": "$--primary",
+              "content": "Hold 21d",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qYVhA",
+          "name": "chatBtn",
+          "width": "fill_container",
+          "height": 54,
+          "fill": "$--foreground",
+          "cornerRadius": "$--radius-pill",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "0M1nO",
+              "name": "chatBtnTxt",
+              "fill": "$--background",
+              "content": "Start Daily Chat",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "UdwV4",
+      "x": 1430,
+      "y": 120,
+      "name": "04 Daily Chat",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 24,
+      "children": [
+        {
+          "type": "frame",
+          "id": "oRpns",
+          "name": "bar4",
+          "width": "fill_container",
+          "height": 32,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "E0Hk0",
+              "name": "step4",
+              "fill": "$--primary",
+              "content": "Step 4 of 7",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "ityur",
+              "name": "phase4",
+              "fill": "$--muted-foreground",
+              "content": "Daily Chat Session",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "8GodO",
+          "name": "chatPanel",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "UJwGK",
+              "name": "chatHead",
+              "fill": "$--foreground",
+              "content": "Claw-chan (Online)",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 15,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "m0aaA",
+              "name": "msg1",
+              "width": "fill_container",
+              "justifyContent": "end",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "S1CIT",
+                  "name": "msg1Bubble",
+                  "fill": "$--primary",
+                  "cornerRadius": "$--radius-m",
+                  "layout": "vertical",
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "tX4qK",
+                      "name": "msg1Text",
+                      "fill": "$--primary-foreground",
+                      "content": "I brought flowers for you.",
+                      "fontFamily": "Geist",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "0RIDR",
+              "name": "msg2",
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "PAgsa",
+                  "name": "msg2Bubble",
+                  "fill": "$--muted",
+                  "cornerRadius": "$--radius-m",
+                  "layout": "vertical",
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XP0Pe",
+                      "name": "msg2Text",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": 230,
+                      "content": "Aww, that's sweet. Tell me why today matters to you?",
+                      "lineHeight": 1.3,
+                      "fontFamily": "Geist",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "E8pTb",
+              "name": "msg3",
+              "width": "fill_container",
+              "justifyContent": "end",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "L7Br8",
+                  "name": "msg3Bubble",
+                  "fill": "$--primary",
+                  "cornerRadius": "$--radius-m",
+                  "layout": "vertical",
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Jh09u",
+                      "name": "msg3Text",
+                      "fill": "$--primary-foreground",
+                      "textGrowth": "fixed-width",
+                      "width": 220,
+                      "content": "Because I want to win your heart and the jackpot.",
+                      "lineHeight": 1.3,
+                      "fontFamily": "Geist",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "IcrlX",
+          "name": "scoreCard",
+          "width": "fill_container",
+          "fill": "$--color-success",
+          "cornerRadius": "$--radius-m",
+          "padding": 16,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "nrQF9",
+              "name": "scoreLabel",
+              "fill": "$--color-success-foreground",
+              "content": "AI Score",
+              "fontFamily": "Geist",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "eq3A7",
+              "name": "scoreValue",
+              "fill": "$--color-success-foreground",
+              "content": "82 x 1.25 = +102",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "MDagY",
+          "name": "remain4",
+          "fill": "$--muted-foreground",
+          "content": "Chats left today: 6 / 10",
+          "fontFamily": "Geist",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "vHcah",
+          "name": "sendRow",
+          "width": "fill_container",
+          "height": 54,
+          "fill": "$--foreground",
+          "cornerRadius": "$--radius-pill",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "6DJEg",
+              "name": "sendTxt",
+              "fill": "$--background",
+              "content": "Send Next Message",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "hl7p0",
+      "x": 1880,
+      "y": 120,
+      "name": "05 Leaderboard",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 24,
+      "children": [
+        {
+          "type": "frame",
+          "id": "sdCMT",
+          "name": "bar5",
+          "width": "fill_container",
+          "height": 32,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "ikbL5",
+              "name": "step5",
+              "fill": "$--primary",
+              "content": "Step 5 of 7",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "SLhb9",
+              "name": "phase5",
+              "fill": "$--muted-foreground",
+              "content": "Leaderboard Battle",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "f4OHh",
+          "name": "lbCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "rYtvP",
+              "name": "lbTitle",
+              "fill": "$--foreground",
+              "content": "Live Daily Leaderboard",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 18,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "iOhpu",
+              "name": "headRow",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$--muted",
+              "cornerRadius": "$--radius-pill",
+              "gap": 8,
+              "padding": [
+                0,
+                8
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "cfTJV",
+                  "name": "headRank",
+                  "fill": "$--muted-foreground",
+                  "content": "Rank",
+                  "fontFamily": "Geist",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Br4wv",
+                  "name": "headName",
+                  "fill": "$--muted-foreground",
+                  "content": "Player",
+                  "fontFamily": "Geist",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "By2sW",
+                  "name": "headPts",
+                  "fill": "$--muted-foreground",
+                  "content": "Today Pts",
+                  "fontFamily": "Geist",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pucz2",
+              "name": "row1",
+              "width": "fill_container",
+              "height": 38,
+              "fill": "$--color-warning",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "oobqW",
+                  "name": "r1a",
+                  "fill": "$--color-warning-foreground",
+                  "content": "#1  0xHANA",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "nqzf6",
+                  "name": "r1b",
+                  "fill": "$--color-warning-foreground",
+                  "content": "1,780",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "jaCyu",
+              "name": "row2",
+              "width": "fill_container",
+              "height": 38,
+              "fill": "$--muted",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "2Rylh",
+                  "name": "r2a",
+                  "fill": "$--foreground",
+                  "content": "#2  0xNOVA",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "163Mm",
+                  "name": "r2b",
+                  "fill": "$--foreground",
+                  "content": "1,700",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sZN4D",
+              "name": "row3",
+              "width": "fill_container",
+              "height": 38,
+              "fill": "$--color-info",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "6Y9zF",
+                  "name": "r3a",
+                  "fill": "$--color-info-foreground",
+                  "content": "#3  You",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "v8VP6",
+                  "name": "r3b",
+                  "fill": "$--color-info-foreground",
+                  "content": "1,640",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "pvJl6",
+          "name": "simCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "ecBEA",
+              "name": "simTitle",
+              "fill": "$--foreground",
+              "content": "Boyfriend Reach Simulator",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "a9z2n",
+              "name": "simNeed",
+              "fill": "$--foreground",
+              "content": "Gap to #1: 140 pts",
+              "fontFamily": "Geist",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "FXS98",
+              "name": "simBoost",
+              "fill": "$--muted-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "If badge upgrades to Gold (x1.6), you need 2 high-score chats.",
+              "lineHeight": 1.3,
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "HxHSA",
+          "name": "simBtn",
+          "width": "fill_container",
+          "height": 52,
+          "fill": "$--foreground",
+          "cornerRadius": "$--radius-pill",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "VHtKx",
+              "name": "simBtnTxt",
+              "fill": "$--background",
+              "content": "Open Full Simulator",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "c8aqf",
+      "x": 2330,
+      "y": 120,
+      "name": "06 Boyfriend Day",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 24,
+      "children": [
+        {
+          "type": "frame",
+          "id": "mjNk7",
+          "name": "bar6",
+          "width": "fill_container",
+          "height": 32,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "bb7DW",
+              "name": "step6",
+              "fill": "$--primary",
+              "content": "Step 6 of 7",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "VXoZy",
+              "name": "phase6",
+              "fill": "$--muted-foreground",
+              "content": "Boyfriend Confirmed",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "JYhso",
+          "name": "winCard",
+          "width": "fill_container",
+          "fill": "$--color-success",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 18,
+          "children": [
+            {
+              "type": "text",
+              "id": "majVS",
+              "name": "winTitle",
+              "fill": "$--color-success-foreground",
+              "content": "You are Day 3 Boyfriend",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 20,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "bQwQA",
+              "name": "winDesc",
+              "fill": "$--color-success-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "As #1 at day close, you receive today's creator fee and keep marriage eligibility if you keep holding.",
+              "lineHeight": 1.35,
+              "fontFamily": "Geist",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "aPGhT",
+              "name": "feeRow",
+              "width": "fill_container",
+              "height": 42,
+              "fill": "$--white",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "H4DiJ",
+                  "name": "feeLabel",
+                  "fill": "$--muted-foreground",
+                  "content": "Creator Fee",
+                  "fontFamily": "Geist",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "QhPbb",
+                  "name": "feeVal",
+                  "fill": "$--foreground",
+                  "content": "12.4 SOL",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 13,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ZkJyx",
+          "name": "claimBtn",
+          "width": "fill_container",
+          "height": 52,
+          "fill": "$--foreground",
+          "cornerRadius": "$--radius-pill",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "CfqmX",
+              "name": "claimTxt",
+              "fill": "$--background",
+              "content": "Claim Daily Fee",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "WHLFy",
+          "name": "ruleCard",
+          "width": "fill_container",
+          "fill": "$--color-error",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "adYvf",
+              "name": "ruleTitle",
+              "fill": "$--color-error-foreground",
+              "content": "Penalty Rule",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "ogxF2",
+              "name": "ruleBody",
+              "fill": "$--color-error-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "If you sell or transfer tokens after becoming boyfriend, you permanently lose marriage eligibility this season.",
+              "lineHeight": 1.3,
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "QBmGY",
+          "name": "holdCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "padding": 14,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "ZDMT7",
+              "name": "holdLabel",
+              "fill": "$--foreground",
+              "content": "Holding Status",
+              "fontFamily": "Geist",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "LF5HS",
+              "name": "holdState",
+              "fill": "$--primary",
+              "content": "Safe ✅",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "89Glp",
+          "name": "nextHint6",
+          "fill": "$--muted-foreground",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Keep scoring. Final marriage day still rewards cumulative points.",
+          "lineHeight": 1.3,
+          "fontFamily": "Geist",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "xWN0I",
+      "x": 2780,
+      "y": 120,
+      "name": "07 Final Marriage Day",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 24,
+      "children": [
+        {
+          "type": "frame",
+          "id": "Ce74o",
+          "name": "bar7",
+          "width": "fill_container",
+          "height": 32,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "mIc0t",
+              "name": "step7",
+              "fill": "$--primary",
+              "content": "Step 7 of 7",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "wNcig",
+              "name": "phase7",
+              "fill": "$--muted-foreground",
+              "content": "Final Marriage Day",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kXieZ",
+          "name": "finalCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 18,
+          "children": [
+            {
+              "type": "text",
+              "id": "3fPjV",
+              "name": "finalTitle",
+              "fill": "$--foreground",
+              "content": "No new boyfriend today",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 20,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "PZsWl",
+              "name": "finalDesc",
+              "fill": "$--muted-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "All 7 boyfriend slots are filled. Today only cumulative points matter for marriage probability.",
+              "lineHeight": 1.35,
+              "fontFamily": "Geist",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "nCwPJ",
+              "name": "jackpotRow",
+              "width": "fill_container",
+              "height": 44,
+              "fill": "$--color-warning",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "YJm1z",
+                  "name": "jackpotLabel",
+                  "fill": "$--color-warning-foreground",
+                  "content": "Season Jackpot",
+                  "fontFamily": "Geist",
+                  "fontSize": 12,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "wdHTG",
+                  "name": "jackpotVal",
+                  "fill": "$--color-warning-foreground",
+                  "content": "248.0 SOL",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 14,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "aaXsA",
+          "name": "oddsCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "eh0WN",
+              "name": "oddsTitle",
+              "fill": "$--foreground",
+              "content": "Marriage Probability (Top 7 only)",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "4cncn",
+              "name": "oddsYou",
+              "width": "fill_container",
+              "height": 40,
+              "fill": "$--color-info",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "YfhP8",
+                  "name": "oddsYouA",
+                  "fill": "$--color-info-foreground",
+                  "content": "You (Day 3)",
+                  "fontFamily": "Geist",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "JFvQc",
+                  "name": "oddsYouB",
+                  "fill": "$--color-info-foreground",
+                  "content": "22.4%",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 13,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ID9Mu",
+              "name": "oddsTop",
+              "width": "fill_container",
+              "height": 40,
+              "fill": "$--muted",
+              "cornerRadius": "$--radius-pill",
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "TaC6j",
+                  "name": "oddsTopA",
+                  "fill": "$--foreground",
+                  "content": "0xHANA (Day 5)",
+                  "fontFamily": "Geist",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "bDA7C",
+                  "name": "oddsTopB",
+                  "fill": "$--foreground",
+                  "content": "26.1%",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wKF37",
+          "name": "finalPush",
+          "width": "fill_container",
+          "fill": "$--color-success",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 6,
+          "padding": 14,
+          "children": [
+            {
+              "type": "text",
+              "id": "z7xxT",
+              "name": "pushA",
+              "fill": "$--color-success-foreground",
+              "content": "Final push: 4 chats remaining",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 13,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "zJKaY",
+              "name": "pushB",
+              "fill": "$--color-success-foreground",
+              "content": "Estimated odds after max score: 27.9%",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Gh7Sj",
+          "name": "lockBtn",
+          "width": "fill_container",
+          "height": 54,
+          "fill": "$--foreground",
+          "cornerRadius": "$--radius-pill",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "b22aW",
+              "name": "lockTxt",
+              "fill": "$--background",
+              "content": "Lock Final Chats",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "AcUpI",
+          "name": "drawTime",
+          "fill": "$--muted-foreground",
+          "content": "Marriage draw at 23:59 UTC",
+          "fontFamily": "Geist",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "Sa5fS",
+      "x": 80,
+      "y": 36,
+      "name": "flowTitle",
+      "fill": "$--foreground",
+      "content": "marry.fun UX Flow Mock",
+      "fontFamily": "JetBrains Mono",
+      "fontSize": 24,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "MQkq1",
+      "x": 940,
+      "y": 520,
+      "name": "arrow2",
+      "fill": "$--foreground",
+      "content": "→",
+      "fontFamily": "JetBrains Mono",
+      "fontSize": 34,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "ws7yI",
+      "x": 1390,
+      "y": 520,
+      "name": "arrow3",
+      "fill": "$--foreground",
+      "content": "→",
+      "fontFamily": "JetBrains Mono",
+      "fontSize": 34,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "vHwGu",
+      "x": 1840,
+      "y": 520,
+      "name": "arrow4",
+      "fill": "$--foreground",
+      "content": "→",
+      "fontFamily": "JetBrains Mono",
+      "fontSize": 34,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "Q6nM2",
+      "x": 2290,
+      "y": 520,
+      "name": "arrow5",
+      "fill": "$--foreground",
+      "content": "→",
+      "fontFamily": "JetBrains Mono",
+      "fontSize": 34,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "ByiY8",
+      "x": 2740,
+      "y": 520,
+      "name": "arrow6",
+      "fill": "$--foreground",
+      "content": "→",
+      "fontFamily": "JetBrains Mono",
+      "fontSize": 34,
+      "fontWeight": "700"
+    },
+    {
+      "type": "frame",
+      "id": "kqLwm",
+      "x": 526,
+      "y": 120,
+      "name": "02B Release Day LP",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 10,
+      "padding": 18,
+      "children": [
+        {
+          "type": "frame",
+          "id": "HHSi7",
+          "name": "topLive",
+          "width": "fill_container",
+          "height": 30,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "e7Q2m",
+              "name": "liveTag",
+              "fill": "$--color-success-foreground",
+              "content": "Marry Fun",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "dYUF2",
+          "name": "heroLive",
+          "clip": true,
+          "width": "fill_container",
+          "height": 170,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 160,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#1C2A52",
+                "position": 0
+              },
+              {
+                "color": "#6B2BA8",
+                "position": 0.55
+              },
+              {
+                "color": "#FF8400",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "padding": 16,
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "text",
+              "id": "Xurvu",
+              "name": "heroLiveTag",
+              "fill": "$--white",
+              "content": "Launch Battle Begins",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "l6JkB",
+              "name": "heroLiveSub",
+              "fill": "$--white",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Compete daily. Become boyfriend. Win jackpot.",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "rpkym",
+          "name": "liveTitle",
+          "fill": "$--foreground",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "The Game Is Live",
+          "fontFamily": "JetBrains Mono",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "83GRf",
+          "name": "liveSub",
+          "fill": "$--muted-foreground",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "No more prelaunch linking steps. Jump into the app and start scoring with Claw-chan now.",
+          "lineHeight": 1.35,
+          "fontFamily": "Geist",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "QITlg",
+          "name": "rulesLive",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 4,
+          "padding": 12,
+          "children": [
+            {
+              "type": "text",
+              "id": "E5DaM",
+              "name": "rulesLiveTitle",
+              "fill": "$--foreground",
+              "content": "What you do now",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "RMP0k",
+              "name": "liveRule1",
+              "fill": "$--foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "• Chat up to 10 times daily for intimacy points.",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "Q6PMz",
+              "name": "liveRule2",
+              "fill": "$--foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "• Use token holding multiplier to climb faster.",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "Hx2O5",
+              "name": "liveRule3",
+              "fill": "$--foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "• Reach #1 to become boyfriend and compete for jackpot marriage.",
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "TisGf",
+          "name": "noticeCard",
+          "width": "fill_container",
+          "fill": "$--color-success",
+          "cornerRadius": "$--radius-m",
+          "layout": "vertical",
+          "gap": 4,
+          "padding": 12,
+          "children": [
+            {
+              "type": "text",
+              "id": "L5Qap",
+              "name": "noticeTitle",
+              "fill": "$--color-success-foreground",
+              "content": "Launch Day Notice",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 13,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "sgDIL",
+              "name": "noticeBody",
+              "fill": "$--color-success-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "X Connect and Wallet Connect sections are removed on LP. Entry is now through app only.",
+              "lineHeight": 1.3,
+              "fontFamily": "Geist",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kNCWd",
+          "name": "appBtn",
+          "width": "fill_container",
+          "height": 54,
+          "fill": "$--foreground",
+          "cornerRadius": "$--radius-pill",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "h3dWz",
+              "name": "appBtnTxt",
+              "fill": "$--background",
+              "content": "Enter App (/app)",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "YsRvO",
+          "name": "appHint",
+          "fill": "$--muted-foreground",
+          "content": "Start daily chat and ranking battle immediately.",
+          "fontFamily": "Geist",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "rectangle",
+      "id": "o5yNT",
+      "x": -49,
+      "y": 1424,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "marry-fun.yamadaasuma.workers.dev_ja(iPhone 14 Pro Max).png",
+        "mode": "fill"
+      },
+      "width": 708,
+      "height": 1585
+    },
+    {
+      "type": "frame",
+      "id": "XlLUI",
+      "x": -564,
+      "y": 120,
+      "name": "Prelaunch LP Simple",
+      "theme": {
+        "Mode": "Dark"
+      },
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 10,
+      "padding": 16,
+      "children": [
+        {
+          "type": "frame",
+          "id": "RgYki",
+          "name": "head",
+          "width": "fill_container",
+          "height": 28,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "34h9s",
+              "name": "brand",
+              "fill": "$--primary",
+              "content": "marry.fun",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 13,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "aWdKR",
+              "name": "mode",
+              "fill": "$--muted-foreground",
+              "content": "Prelaunch",
+              "fontFamily": "Geist",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "USCNB",
+          "name": "heroTitle",
+          "fill": "$--foreground",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Connect to Reserve Your Spot",
+          "fontFamily": "JetBrains Mono",
+          "fontSize": 22,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "P4Otm",
+          "name": "heroSub",
+          "fill": "$--muted-foreground",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Only two steps before launch: link X and connect wallet.",
+          "lineHeight": 1.3,
+          "fontFamily": "Geist",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "ALx4j",
+          "name": "connectCard",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 10,
+          "children": [
+            {
+              "type": "text",
+              "id": "tBNwq",
+              "name": "connectTitle",
+              "fill": "$--primary",
+              "content": "Connect Accounts",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "9iEYu",
+              "name": "xBtn",
+              "width": "fill_container",
+              "height": 42,
+              "fill": "$--secondary",
+              "cornerRadius": "$--radius-pill",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "B5ITc",
+                  "name": "xTxt",
+                  "fill": "$--secondary-foreground",
+                  "content": "Connect X",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sihta",
+              "name": "walletBtn",
+              "width": "fill_container",
+              "height": 42,
+              "fill": "$--primary",
+              "cornerRadius": "$--radius-pill",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "cEDsL",
+                  "name": "walletTxt",
+                  "fill": "$--primary-foreground",
+                  "content": "Connect Wallet",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "JN8UW",
+          "name": "spacer",
+          "width": "fill_container",
+          "height": "fill_container"
+        },
+        {
+          "type": "frame",
+          "id": "J2aqM",
+          "name": "footer",
+          "width": "fill_container",
+          "fill": "$--card",
+          "cornerRadius": "$--radius-m",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 10,
+          "children": [
+            {
+              "type": "text",
+              "id": "cNAxk",
+              "name": "footerTitle",
+              "fill": "$--foreground",
+              "content": "Official Links",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "RLTJQ",
+              "name": "linksRow",
+              "width": "fill_container",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WYnjN",
+                  "name": "officialX",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$--accent",
+                  "cornerRadius": "$--radius-pill",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jBBqz",
+                      "name": "officialXTxt",
+                      "fill": "$--foreground",
+                      "content": "Official X",
+                      "fontFamily": "Geist",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "aMCNl",
+                  "name": "pump",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$--accent",
+                  "cornerRadius": "$--radius-pill",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "nvRx5",
+                      "name": "pumpTxt",
+                      "fill": "$--foreground",
+                      "content": "pump.fun",
+                      "fontFamily": "Geist",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "jdFE2",
+              "name": "howBtn",
+              "width": "fill_container",
+              "height": 38,
+              "fill": "$--accent",
+              "cornerRadius": "$--radius-pill",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "padding": [
+                0,
+                10
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "8lcQU",
+                  "name": "howTxt",
+                  "fill": "$--foreground",
+                  "content": "How it Works",
+                  "fontFamily": "Geist",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "nM6LI",
+                  "name": "howIcon",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "external-link",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--primary"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "rectangle",
+      "id": "NSEKB",
+      "x": 809,
+      "y": 1424,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "www.cashcity.fun_(iPhone 14 Pro Max).png",
+        "mode": "fill"
+      },
+      "width": 732,
+      "height": 1588
+    },
+    {
+      "type": "frame",
+      "id": "RdCNp",
+      "x": 91,
+      "y": 2760,
+      "name": "xBtn",
+      "width": "fill_container(427)",
+      "height": 48,
+      "fill": "$--secondary",
+      "cornerRadius": "$--radius-pill",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$--border"
+      },
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "4lA9j",
+          "name": "xTxt",
+          "fill": "$--secondary-foreground",
+          "content": "1) Connect [X icon]",
+          "fontFamily": "JetBrains Mono",
+          "fontSize": 12,
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "MlItA",
+      "x": 961,
+      "y": 2784,
+      "name": "xBtn",
+      "width": "fill_container(427)",
+      "height": 48,
+      "fill": "$--secondary",
+      "cornerRadius": "$--radius-pill",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$--border"
+      },
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "FLqWA",
+          "name": "xTxt",
+          "fill": "$--secondary-foreground",
+          "content": "1) Connect [X icon]",
+          "fontFamily": "JetBrains Mono",
+          "fontSize": 12,
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "l3FZF",
+      "x": 91,
+      "y": 2832,
+      "name": "wBtn",
+      "width": "fill_container(427)",
+      "height": 48,
+      "fill": "$--primary",
+      "cornerRadius": "$--radius-pill",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "qT5PV",
+          "name": "wTxt",
+          "fill": "$--primary-foreground",
+          "content": "2) Connect Wallet",
+          "fontFamily": "JetBrains Mono",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    }
+  ],
+  "themes": {
+    "Mode": [
+      "Light",
+      "Dark"
+    ]
+  },
+  "variables": {
+    "--sidebar": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E7E8E5"
+        },
+        {
+          "value": "#18181b",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--sidebar-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#666666"
+        },
+        {
+          "value": "#fafafa",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--sidebar-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#18181b"
+        },
+        {
+          "value": "#18181b",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--sidebar-primary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#fafafa"
+        },
+        {
+          "value": "#fafafa",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--sidebar-border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#CBCCC9"
+        },
+        {
+          "value": "#ffffff1a",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--sidebar-accent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#CBCCC9"
+        },
+        {
+          "value": "#2a2a30",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--sidebar-accent-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#18181b"
+        },
+        {
+          "value": "#fafafa",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--sidebar-ring": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#71717a"
+        },
+        {
+          "value": "#71717a",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--background": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F2F3F0"
+        },
+        {
+          "value": "#111111",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#111111"
+        },
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--card": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF"
+        },
+        {
+          "value": "#1A1A1A",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--card-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#111111"
+        },
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--popover": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF"
+        },
+        {
+          "value": "#1A1A1A",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--popover-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#111111"
+        },
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FF8400"
+        },
+        {
+          "value": "#FF8400",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--primary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#111111"
+        },
+        {
+          "value": "#111111",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E7E8E5"
+        },
+        {
+          "value": "#2E2E2E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--secondary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#111111"
+        },
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--muted": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F2F3F0"
+        },
+        {
+          "value": "#2E2E2E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--muted-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#666666"
+        },
+        {
+          "value": "#B8B9B6",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--accent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F2F3F0"
+        },
+        {
+          "value": "#111111",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--accent-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#111111"
+        },
+        {
+          "value": "#F2F3F0",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--destructive": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#D93C15"
+        },
+        {
+          "value": "#FF5C33",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#CBCCC9"
+        },
+        {
+          "value": "#2E2E2E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--input": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#CBCCC9"
+        },
+        {
+          "value": "#2E2E2E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ring": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#666666"
+        },
+        {
+          "value": "#666666",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--white": {
+      "type": "color",
+      "value": "#FFFFFF"
+    },
+    "--black": {
+      "type": "color",
+      "value": "#000000"
+    },
+    "--font-primary": {
+      "type": "string",
+      "value": "JetBrains Mono"
+    },
+    "--font-secondary": {
+      "type": "string",
+      "value": "Geist"
+    },
+    "--radius-none": {
+      "type": "number",
+      "value": 0
+    },
+    "--radius-pill": {
+      "type": "number",
+      "value": 999
+    },
+    "--color-success": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#DFE6E1"
+        },
+        {
+          "value": "#222924",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--color-success-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#004D1A"
+        },
+        {
+          "value": "#B6FFCE",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--color-warning": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E9E3D8"
+        },
+        {
+          "value": "#291C0F",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--color-warning-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#804200"
+        },
+        {
+          "value": "#FF8400",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--color-error": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E5DCDA"
+        },
+        {
+          "value": "#24100B",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--color-error-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#8C1C00"
+        },
+        {
+          "value": "#FF5C33",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--color-info": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#DFDFE6"
+        },
+        {
+          "value": "#222229",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--color-info-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#000066"
+        },
+        {
+          "value": "#B2B2FF",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--radius-m": {
+      "type": "number",
+      "value": 16
+    }
+  }
+}
