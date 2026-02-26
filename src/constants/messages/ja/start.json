@@ -30,8 +30,10 @@
   "generateProfileImage": "画像を生成",
   "generatingProfileImage": "画像生成中...",
   "profilePreviewAlt": "生成されたプロフィール画像",
-  "shareProfileOnX": "Post on X",
+  "shareProfileOnX": "Xに投稿",
+  "signOut": "サインアウト",
   "preparingShare": "共有準備中...",
   "profileImageGenerateError": "プロフィール画像の生成に失敗しました。",
-  "profileShareError": "共有リンクの生成に失敗しました。"
+  "profileShareError": "共有リンクの生成に失敗しました。",
+  "readyPhaseDescription": "現在は登録機能のみ公開中です。"
 }

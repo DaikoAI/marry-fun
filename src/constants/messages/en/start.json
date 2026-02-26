@@ -31,7 +31,9 @@
   "generatingProfileImage": "Generating...",
   "profilePreviewAlt": "Generated profile image",
   "shareProfileOnX": "Post on X",
+  "signOut": "Sign Out",
   "preparingShare": "Preparing share...",
   "profileImageGenerateError": "Failed to generate profile image.",
-  "profileShareError": "Failed to prepare share link."
+  "profileShareError": "Failed to prepare share link.",
+  "readyPhaseDescription": "Registration is currently available. Gameplay will open soon."
 }

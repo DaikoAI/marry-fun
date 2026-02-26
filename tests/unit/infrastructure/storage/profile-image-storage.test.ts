@@ -61,4 +61,14 @@ describe("uploadProfileCompositeImageToR2", () => {
       }),
     ).rejects.toThrow("R2_PROFILE_IMAGE_PUBLIC_BASE_URL is not configured");
   });
+
+  it("contentType に応じた拡張子で保存キーを作る", async () => {
+    const result = await uploadProfileCompositeImageToR2({
+      userId: "user-1",
+      imageBytes: new ArrayBuffer(3),
+      contentType: "image/jpeg",
+    });
+
+    expect(result.key).toMatch(/^profile-image\/user-1\/\d{4}-\d{2}-\d{2}\/.+\.jpg$/);
+  });
 });

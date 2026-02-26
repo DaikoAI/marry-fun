@@ -5,6 +5,19 @@ function sanitizePathSegment(value: string): string {
   return value.replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
+function extensionFromContentType(contentType: string): string {
+  switch (contentType.toLowerCase()) {
+    case "image/png":
+      return "png";
+    case "image/webp":
+      return "webp";
+    case "image/jpeg":
+      return "jpg";
+    default:
+      return "bin";
+  }
+}
+
 function buildPublicUrl(key: string): string {
   const baseUrl = env.R2_PROFILE_IMAGE_PUBLIC_BASE_URL;
   if (baseUrl) {
@@ -42,7 +55,8 @@ export async function uploadProfileCompositeImageToR2(
   const now = new Date();
   const dateKey = now.toISOString().slice(0, 10);
   const userKey = sanitizePathSegment(input.userId);
-  const key = joinR2Key(["profile-image", userKey, dateKey, `${crypto.randomUUID()}.png`]);
+  const extension = extensionFromContentType(input.contentType);
+  const key = joinR2Key(["profile-image", userKey, dateKey, `${crypto.randomUUID()}.${extension}`]);
 
   const putResult = await putImageR2(bucket, key, input.imageBytes, input.contentType);
   if (!putResult.isOk) {

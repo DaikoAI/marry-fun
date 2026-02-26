@@ -23,8 +23,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Invalid request" }, { status: 400 });
   }
 
-  if (!env.BETTER_AUTH_SECRET) {
-    return NextResponse.json({ message: "Share secret is not configured" }, { status: 500 });
+  const profileShareTokenSecret = env.PROFILE_SHARE_TOKEN_SECRET;
+  if (!profileShareTokenSecret) {
+    return NextResponse.json({ message: "Profile share secret is not configured" }, { status: 500 });
   }
 
   const repository = new D1ProfileImageRepository();
@@ -38,7 +39,8 @@ export async function POST(request: Request) {
     userId,
     dateKey,
   });
-  const name = context.username?.trim() || session.user.name.trim() || "Guest";
+  const sessionName = typeof session.user.name === "string" ? session.user.name.trim() : "";
+  const name = context.username?.trim() || sessionName || "Guest";
   const token = createProfileShareToken(
     {
       userId,
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
       location: decorations.location,
       tags: decorations.tags,
     },
-    env.BETTER_AUTH_SECRET,
+    profileShareTokenSecret,
   );
 
   const shareUrl = `${new URL(request.url).origin}/${parsed.data.locale}/profile-share/${token}`;

@@ -14,7 +14,8 @@ interface ProfileSharePageProps {
 export async function generateMetadata({ params }: ProfileSharePageProps): Promise<Metadata> {
   const { locale, token } = await params;
   const path = `/${locale}/profile-share/${token}`;
-  const decoded = env.BETTER_AUTH_SECRET ? decodeProfileShareToken(token, env.BETTER_AUTH_SECRET) : null;
+  const decoded =
+    env.PROFILE_SHARE_TOKEN_SECRET ? decodeProfileShareToken(token, env.PROFILE_SHARE_TOKEN_SECRET) : null;
   const imagePath = decoded?.imageUrl ?? `/api/og/profile/${token}`;
 
   return {

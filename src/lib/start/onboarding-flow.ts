@@ -10,6 +10,7 @@ interface GetStartOnboardingPhaseParams {
 
 interface GetStartOnboardingStepParams {
   isWalletAuthenticated: boolean;
+  isXLinked: boolean;
   requiresUsername: boolean;
 }
 
@@ -47,7 +48,7 @@ export function getStartOnboardingPhase(params: GetStartOnboardingPhaseParams): 
 export function getStartOnboardingStep(params: GetStartOnboardingStepParams): StartOnboardingStep {
   const phase = getStartOnboardingPhase({
     isWalletAuthenticated: params.isWalletAuthenticated,
-    isXLinked: params.isWalletAuthenticated,
+    isXLinked: params.isXLinked,
     username: params.requiresUsername ? "" : "ok",
     profileImage: params.requiresUsername ? null : "https://example.com/profile.webp",
   });

@@ -18,11 +18,12 @@ import { getStartOnboardingPhase } from "@/lib/start/onboarding-flow";
 import { shouldShowPrologueSkip } from "@/lib/start/prologue-skip";
 import { runWithViewTransition } from "@/lib/start/view-transition";
 import { useGameStore } from "@/store/game-store";
+import { logger } from "@/utils/logger";
 
 type FormSubmitEvent = Parameters<NonNullable<ComponentProps<"form">["onSubmit"]>>[0];
 
 type StartPageUiPhase = "form" | "prologue";
-const IS_PLAY_NOW_ENABLED = false;
+const IS_PLAY_NOW_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PLAY_NOW === "true";
 
 function isValidUsername(name: string): boolean {
   const t = name.trim();
@@ -36,6 +37,18 @@ function readApiErrorMessage(payload: unknown): string | null {
 
   if ("message" in payload && typeof payload.message === "string" && payload.message.length > 0) {
     return payload.message;
+  }
+
+  return null;
+}
+
+export function readGeneratedProfileImageUrl(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  if ("imageUrl" in payload && typeof payload.imageUrl === "string" && payload.imageUrl.length > 0) {
+    return payload.imageUrl;
   }
 
   return null;
@@ -281,6 +294,10 @@ export function StartPageClient() {
   const handleGenerateProfileImage = () => {
     if (onboardingPhase !== "profile" || isGeneratingProfile) return;
 
+    logger.info("[start] profile image generation requested", {
+      locale,
+      onboardingPhase,
+    });
     setProfileActionError(null);
     setIsGeneratingProfile(true);
 
@@ -295,13 +312,25 @@ export function StartPageClient() {
         });
 
         const payload: unknown = await response.json().catch(() => null);
+        const imageUrl = readGeneratedProfileImageUrl(payload);
+        logger.info("[start] profile image generation response", {
+          ok: response.ok,
+          status: response.status,
+          hasImageUrl: Boolean(imageUrl),
+        });
         if (!response.ok) {
           throw new Error(readApiErrorMessage(payload) ?? t("profileImageGenerateError"));
         }
 
         await session.refetch();
+        logger.info("[start] profile image generation success", {
+          imageUrl: imageUrl ?? "n/a",
+        });
       } catch (error) {
         const message = error instanceof Error ? error.message : t("profileImageGenerateError");
+        logger.error("[start] profile image generation failed", {
+          message,
+        });
         setProfileActionError(message);
       } finally {
         setIsGeneratingProfile(false);
@@ -483,18 +512,30 @@ export function StartPageClient() {
             {displayOnboardingPhase === "profile" && (
               <div className="space-y-3 text-center">
                 <div className="rounded-xl border border-white/25 bg-black/60 px-4 py-3 backdrop-blur-sm">
-                  <p className="text-base font-semibold text-white">
-                    {t("profilePhaseTitle")}
-                  </p>
-                  <p className="mt-1 text-sm leading-snug text-white/95">
-                    {t("profilePhaseDescription")}
-                  </p>
+                  <p className="text-base font-semibold text-white">{t("profilePhaseTitle")}</p>
+                  <p className="mt-1 text-sm leading-snug text-white/95">{t("profilePhaseDescription")}</p>
                 </div>
 
                 {userImage && (
                   <div className="mx-auto mt-3 w-[180px] overflow-hidden rounded-2xl border border-white/60 bg-black/60 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={userImage} alt={t("profilePreviewAlt")} className="h-[225px] w-full object-cover" />
+                    <img
+                      src={userImage}
+                      alt={t("profilePreviewAlt")}
+                      className="h-[225px] w-full object-cover"
+                      onLoad={event => {
+                        logger.info("[start] profile preview loaded", {
+                          phase: "profile",
+                          src: event.currentTarget.currentSrc || event.currentTarget.src,
+                        });
+                      }}
+                      onError={event => {
+                        logger.warn("[start] profile preview failed to load", {
+                          phase: "profile",
+                          src: event.currentTarget.currentSrc || event.currentTarget.src,
+                        });
+                      }}
+                    />
                   </div>
                 )}
 
@@ -530,9 +571,26 @@ export function StartPageClient() {
                 {userImage && (
                   <div className="mx-auto mb-3 w-[180px] overflow-hidden rounded-2xl border border-white/50 bg-black/45 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={userImage} alt={t("profilePreviewAlt")} className="h-[225px] w-full object-cover" />
+                    <img
+                      src={userImage}
+                      alt={t("profilePreviewAlt")}
+                      className="h-[225px] w-full object-cover"
+                      onLoad={event => {
+                        logger.info("[start] profile preview loaded", {
+                          phase: "ready",
+                          src: event.currentTarget.currentSrc || event.currentTarget.src,
+                        });
+                      }}
+                      onError={event => {
+                        logger.warn("[start] profile preview failed to load", {
+                          phase: "ready",
+                          src: event.currentTarget.currentSrc || event.currentTarget.src,
+                        });
+                      }}
+                    />
                   </div>
                 )}
+                <p className="text-center text-sm text-white/85">{t("readyPhaseDescription")}</p>
                 {gameOverBlocked && (
                   <p className="text-sm text-red-200" role="alert">
                     {t("gameOverBlocked")}
@@ -543,13 +601,6 @@ export function StartPageClient() {
                     {t("initError")}
                   </p>
                 )}
-                <button
-                  type="submit"
-                  disabled={!canStart}
-                  className="mx-auto block rounded-full border-2 border-pink-200/50 bg-black/55 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-                >
-                  {t("submit")}
-                </button>
               </>
             )}
           </div>

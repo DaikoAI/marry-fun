@@ -1,6 +1,7 @@
 import {
   buildRunwareProfilePrompt,
   normalizeRunwareReferenceImageUrl,
+  RUNWARE_PROFILE_BACKGROUND_PROMPT,
   RUNWARE_PROFILE_CFG,
   RUNWARE_PROFILE_IMAGE_SIZE,
   RUNWARE_PROFILE_MODEL_DEFAULT,
@@ -10,6 +11,8 @@ import {
   RUNWARE_PROFILE_STEPS,
 } from "@/constants/profile-image/runware";
 import { logger } from "@/utils/logger";
+
+const RUNWARE_REQUEST_TIMEOUT_MS = 15_000;
 
 interface RunwareTaskResult {
   imageURL?: unknown;
@@ -61,10 +64,17 @@ function readRunwareErrorMessage(payload: unknown): string | null {
 }
 
 export function pickRunwareImageUrlFromResponse(payload: unknown): string | null {
+  const urls = pickRunwareImageUrlsFromResponse(payload);
+  return urls[0] ?? null;
+}
+
+/** Returns all image URLs from Runware response in task order. */
+export function pickRunwareImageUrlsFromResponse(payload: unknown): string[] {
   if (!payload || typeof payload !== "object" || !("data" in payload) || !Array.isArray(payload.data)) {
-    return null;
+    return [];
   }
 
+  const result: string[] = [];
   for (const item of payload.data as RunwareTaskResult[]) {
     const candidate =
       typeof item.imageURL === "string" ? item.imageURL
@@ -77,14 +87,115 @@ export function pickRunwareImageUrlFromResponse(payload: unknown): string | null
     try {
       const parsed = new URL(candidate);
       if (parsed.protocol === "http:" || parsed.protocol === "https:") {
-        return candidate;
+        result.push(candidate);
       }
     } catch {
-      continue;
+      // skip invalid URL
     }
   }
 
-  return null;
+  return result;
+}
+
+interface RunwareImageInferenceTask {
+  positivePrompt: string;
+  referenceImages?: string[];
+  seed?: number;
+}
+
+/** 1 回の Runware imageInference リクエストを送り、先頭の画像 URL を返す。既存実装の共通化。 */
+async function requestRunwareImageInference(options: {
+  apiKey: string;
+  model: string;
+  task: RunwareImageInferenceTask;
+  traceId: string;
+  logLabel?: string;
+}): Promise<{ imageUrl: string }> {
+  const { apiKey, model, task, traceId, logLabel = "runware" } = options;
+  const startedAt = Date.now();
+
+  const taskPayload: Record<string, unknown> = {
+    taskType: "imageInference",
+    taskUUID: crypto.randomUUID(),
+    model,
+    positivePrompt: task.positivePrompt,
+    negativePrompt: RUNWARE_PROFILE_NEGATIVE_PROMPT,
+    width: RUNWARE_PROFILE_IMAGE_SIZE.width,
+    height: RUNWARE_PROFILE_IMAGE_SIZE.height,
+    numberResults: RUNWARE_PROFILE_NUM_RESULTS,
+    outputFormat: RUNWARE_PROFILE_OUTPUT_FORMAT,
+    steps: RUNWARE_PROFILE_STEPS,
+    CFGScale: RUNWARE_PROFILE_CFG,
+    seed: task.seed,
+  };
+  if (task.referenceImages?.length) {
+    taskPayload.inputs = { referenceImages: task.referenceImages };
+  }
+
+  const body = [taskPayload];
+
+  logger.debug(`[${logLabel}] request start`, {
+    traceId,
+    model,
+    taskType: "imageInference",
+    width: RUNWARE_PROFILE_IMAGE_SIZE.width,
+    height: RUNWARE_PROFILE_IMAGE_SIZE.height,
+  });
+
+  let response: Response;
+  try {
+    response = await fetch("https://api.runware.ai/v1", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+      signal: AbortSignal.timeout(RUNWARE_REQUEST_TIMEOUT_MS),
+    });
+  } catch (error) {
+    logger.error(`[${logLabel}] network failure`, {
+      traceId,
+      model,
+      durationMs: Date.now() - startedAt,
+      message: error instanceof Error ? error.message : "unknown fetch error",
+    });
+    throw error;
+  }
+
+  const payload: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const detail = readRunwareErrorMessage(payload);
+    logger.warn(`[${logLabel}] request failed`, {
+      traceId,
+      model,
+      status: response.status,
+      durationMs: Date.now() - startedAt,
+      detail,
+    });
+    throw new Error(`Runware request failed with status ${String(response.status)}${detail ? `: ${detail}` : ""}`);
+  }
+
+  const imageUrl = pickRunwareImageUrlFromResponse(payload);
+  if (!imageUrl) {
+    logger.warn(`[${logLabel}] missing image url in response`, {
+      traceId,
+      model,
+      status: response.status,
+      durationMs: Date.now() - startedAt,
+    });
+    throw new Error("Runware response does not contain image URL");
+  }
+
+  logger.info(`[${logLabel}] request success`, {
+    traceId,
+    model,
+    status: response.status,
+    durationMs: Date.now() - startedAt,
+    imageUrl: redactImageUrl(imageUrl),
+  });
+  return { imageUrl };
 }
 
 export interface GenerateProfileImageWithRunwareInput {
@@ -109,7 +220,6 @@ export async function generateProfileImageWithRunware(
   const traceId = crypto.randomUUID().slice(0, 8);
 
   const requestWithModel = async (model: string): Promise<{ imageUrl: string }> => {
-    const startedAt = Date.now();
     const prompt = buildRunwareProfilePrompt({
       locale: input.locale,
       displayName: input.displayName,
@@ -117,92 +227,17 @@ export async function generateProfileImageWithRunware(
     });
     const normalizedFaceImageUrl = normalizeRunwareReferenceImageUrl(input.inputFaceImageUrl);
 
-    const body = [
-      {
-        taskType: "imageInference",
-        taskUUID: crypto.randomUUID(),
-        model,
+    return requestRunwareImageInference({
+      apiKey,
+      model,
+      traceId,
+      logLabel: "runware",
+      task: {
         positivePrompt: prompt,
-        negativePrompt: RUNWARE_PROFILE_NEGATIVE_PROMPT,
-        width: RUNWARE_PROFILE_IMAGE_SIZE.width,
-        height: RUNWARE_PROFILE_IMAGE_SIZE.height,
-        numberResults: RUNWARE_PROFILE_NUM_RESULTS,
-        outputFormat: RUNWARE_PROFILE_OUTPUT_FORMAT,
-        steps: RUNWARE_PROFILE_STEPS,
-        CFGScale: RUNWARE_PROFILE_CFG,
-        inputs: {
-          referenceImages: [normalizedFaceImageUrl],
-        },
+        referenceImages: [normalizedFaceImageUrl],
         seed: input.seed,
       },
-    ];
-
-    logger.debug("[runware] request start", {
-      traceId,
-      model,
-      taskType: "imageInference",
-      locale: input.locale,
-      promptLength: prompt.length,
-      hasSeed: input.seed !== undefined,
-      width: RUNWARE_PROFILE_IMAGE_SIZE.width,
-      height: RUNWARE_PROFILE_IMAGE_SIZE.height,
-      inputFaceImage: redactImageUrl(input.inputFaceImageUrl),
-      normalizedInputFaceImage: redactImageUrl(normalizedFaceImageUrl),
     });
-
-    let response: Response;
-    try {
-      response = await fetch("https://api.runware.ai/v1", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(body),
-        cache: "no-store",
-      });
-    } catch (error) {
-      logger.error("[runware] network failure", {
-        traceId,
-        model,
-        durationMs: Date.now() - startedAt,
-        message: error instanceof Error ? error.message : "unknown fetch error",
-      });
-      throw error;
-    }
-
-    const payload: unknown = await response.json().catch(() => null);
-    if (!response.ok) {
-      const detail = readRunwareErrorMessage(payload);
-      logger.warn("[runware] request failed", {
-        traceId,
-        model,
-        status: response.status,
-        durationMs: Date.now() - startedAt,
-        detail,
-      });
-      throw new Error(`Runware request failed with status ${String(response.status)}${detail ? `: ${detail}` : ""}`);
-    }
-
-    const imageUrl = pickRunwareImageUrlFromResponse(payload);
-    if (!imageUrl) {
-      logger.warn("[runware] missing image url in response", {
-        traceId,
-        model,
-        status: response.status,
-        durationMs: Date.now() - startedAt,
-      });
-      throw new Error("Runware response does not contain image URL");
-    }
-
-    logger.info("[runware] request success", {
-      traceId,
-      model,
-      status: response.status,
-      durationMs: Date.now() - startedAt,
-      imageUrl: redactImageUrl(imageUrl),
-    });
-    return { imageUrl };
   };
 
   try {
@@ -224,4 +259,34 @@ export async function generateProfileImageWithRunware(
     });
     throw error;
   }
+}
+
+export interface GenerateProfileBackgroundWithRunwareInput {
+  seed?: number;
+}
+
+/** 背景のみ生成（Tinder 風カード用）。参照画像なし。既存 request を共通化して利用。 */
+export async function generateProfileBackgroundWithRunware(
+  input: GenerateProfileBackgroundWithRunwareInput = {},
+): Promise<{ imageUrl: string }> {
+  const { env } = await import("@/env");
+
+  const apiKey = env.RUNWARE_API_KEY;
+  if (!apiKey) {
+    throw new Error("RUNWARE_API_KEY is not configured");
+  }
+
+  const model = env.RUNWARE_MODEL ?? RUNWARE_PROFILE_MODEL_DEFAULT;
+  const traceId = crypto.randomUUID().slice(0, 8);
+
+  return requestRunwareImageInference({
+    apiKey,
+    model,
+    traceId,
+    logLabel: "runware",
+    task: {
+      positivePrompt: RUNWARE_PROFILE_BACKGROUND_PROMPT,
+      seed: input.seed,
+    },
+  });
 }

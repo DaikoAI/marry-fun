@@ -1,6 +1,6 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   formatConnectedWalletButtonLabel,
@@ -11,18 +11,21 @@ import {
   SolanaAuthPanel,
 } from "@/components/auth/solana-auth-panel";
 
-const mockWalletState = {
+const createWalletState = () => ({
   connected: false,
   connecting: false,
   publicKey: null as { toBase58: () => string } | null,
   signMessage: undefined as ((message: Uint8Array) => Promise<Uint8Array>) | undefined,
-};
+});
 
-const mockSessionState = {
+const createSessionState = () => ({
   data: null as { session?: unknown; user?: { name?: string | null } } | null,
   isPending: false,
   refetch: vi.fn(),
-};
+});
+
+let mockWalletState = createWalletState();
+let mockSessionState = createSessionState();
 
 vi.mock("next-intl", () => ({
   useTranslations: vi.fn(() => (key: string) => key),
@@ -54,6 +57,12 @@ vi.mock("@/lib/auth/auth-client", () => ({
 }));
 
 describe("SolanaAuthPanel", () => {
+  beforeEach(() => {
+    mockWalletState = createWalletState();
+    mockSessionState = createSessionState();
+    vi.clearAllMocks();
+  });
+
   it("WalletSignMessageError のユーザー拒否を判定できる", () => {
     const error = new Error("User rejected the request.");
     error.name = "WalletSignMessageError";
@@ -94,7 +103,7 @@ describe("SolanaAuthPanel", () => {
 
     const html = renderToStaticMarkup(React.createElement(SolanaAuthPanel, { variant: "onboarding" }));
 
-    expect(html).toContain(">7K..x5kD✅<");
+    expect(html).toContain(">7K6r..x5kD ✅<");
   });
 
   it("@username のX連携済みラベルを作れる", () => {
@@ -103,7 +112,7 @@ describe("SolanaAuthPanel", () => {
   });
 
   it("wallet連携済みラベルを作れる", () => {
-    expect(formatConnectedWalletButtonLabel("7K6r3x7y8jP2m6PV4m9WQbqv9cG7hX5aQk3bF1wVx5kD")).toBe("7K..x5kD✅");
+    expect(formatConnectedWalletButtonLabel("7K6r3x7y8jP2m6PV4m9WQbqv9cG7hX5aQk3bF1wVx5kD")).toBe("7K6r..x5kD ✅");
   });
 
   it("session 読み込み中は自動署名を開始しない", () => {

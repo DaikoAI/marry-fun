@@ -298,6 +298,7 @@ export function SolanaAuthPanel({ variant = "default" }: SolanaAuthPanelProps) {
     setErrorMessage(null);
 
     try {
+      // linkSocial navigates to OAuth provider on success; status is refreshed on callback return.
       const result = await authClient.linkSocial({
         provider: "twitter",
         callbackURL: window.location.href,
@@ -386,7 +387,7 @@ export function SolanaAuthPanel({ variant = "default" }: SolanaAuthPanelProps) {
             }}
             className="rounded-lg border border-white/50 bg-black/35 px-3 py-1.5 text-xs font-semibold text-white/95 transition hover:bg-black/45 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none"
           >
-            Sign Out
+            {t("signOut")}
           </button>
         )}
         {errorMessage && (

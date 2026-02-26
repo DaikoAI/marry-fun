@@ -1,12 +1,50 @@
 # TODO
 
-- [ ] 2026-02-26 Profile Image R2 Direct URL + Top Page Display
-- [ ] Remove profile-image API proxy URL fallback and use R2 public URL directly
-- [ ] Update profile-image generate route/tests to stop passing `requestOrigin`
-- [ ] Show generated profile image on top page after generation
-- [ ] Run targeted tests for storage route/start-page
-- [ ] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
-- [ ] Add review summary for this task
+- [x] 2026-02-26 Local Wrangler Dev + Local R2 Upload/Display + Client Logs
+- [x] RED: add/update tests to cover new local dev script behavior and client logging touchpoints
+- [x] GREEN: switch `bun run dev` to Wrangler-based local flow (no plain `next dev`)
+- [x] GREEN: ensure local preview/build load `.env.local` (avoid `.env.production` for local run)
+- [x] GREEN: inject local `R2_PROFILE_IMAGE_PUBLIC_BASE_URL` for local object display
+- [x] GREEN: add client-side logs for profile image generate/display flow
+- [x] Run targeted tests/lint
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Local Wrangler Dev + Local R2 Upload/Display + Client Logs)
+
+- ui-ux-pro-max: Onboarding UI structure remains unchanged; added logs do not alter interactive hierarchy or visual affordances, and profile preview success/failure states are now observable in client logs.
+- vercel-react-best-practices: Kept client behavior lightweight (no new fetch waterfall, no broad effect dependencies). Logging was scoped to existing async handlers and image events only.
+- web-design-guidelines: Pulled latest guidelines and re-checked touched UI file; icon buttons keep `aria-label`, form metadata remains intact, and profile preview images keep `alt` text without introducing new guideline violations.
+
+- [x] 2026-02-26 Profile Image Black Render Fix + Browser Verification
+- [x] RED: add failing integration assertion for data URL conversion in profile-image generate route
+- [x] GREEN: fetch Runware images and pass data URLs to OG composite renderer
+- [x] Switch Runware output format from WEBP to PNG for OG compatibility
+- [x] Run targeted lint on changed files
+- [x] Run targeted tests for profile-image route and Runware client
+- [x] Verify rendered composite is not black via browser automation
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Profile Image Black Render Fix + Browser Verification)
+
+- ui-ux-pro-max: Confirmed profile preview remains visible with existing action hierarchy; no additional visual regressions introduced in top-page profile display flow.
+- vercel-react-best-practices: Kept the fix server-side and minimal (single conversion step before composite), preserving existing client rendering/data-fetch boundaries.
+- web-design-guidelines: UI surface unchanged in this patch; validated current top-page controls/accessibility patterns remain compliant after backend image pipeline update.
+
+- [x] 2026-02-26 Profile Image R2 Direct URL + Top Page Display
+- [x] Remove profile-image API proxy URL fallback and use R2 public URL directly
+- [x] Update profile-image generate route/tests to stop passing `requestOrigin`
+- [x] Show generated profile image on top page after generation
+- [x] Run targeted tests for storage route/start-page
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Profile Image R2 Direct URL + Top Page Display)
+
+- ui-ux-pro-max: Confirmed generated profile image remains visible in onboarding completion (`ready`) so users can verify result before starting gameplay; async action buttons keep disabled/loading behavior.
+- vercel-react-best-practices: Kept changes lightweight (no new fetch waterfalls, no broad effect dependencies), and constrained UI change to existing client component branch rendering.
+- web-design-guidelines: Checked updated start page against latest rules (icon button labels/focus-visible, form metadata, safe-area placement). No new blocking guideline violations introduced by this patch.
 
 - [x] 2026-02-26 Top Page Text Readability Improvements
 - [x] Improve top background readability baseline (overlay/contrast)
@@ -16,7 +54,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Top Page Text Readability Improvements)
+## Review Summary (Top Page Text Readability Improvements)
 
 - ui-ux-pro-max: Applied contrast/readability guidance by adding a top-only background dim/gradient layer, unifying onboarding copy into a protected glass panel, and strengthening control contrast without changing interaction flow.
 - vercel-react-best-practices: Kept this patch purely presentational (no new data fetching/effects, no broader subscriptions), while preserving component boundaries (`Background` + `StartPageClient`) and existing render behavior.
@@ -30,7 +68,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Build/Preview Failure Fix)
+## Review Summary (Build/Preview Failure Fix)
 
 - ui-ux-pro-max: Added explicit keyboard focus styles on new global error retry actions, keeping fallback UI interaction discoverable and accessible in both root/locale error boundaries.
 - vercel-react-best-practices: Marked `/[locale]/chat` as `force-dynamic` to avoid invalid build-time prerendering of client/store-driven chat state while keeping runtime rendering intact.
@@ -43,7 +81,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Sound Button Size Regression)
+## Review Summary (Sound Button Size Regression)
 
 - ui-ux-pro-max: Re-checked icon-button guidance; top-right controls now share consistent compact sizing (`h-8 w-8`) with visible focus states and no layout-shift interaction changes.
 - vercel-react-best-practices: Change is presentational only (single class override adjustment) and keeps component isolation intact; no new data fetching, effects, or render hotspots.
@@ -81,7 +119,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Wallet Sign Rejection Handling)
+## Review Summary (Wallet Sign Rejection Handling)
 
 - ui-ux-pro-max: Confirmed error feedback semantics remain accessible (`role="status"` + `aria-live="polite"`), and cancellation now avoids noisy false-error messaging while preserving button state UX.
 - vercel-react-best-practices: Verified no new waterfall/rerender regressions; cancellation branch exits early in catch path and keeps existing memoized callback/effect structure intact.
@@ -95,7 +133,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Top Page BGM Toggle)
+## Review Summary (Top Page BGM Toggle)
 
 - ui-ux-pro-max: Checked interaction/accessibility heuristics (visible focus, click/tap primary action, touch target sizing). Updated top-right controls to `h-11 w-11` and kept focus ring styling for keyboard users.
 - vercel-react-best-practices: Change is UI-only and lightweight (no additional waterfalls, no heavy imports, no new broad effect dependencies). `BgmController` remains a small isolated client component.
@@ -110,7 +148,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Language Toggle Icon)
+## Review Summary (Language Toggle Icon)
 
 - ui-ux-pro-max: Applied icon-only control accessibility guidance by adding a clear `aria-label`, visible focus ring, and consistent icon button interaction (`cursor-pointer` + hover feedback).
 - vercel-react-best-practices: Kept changes lightweight and client-safe (no new waterfalls, no added heavy imports, direct `Link` navigation preserved).
@@ -126,7 +164,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Start Screen Auth Panel Sticky Bottom + Connected Labels)
+## Review Summary (Start Screen Auth Panel Sticky Bottom + Connected Labels)
 
 - ui-ux-pro-max: Matched touch-target and spacing guidance (`h-11 w-11`, `gap-2`) and preserved visible focus styles on interactive controls; bottom-sticky auth panel keeps primary action location stable across onboarding states.
 - vercel-react-best-practices: Kept logic local and lightweight (no new waterfalls, no expensive render work, no broad effect dependencies). Added pure label-format helpers and reused existing flow.
@@ -143,7 +181,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (X Callback Re-Auth + Profile Persistence)
+## Review Summary (X Callback Re-Auth + Profile Persistence)
 
 - ui-ux-pro-max: Applied high-severity UX checks (`Focus States`, `Loading Buttons`, async feedback). `SolanaAuthPanel` keeps visible `focus-visible` rings, loading labels (`connecting` / `signing`), and disabled states during async auth/link operations.
 - vercel-react-best-practices: Aligned with rerender/waterfall guidance by gating auto-sign-in with primitive `session.isPending` and parallelizing independent route reads (`hasSvmWallet` + `findTwitterAccountByUserId`) via `Promise.all`.
@@ -158,12 +196,12 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (DB Table Naming Snake Case Alignment)
+## Review Summary (DB Table Naming Snake Case Alignment)
 
 - ui-ux-pro-max: No UI component changes in this task; reviewed impact scope and confirmed no visual/accessibility regressions introduced by schema-only updates.
 - vercel-react-best-practices: Change was DB schema/migration focused with no new React render paths; no client waterfall or rerender regressions introduced.
 - web-design-guidelines: Retrieved latest guideline source and reviewed changed surface area; no guideline-relevant UI changes in this patch.
-- Validation notes: integration tests for auth routes passed; `bun run typecheck` currently fails due existing side-effect CSS import resolution errors in [layout.tsx](/Users/asumayamada/Work/daikolabs/marry-fun/src/app/[locale]/layout.tsx:14) and [layout.tsx](/Users/asumayamada/Work/daikolabs/marry-fun/src/app/[locale]/layout.tsx:15), unrelated to this migration rename/regeneration task.
+- Validation notes: integration tests for auth routes passed; `bun run typecheck` currently fails due existing side-effect CSS import resolution errors in `src/app/[locale]/layout.tsx:14` and `src/app/[locale]/layout.tsx:15`, unrelated to this migration rename/regeneration task.
 
 ## 2026-02-24 Onboarding Copy After X Connect
 
@@ -173,7 +211,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Onboarding Copy After X Connect)
+## Review Summary (Onboarding Copy After X Connect)
 
 - ui-ux-pro-max: Verified this keeps onboarding status feedback explicit; linked-X state now shows clear success copy while preserving existing spacing/contrast.
 - vercel-react-best-practices: Change is render-only copy branching via a pure helper (`getOnboardingHeadlineCopy`) with no added data fetching, effects, or rerender hotspots.
@@ -193,7 +231,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Top Page 3-Phase + Runware Profile Share)
+## Review Summary (Top Page 3-Phase + Runware Profile Share)
 
 - ui-ux-pro-max: Applied onboarding and form UX checks (status clarity, focus-visible controls, async feedback); phase cards keep clear progression and mobile-safe spacing while preserving fixed bottom auth controls.
 - vercel-react-best-practices: Kept data reads localized and lightweight (session + `/api/auth/x/link-status`), no heavy client dependencies added, and API responsibilities split into focused routes (`generate`, `share-token`, `og`).
@@ -209,7 +247,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (ViewTransition Illegal Invocation Fix)
+## Review Summary (ViewTransition Illegal Invocation Fix)
 
 - ui-ux-pro-max: Confirmed the onboarding phase animation path now degrades safely (transition API unavailable -> immediate update), avoiding broken UX while keeping motion behavior intact.
 - vercel-react-best-practices: Kept the effect dependency surface narrow (`displayOnboardingPhase`, `onboardingPhase`) and isolated transition invocation in a small helper for stable client rendering behavior.
@@ -224,7 +262,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Runware 400 During Profile Image Generation)
+## Review Summary (Runware 400 During Profile Image Generation)
 
 - ui-ux-pro-max: No UI layer changes in this patch; reviewed impact scope and confirmed no visual or interaction regressions are introduced.
 - vercel-react-best-practices: API/image-generation flow remains minimal and dependency-safe; the fix only changes provider payload shape and default model while preserving existing request lifecycle and fallback behavior.
@@ -238,7 +276,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Runware Reference Image Width 400 Fix)
+## Review Summary (Runware Reference Image Width 400 Fix)
 
 - ui-ux-pro-max: No UI component/layout changes in this fix; verified impact is server-side request shaping only with no UX regressions.
 - vercel-react-best-practices: Updated logic stays in server utility scope, keeps API flow simple, and avoids additional client-side fetch/render work.
@@ -255,7 +293,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (R2 Profile Image Path + Public URL Fallback)
+## Review Summary (R2 Profile Image Path + Public URL Fallback)
 
 - ui-ux-pro-max: No UI component changes; this update is storage and API plumbing only, so visual/accessibility behavior remains unchanged.
 - vercel-react-best-practices: Kept server flow simple by adding a single origin fallback path and a focused R2 object read route, without introducing new client waterfalls.
@@ -288,7 +326,7 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Web3 SVM Verify Domain Handling)
+## Review Summary (Web3 SVM Verify Domain Handling)
 
 - ui-ux-pro-max: No UI layer changes in this task; reviewed impact scope and confirmed no layout/interaction/accessibility regressions.
 - vercel-react-best-practices: Kept route/auth changes minimal and request-scoped (no client bundle impact, no new waterfalls), with pure helper extraction for deterministic domain resolution.
@@ -302,8 +340,22 @@
 - [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
 - [x] Add review summary for this task
 
-### Review Summary (Auth Domain Constants Extraction)
+## Review Summary (Auth Domain Constants Extraction)
 
 - ui-ux-pro-max: No UI changes in this task; reviewed scope and confirmed no visual/interaction impact.
 - vercel-react-best-practices: Refactor is server/constants-only and preserves current request flow without adding render or fetch overhead.
 - web-design-guidelines: No guideline-relevant surface change (non-UI patch); no new findings.
+
+## 2026-02-26 Final Check (lint / format / typecheck)
+
+- [x] Run `bun run lint` and confirm zero errors/warnings
+- [x] Run `bun run format` and confirm zero errors/warnings
+- [x] Run `bun run typecheck` and confirm zero errors/warnings
+- [x] If any issue appears, fix the root cause with minimal changes and rerun all checks
+- [x] Add review summary for this task
+
+## Review Summary (Final Check lint / format / typecheck)
+
+- ui-ux-pro-max: This patch only resolves lint-rule compatibility in server-side OG image composition (`next/og`) and does not alter interactive UI flows or visual hierarchy.
+- vercel-react-best-practices: Renamed a non-hook helper and fixed a strict template-expression type issue; no new client data-fetch, bundle, or rerender risk introduced.
+- web-design-guidelines: Fetched latest guideline source and reviewed `src/lib/profile-image/tinder-composite.tsx`; no new web-interface guideline violations in user-facing UI surfaces.

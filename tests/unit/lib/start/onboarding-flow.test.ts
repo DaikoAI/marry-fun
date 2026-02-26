@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getStartOnboardingPhase } from "@/lib/start/onboarding-flow";
+import { getStartOnboardingPhase, getStartOnboardingStep } from "@/lib/start/onboarding-flow";
 
 describe("getStartOnboardingPhase", () => {
   it("wallet 未認証は connect フェーズ", () => {
@@ -56,5 +56,27 @@ describe("getStartOnboardingPhase", () => {
         profileImage: "https://cdn.example.com/avatar.webp",
       }),
     ).toBe("ready");
+  });
+});
+
+describe("getStartOnboardingStep", () => {
+  it("wallet または X が未連携なら wallet ステップ", () => {
+    expect(
+      getStartOnboardingStep({
+        isWalletAuthenticated: true,
+        isXLinked: false,
+        requiresUsername: false,
+      }),
+    ).toBe("wallet");
+  });
+
+  it("wallet と X が連携済みで username 未設定なら name ステップ", () => {
+    expect(
+      getStartOnboardingStep({
+        isWalletAuthenticated: true,
+        isXLinked: true,
+        requiresUsername: true,
+      }),
+    ).toBe("name");
   });
 });

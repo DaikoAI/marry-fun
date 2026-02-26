@@ -6,12 +6,19 @@ import { uploadProfileCompositeImageToR2 } from "@/infrastructure/storage/r2/pro
 import { getServerSession } from "@/lib/auth/server-session";
 import { createTinderProfileCompositeImage } from "@/lib/profile-image/tinder-composite";
 import { pickRandomProfileDecorations } from "@/lib/profile-share";
-import { generateProfileImageWithRunware } from "@/lib/runware/profile-image";
+import { generateProfileBackgroundWithRunware, generateProfileImageWithRunware } from "@/lib/runware/profile-image";
 import { logger } from "@/utils/logger";
 
 const requestSchema = z.object({
   locale: z.enum(["ja", "en"]).default("en"),
   seed: z.number().int().min(0).optional(),
+  frame: z
+    .object({
+      borderColor: z.string().max(32).optional(),
+      borderWidth: z.number().int().min(1).max(24).optional(),
+      borderRadius: z.number().int().min(8).max(64).optional(),
+    })
+    .optional(),
 });
 
 function maskUserId(userId: string): string {
@@ -26,6 +33,38 @@ function maskImageUrl(url: string): string {
   } catch {
     return "invalid-url";
   }
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
+async function fetchGeneratedImageAsDataUrl(imageUrl: string): Promise<string> {
+  const response = await fetch(imageUrl, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch generated image (${String(response.status)})`);
+  }
+
+  const imageBytes = await response.arrayBuffer();
+  if (imageBytes.byteLength === 0) {
+    throw new Error("Generated image bytes are empty");
+  }
+
+  const rawContentType = response.headers.get("content-type") ?? "image/png";
+  const contentType =
+    rawContentType.startsWith("image/") ? rawContentType.split(";")[0]?.trim() || "image/png" : "image/png";
+  const base64 = arrayBufferToBase64(imageBytes);
+  return `data:${contentType};base64,${base64}`;
 }
 
 export async function POST(request: Request) {
@@ -91,13 +130,18 @@ export async function POST(request: Request) {
       xProfileImage: maskImageUrl(context.xProfileImageUrl),
     });
 
-    const result = await generateProfileImageWithRunware({
-      locale: parsed.data.locale,
-      seed: parsed.data.seed,
-      inputFaceImageUrl: context.xProfileImageUrl,
-      displayName: context.username ?? "guest",
-      xUsername: context.xUsername,
-    });
+    const seed = parsed.data.seed;
+
+    const [backgroundResult, characterResult] = await Promise.all([
+      generateProfileBackgroundWithRunware({ seed }),
+      generateProfileImageWithRunware({
+        locale: parsed.data.locale,
+        seed,
+        inputFaceImageUrl: context.xProfileImageUrl,
+        displayName: context.username ?? "guest",
+        xUsername: context.xUsername,
+      }),
+    ]);
 
     const sessionName = typeof session.user.name === "string" ? session.user.name.trim() : "";
     const displayName = context.username?.trim() || sessionName || "Guest";
@@ -111,12 +155,19 @@ export async function POST(request: Request) {
       tagsCount: decorations.tags.length,
     });
 
+    const [backgroundDataUrl, characterDataUrl] = await Promise.all([
+      fetchGeneratedImageAsDataUrl(backgroundResult.imageUrl),
+      fetchGeneratedImageAsDataUrl(characterResult.imageUrl),
+    ]);
+
     const compositeImage = createTinderProfileCompositeImage({
-      imageUrl: result.imageUrl,
+      backgroundImageUrl: backgroundDataUrl,
+      characterImageUrl: characterDataUrl,
       name: displayName,
       location: decorations.location,
       tags: decorations.tags,
       badge: decorations.badge,
+      frame: parsed.data.frame,
     });
 
     const compositeBytes = await compositeImage.arrayBuffer();

@@ -1,8 +1,13 @@
 import { getObjectR2 } from "@/lib/r2";
 import { resolveProfileImagesBucket } from "@/infrastructure/storage/r2/profile-image-storage";
+import { logger } from "@/utils/logger";
 
-function decodeR2KeyPath(parts: string[]): string {
-  return parts.map(segment => decodeURIComponent(segment)).join("/");
+function decodeR2KeyPath(parts: string[]): string | null {
+  try {
+    return parts.map(segment => decodeURIComponent(segment)).join("/");
+  } catch {
+    return null;
+  }
 }
 
 export async function GET(_request: Request, context: { params: Promise<{ key: string[] }> }) {
@@ -12,10 +17,17 @@ export async function GET(_request: Request, context: { params: Promise<{ key: s
   }
 
   const objectKey = decodeR2KeyPath(keyParts);
+  if (!objectKey) {
+    return new Response("Invalid key", { status: 400 });
+  }
   const bucket = await resolveProfileImagesBucket();
   const objectResult = await getObjectR2(bucket, objectKey);
   if (!objectResult.isOk) {
-    return new Response(objectResult.error.message, { status: 500 });
+    logger.error("[profile-image/object] failed to fetch object", {
+      key: objectKey,
+      error: objectResult.error,
+    });
+    return new Response("Failed to load object", { status: 500 });
   }
 
   const object = objectResult.value;

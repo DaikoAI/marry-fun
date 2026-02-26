@@ -124,4 +124,18 @@ describe("StartPageClient", () => {
     expect(html).toContain('src="https://cdn.example.com/profile-image/u1/2026-02-26/a.png"');
     expect(html).toContain('alt="profilePreviewAlt"');
   });
+
+  it("プロフィール画像生成APIレスポンスから imageUrl を抽出できる", async () => {
+    const pageModule = await import("@/app/[locale]/start/start-page-client");
+    const readGeneratedProfileImageUrl = (pageModule as {
+      readGeneratedProfileImageUrl?: (payload: unknown) => string | null;
+    }).readGeneratedProfileImageUrl;
+
+    expect(readGeneratedProfileImageUrl).toBeTypeOf("function");
+    expect(readGeneratedProfileImageUrl?.({ imageUrl: "https://cdn.example.com/profile-image/u1/new.png" })).toBe(
+      "https://cdn.example.com/profile-image/u1/new.png",
+    );
+    expect(readGeneratedProfileImageUrl?.({ imageUrl: 123 })).toBeNull();
+    expect(readGeneratedProfileImageUrl?.(null)).toBeNull();
+  });
 });

@@ -129,7 +129,7 @@ describe("generateProfileImageWithRunware", () => {
       width: 768,
       height: 960,
       numberResults: 1,
-      outputFormat: "WEBP",
+      outputFormat: "PNG",
       steps: 28,
       CFGScale: 6.5,
       inputs: {
