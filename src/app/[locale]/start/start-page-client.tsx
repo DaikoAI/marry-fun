@@ -54,6 +54,13 @@ export function readGeneratedProfileImageUrl(payload: unknown): string | null {
   return null;
 }
 
+export function resolveProfilePreviewImage(options: {
+  generatedImageUrl: string | null;
+  sessionImageUrl: string | null;
+}): string | null {
+  return options.generatedImageUrl ?? options.sessionImageUrl ?? null;
+}
+
 export function StartPageClient() {
   const router = useRouter();
   const { triggerHaptic } = useHaptic();
@@ -76,6 +83,7 @@ export function StartPageClient() {
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const [isPreparingShare, setIsPreparingShare] = useState(false);
   const [profileActionError, setProfileActionError] = useState<string | null>(null);
+  const [generatedProfileImageUrl, setGeneratedProfileImageUrl] = useState<string | null>(null);
   const t = useTranslations("start");
   const locale = useLocale();
   const localeMenuRef = useRef<HTMLDivElement | null>(null);
@@ -83,12 +91,19 @@ export function StartPageClient() {
   const effectiveUsername = hasStoredUsername ? storedName.trim() : username.trim();
   const isValid = isValidUsername(effectiveUsername);
   const isWalletAuthenticated = Boolean(session.data?.session);
+  const profilePreviewImage =
+    isWalletAuthenticated ?
+      resolveProfilePreviewImage({
+        generatedImageUrl: generatedProfileImageUrl,
+        sessionImageUrl: userImage,
+      })
+    : null;
 
   const onboardingPhase = getStartOnboardingPhase({
     isWalletAuthenticated,
     isXLinked,
     username: storedName,
-    profileImage: userImage,
+    profileImage: profilePreviewImage,
   });
   const [displayOnboardingPhase, setDisplayOnboardingPhase] = useState(onboardingPhase);
 
@@ -322,6 +337,9 @@ export function StartPageClient() {
           throw new Error(readApiErrorMessage(payload) ?? t("profileImageGenerateError"));
         }
 
+        if (imageUrl) {
+          setGeneratedProfileImageUrl(imageUrl);
+        }
         await session.refetch();
         logger.info("[start] profile image generation success", {
           imageUrl: imageUrl ?? "n/a",
@@ -339,7 +357,7 @@ export function StartPageClient() {
   };
 
   const handleShareOnX = () => {
-    if (!userImage || isPreparingShare) return;
+    if (!profilePreviewImage || isPreparingShare) return;
 
     setProfileActionError(null);
     setIsPreparingShare(true);
@@ -516,11 +534,11 @@ export function StartPageClient() {
                   <p className="mt-1 text-sm leading-snug text-white/95">{t("profilePhaseDescription")}</p>
                 </div>
 
-                {userImage && (
+                {profilePreviewImage && (
                   <div className="mx-auto mt-3 w-[180px] overflow-hidden rounded-2xl border border-white/60 bg-black/60 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={userImage}
+                      src={profilePreviewImage}
                       alt={t("profilePreviewAlt")}
                       className="h-[225px] w-full object-cover"
                       onLoad={event => {
@@ -551,7 +569,7 @@ export function StartPageClient() {
                   <button
                     type="button"
                     onClick={handleShareOnX}
-                    disabled={!userImage || isPreparingShare}
+                    disabled={!profilePreviewImage || isPreparingShare}
                     className="rounded-full border border-sky-200/70 bg-sky-500/40 px-6 py-2.5 text-sm font-semibold tracking-wide text-sky-50 transition-colors hover:bg-sky-500/50 focus-visible:ring-2 focus-visible:ring-sky-200/80 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-45"
                   >
                     {isPreparingShare ? t("preparingShare") : t("shareProfileOnX")}

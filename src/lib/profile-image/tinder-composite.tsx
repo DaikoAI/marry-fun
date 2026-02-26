@@ -26,12 +26,36 @@ const DEFAULT_FRAME: Required<TinderFrameOptions> = {
   borderRadius: 32,
 };
 
+interface TinderFrameStyles {
+  outer: Required<TinderFrameOptions>;
+  inner: {
+    inset: number;
+    borderRadius: number;
+  };
+}
+
+export function resolveTinderFrameStyles(frame?: TinderFrameOptions): TinderFrameStyles {
+  const outer: Required<TinderFrameOptions> = {
+    ...DEFAULT_FRAME,
+    ...frame,
+  };
+  const inset = Math.max(0, outer.borderWidth);
+
+  return {
+    outer,
+    inner: {
+      inset,
+      borderRadius: Math.max(0, outer.borderRadius - inset),
+    },
+  };
+}
+
 export interface TinderProfileCompositeInput {
   /** Legacy: single full-bleed image (e.g. OG with stored composite URL). */
   imageUrl?: string;
-  /** New: background image (Runware brick texture) behind the card. */
+  /** Optional background image behind the Tinder-style card. */
   backgroundImageUrl?: string;
-  /** New: character/avatar image inside the card. When set with backgroundImageUrl, card layout is used. */
+  /** Character/avatar image inside the card. When set, card layout is used. */
   characterImageUrl?: string;
   name: string;
   location: string;
@@ -42,7 +66,7 @@ export interface TinderProfileCompositeInput {
 }
 
 function hasCardLayout(input: TinderProfileCompositeInput): boolean {
-  return Boolean(input.backgroundImageUrl && input.characterImageUrl);
+  return Boolean(input.characterImageUrl);
 }
 
 export function createTinderProfileCompositeImage(input: TinderProfileCompositeInput): ImageResponse {
@@ -51,10 +75,7 @@ export function createTinderProfileCompositeImage(input: TinderProfileCompositeI
     .map(tag => `#${tag}`)
     .join("  ");
 
-  const frame: Required<TinderFrameOptions> = {
-    ...DEFAULT_FRAME,
-    ...input.frame,
-  };
+  const frameStyles = resolveTinderFrameStyles(input.frame);
 
   const isCardLayout = hasCardLayout(input);
 
@@ -117,65 +138,74 @@ export function createTinderProfileCompositeImage(input: TinderProfileCompositeI
             transform: "translate(-50%, -50%)",
             width: TINDER_CARD_SIZE.width,
             height: TINDER_CARD_SIZE.height,
-            borderRadius: frame.borderRadius,
-            border: `${String(frame.borderWidth)}px solid ${frame.borderColor}`,
-            overflow: "hidden",
+            borderRadius: frameStyles.outer.borderRadius,
+            border: `${String(frameStyles.outer.borderWidth)}px solid ${frameStyles.outer.borderColor}`,
             display: "flex",
             flexDirection: "column",
             boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
           }}
         >
-          <img
-            src={input.characterImageUrl}
-            alt={input.name}
-            width={TINDER_CARD_SIZE.width}
-            height={TINDER_CARD_SIZE.height}
-            style={{
-              width: `${String(TINDER_CARD_SIZE.width)}px`,
-              height: `${String(TINDER_CARD_SIZE.height)}px`,
-              objectFit: "cover",
-              position: "absolute",
-              inset: 0,
-            }}
-          />
           <div
             style={{
               position: "absolute",
-              inset: 0,
+              inset: frameStyles.inner.inset,
+              borderRadius: frameStyles.inner.borderRadius,
+              overflow: "hidden",
               display: "flex",
-              background: "linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.74) 100%)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 24,
-              right: 24,
-              border: "2px solid rgba(255,255,255,0.88)",
-              borderRadius: 999,
-              padding: "8px 16px",
-              fontSize: 24,
-              fontWeight: 700,
-              letterSpacing: 1,
-              background: "rgba(0,0,0,0.28)",
             }}
           >
-            {input.badge}
-          </div>
-          <div
-            style={{
-              marginTop: "auto",
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              padding: "0 40px 48px",
-            }}
-          >
-            <div style={{ display: "flex", fontSize: 48, fontWeight: 700, lineHeight: 1.1 }}>{input.name}</div>
-            <div style={{ display: "flex", fontSize: 26, opacity: 0.95 }}>Location: {input.location}</div>
-            <div style={{ display: "flex", fontSize: 22, opacity: 0.92 }}>{tagsText}</div>
-            <div style={{ display: "flex", fontSize: 20, opacity: 0.9 }}>made with marry.fun</div>
+            <img
+              src={input.characterImageUrl}
+              alt={input.name}
+              width={TINDER_CARD_SIZE.width}
+              height={TINDER_CARD_SIZE.height}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                position: "absolute",
+                inset: 0,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                background: "linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.74) 100%)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: 24,
+                right: 24,
+                border: "2px solid rgba(255,255,255,0.88)",
+                borderRadius: 999,
+                padding: "8px 16px",
+                fontSize: 24,
+                fontWeight: 700,
+                letterSpacing: 1,
+                background: "rgba(0,0,0,0.28)",
+              }}
+            >
+              {input.badge}
+            </div>
+            <div
+              style={{
+                marginTop: "auto",
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                padding: "0 40px 48px",
+              }}
+            >
+              <div style={{ display: "flex", fontSize: 48, fontWeight: 700, lineHeight: 1.1 }}>{input.name}</div>
+              <div style={{ display: "flex", fontSize: 26, opacity: 0.95 }}>Location: {input.location}</div>
+              <div style={{ display: "flex", fontSize: 22, opacity: 0.92 }}>{tagsText}</div>
+              <div style={{ display: "flex", fontSize: 20, opacity: 0.9 }}>made with marry.fun</div>
+            </div>
           </div>
         </div>
       : null}

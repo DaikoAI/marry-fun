@@ -43,9 +43,9 @@ If face detection fails or is incomplete, reconstruct minimally while preserving
 export const RUNWARE_PROFILE_PROMPT_CORE =
   "rwre, anime-style selfie portrait, black suit, white shirt, black tie, smartphone selfie, upper torso centered, slight high-angle camera, confident relaxed expression, luxury high-rise apartment night bokeh, warm cinematic lighting, preserve exact reference face identity";
 
-/** Background-only prompt: warm brick/wall texture, no person. Used behind the Tinder-style card. */
+/** Background-only prompt used behind the Tinder-style card. Keep it abstract and non-distracting. */
 export const RUNWARE_PROFILE_BACKGROUND_PROMPT =
-  "warm brown orange brick wall texture, old rustic wall, rough irregular surface, natural lighting, shallow depth of field, no people, no characters, no text, seamless background, vertical composition 4:5";
+  "soft cinematic gradient backdrop, amber and navy tones, city lights bokeh, abstract luxury ambiance, shallow depth of field, smooth texture, no people, no characters, no text, seamless background, vertical composition 4:5";
 
 const X_PROFILE_SIZE_NAMES = new Set(["mini", "normal", "bigger", "small", "thumb"]);
 

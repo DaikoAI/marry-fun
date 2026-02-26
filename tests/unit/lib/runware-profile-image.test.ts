@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildRunwareProfilePrompt,
   normalizeRunwareReferenceImageUrl,
+  RUNWARE_PROFILE_BACKGROUND_PROMPT,
   RUNWARE_PROFILE_MODEL_DEFAULT,
   RUNWARE_PROFILE_PROMPT_MAX_LENGTH,
 } from "@/constants/profile-image/runware";
@@ -63,6 +64,15 @@ describe("normalizeRunwareReferenceImageUrl", () => {
       "https://pbs.twimg.com/profile_images/19260958/avatar?format=jpg&name=normal",
     );
     expect(normalized).toBe("https://pbs.twimg.com/profile_images/19260958/avatar?format=jpg&name=400x400");
+  });
+});
+
+describe("RUNWARE_PROFILE_BACKGROUND_PROMPT", () => {
+  it("レンガ/壁を固定せず、雰囲気背景を指示する", () => {
+    const prompt = RUNWARE_PROFILE_BACKGROUND_PROMPT.toLowerCase();
+    expect(prompt).not.toContain("brick");
+    expect(prompt).not.toContain("wall");
+    expect(prompt).toContain("bokeh");
   });
 });
 
@@ -159,6 +169,36 @@ describe("generateProfileImageWithRunware", () => {
         xUsername: "alice_x",
       }),
     ).rejects.toThrow("Runware request failed with status 400: positivePrompt length should be <= 300");
+  });
+
+  it("Runwareが一時的な400 inference errorを返した場合は再試行して成功する", async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: [{ error: "Inference error occurred while processing the request. Please try again." }],
+          }),
+          { status: 400, headers: { "content-type": "application/json" } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: [{ imageURL: "https://im.runware.ai/retry-success.webp" }],
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        ),
+      );
+
+    const result = await generateProfileImageWithRunware({
+      locale: "en",
+      inputFaceImageUrl: "https://pbs.twimg.com/profile_images/123/avatar.jpg",
+      displayName: "alice",
+      xUsername: "alice_x",
+    });
+
+    expect(result).toEqual({ imageUrl: "https://im.runware.ai/retry-success.webp" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("RUNWARE_MODEL が失敗したらデフォルトモデルで再試行する", async () => {

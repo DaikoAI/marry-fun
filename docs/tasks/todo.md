@@ -1,5 +1,74 @@
 # TODO
 
+- [x] 2026-02-27 Ensure generated profile image appears on top page reliably
+- [x] RED: add failing integration test for background timeout fallback in `POST /api/profile-image/generate`
+- [x] GREEN: make Runware background generation non-blocking (fallback on failure/timeout)
+- [x] GREEN: fallback to X profile image when character generation times out/fails
+- [x] GREEN: support Tinder card layout even when only character image is available
+- [x] GREEN: reflect generated `imageUrl` immediately on top page before session refetch completes
+- [x] Run targeted tests/lint for profile-image route/start-page/composite
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Ensure generated profile image appears on top page reliably)
+
+- ui-ux-pro-max: Preserved onboarding flow while improving perceived responsiveness by showing generated profile preview immediately and keeping a stable card presentation even when dynamic background generation fails.
+- vercel-react-best-practices: Kept changes localized and lightweight (no additional client data waterfall); UI now uses API response data directly for instant feedback while still refetching session for canonical state.
+- web-design-guidelines: Pulled latest guideline source and verified changed scope; no new interactive accessibility regressions introduced by this patch.
+
+- [x] 2026-02-26 Profile image background/style mismatch (brick background + missing Tinder frame)
+- [x] RED: add failing tests for background prompt direction and frame visibility layout
+- [x] GREEN: change Runware background prompt to non-brick abstract bokeh mood
+- [x] GREEN: fix Tinder composite frame rendering so border is not hidden by character image
+- [x] Run targeted tests for runware profile-image + tinder composite + generate route
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Profile image background/style mismatch)
+
+- ui-ux-pro-max: Updated the generated visual direction from hard-coded rustic brick texture to a softer cinematic bokeh backdrop and restored clear frame hierarchy (outer frame + inner clipped content) for stronger Tinder-like readability.
+- vercel-react-best-practices: Change is isolated to prompt constant/compositor utility; no additional client-side fetching, rerender paths, or bundle-heavy dependencies were introduced.
+- web-design-guidelines: Pulled latest guideline source and verified changed scope (`lib` + `constants` + tests) has no interactive web UI regressions; this patch affects generated image composition, not DOM control semantics.
+
+- [x] 2026-02-26 Move `R2_PROFILE_IMAGE_PUBLIC_BASE_URL` from npm script inline env to `.env.local`
+- [x] Remove inline `--env=R2_PROFILE_IMAGE_PUBLIC_BASE_URL=...` from `package.json` preview script
+- [x] Add `R2_PROFILE_IMAGE_PUBLIC_BASE_URL` to `.env.local`
+- [x] Validate package formatting and env presence
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Move R2 public base URL config to `.env.local`)
+
+- ui-ux-pro-max: No UI code was changed; config-only update has no visual or interaction impact.
+- vercel-react-best-practices: No React/Next rendering or data-fetch path changed; runtime behavior is unaffected except env sourcing location.
+- web-design-guidelines: Pulled latest guideline source and confirmed changed files are config/task docs only, so no UI guideline findings.
+
+- [x] 2026-02-26 Runware transient 400 inference error (`/api/profile-image/generate` -> 502)
+- [x] RED: add failing unit test for transient Runware 400 retry behavior
+- [x] GREEN: retry transient Runware inference failures before surfacing error
+- [x] Run targeted tests for runware profile-image lib + generate route
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Runware transient 400 inference error)
+
+- ui-ux-pro-max: No UI component/layout changes in this patch; behavior update is server-side retry logic only.
+- vercel-react-best-practices: No React/Next rendering/data-fetch paths were added or changed; impact is isolated to server-side Runware adapter resilience.
+- web-design-guidelines: Pulled latest guidelines and checked touched scope; only server/lib/test files changed, so there are no UI-guideline findings for this task.
+
+- [x] 2026-02-26 GitHub Actions `setup-bun` fetch failure
+- [x] Identify root cause from workflow/action usage and choose minimal robust fix
+- [x] Replace failing Bun setup path in all affected workflows
+- [x] Validate workflow YAML + command correctness locally
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (GitHub Actions `setup-bun` fetch failure)
+
+- ui-ux-pro-max: No UI surface/files changed in this patch; workflow-only change does not affect layout, interaction, or accessibility presentation.
+- vercel-react-best-practices: No React/Next runtime code changed; no new client/server render paths, data fetching, or bundle impact introduced.
+- web-design-guidelines: Pulled latest guidelines and re-checked changed scope; only `.github/workflows/*.yml` were modified, so no guideline-relevant UI findings.
+
 - [x] 2026-02-26 Local Wrangler Dev + Local R2 Upload/Display + Client Logs
 - [x] RED: add/update tests to cover new local dev script behavior and client logging touchpoints
 - [x] GREEN: switch `bun run dev` to Wrangler-based local flow (no plain `next dev`)

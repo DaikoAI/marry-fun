@@ -31,6 +31,14 @@ function readCompositeInput(): { backgroundImageUrl: string; characterImageUrl: 
   };
 }
 
+function readCompositeInputRecord(): Record<string, unknown> {
+  const input = mockCreateTinderProfileCompositeImage.mock.calls.at(-1)?.[0];
+  if (!input || typeof input !== "object") {
+    throw new TypeError("composite input is missing");
+  }
+  return input as Record<string, unknown>;
+}
+
 vi.mock("@/lib/auth/server-session", () => ({
   getServerSession: mockGetServerSession,
 }));
@@ -188,5 +196,51 @@ describe("POST /api/profile-image/generate", () => {
     const compositeInput = readCompositeInput();
     expect(compositeInput.backgroundImageUrl).toMatch(/^data:image\/webp;base64,/);
     expect(compositeInput.characterImageUrl).toMatch(/^data:image\/webp;base64,/);
+  });
+
+  it("背景生成がタイムアウトしてもキャラ画像のみで合成して保存する", async () => {
+    mockGenerateProfileBackgroundWithRunware.mockRejectedValueOnce(new Error("TimeoutError: aborted"));
+
+    const req = new Request("http://localhost:8787/api/profile-image/generate", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ locale: "en" }),
+    });
+
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith("https://im.runware.ai/generated-avatar.webp", {
+      cache: "no-store",
+    });
+
+    const compositeInput = readCompositeInputRecord();
+    expect(compositeInput.backgroundImageUrl).toBeUndefined();
+    expect(compositeInput.characterImageUrl).toMatch(/^data:image\/webp;base64,/);
+    expect(json).toEqual({ imageUrl: "https://cdn.example.com/profile-image/u1/2026-02-24/uuid.png" });
+  });
+
+  it("キャラ生成がタイムアウトしてもXプロフィール画像にフォールバックして保存する", async () => {
+    mockGenerateProfileImageWithRunware.mockRejectedValueOnce(new Error("TimeoutError: aborted"));
+
+    const req = new Request("http://localhost:8787/api/profile-image/generate", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ locale: "en" }),
+    });
+
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledWith("https://pbs.twimg.com/profile_images/123/avatar.jpg", {
+      cache: "no-store",
+    });
+
+    const compositeInput = readCompositeInputRecord();
+    expect(compositeInput.characterImageUrl).toMatch(/^data:image\/webp;base64,/);
+    expect(json).toEqual({ imageUrl: "https://cdn.example.com/profile-image/u1/2026-02-24/uuid.png" });
   });
 });

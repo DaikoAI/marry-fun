@@ -127,9 +127,11 @@ describe("StartPageClient", () => {
 
   it("プロフィール画像生成APIレスポンスから imageUrl を抽出できる", async () => {
     const pageModule = await import("@/app/[locale]/start/start-page-client");
-    const readGeneratedProfileImageUrl = (pageModule as {
-      readGeneratedProfileImageUrl?: (payload: unknown) => string | null;
-    }).readGeneratedProfileImageUrl;
+    const readGeneratedProfileImageUrl = (
+      pageModule as {
+        readGeneratedProfileImageUrl?: (payload: unknown) => string | null;
+      }
+    ).readGeneratedProfileImageUrl;
 
     expect(readGeneratedProfileImageUrl).toBeTypeOf("function");
     expect(readGeneratedProfileImageUrl?.({ imageUrl: "https://cdn.example.com/profile-image/u1/new.png" })).toBe(
@@ -137,5 +139,29 @@ describe("StartPageClient", () => {
     );
     expect(readGeneratedProfileImageUrl?.({ imageUrl: 123 })).toBeNull();
     expect(readGeneratedProfileImageUrl?.(null)).toBeNull();
+  });
+
+  it("生成直後の画像URLをセッション画像より優先して表示用に使う", async () => {
+    const pageModule = await import("@/app/[locale]/start/start-page-client");
+    const resolveProfilePreviewImage = (
+      pageModule as {
+        resolveProfilePreviewImage?: (options: {
+          generatedImageUrl: string | null;
+          sessionImageUrl: string | null;
+        }) => string | null;
+      }
+    ).resolveProfilePreviewImage;
+
+    expect(resolveProfilePreviewImage).toBeTypeOf("function");
+    expect(
+      resolveProfilePreviewImage?.({
+        generatedImageUrl: "https://cdn.example.com/profile-image/u1/generated.png",
+        sessionImageUrl: "https://cdn.example.com/profile-image/u1/session.png",
+      }),
+    ).toBe("https://cdn.example.com/profile-image/u1/generated.png");
+    expect(
+      resolveProfilePreviewImage?.({ generatedImageUrl: null, sessionImageUrl: "https://cdn.example.com/a.png" }),
+    ).toBe("https://cdn.example.com/a.png");
+    expect(resolveProfilePreviewImage?.({ generatedImageUrl: null, sessionImageUrl: null })).toBeNull();
   });
 });

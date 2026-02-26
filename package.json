@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "bun run build:cf:local && bun run preview",
     "dev:next": "bun run sync:soul && dotenvx run --convention=nextjs -- next dev --turbopack --port 8787",
-    "preview": "dotenvx run --env-file=.env.local --overload --env=R2_PROFILE_IMAGE_PUBLIC_BASE_URL=http://127.0.0.1:8787/api/profile-image/object/ -- sh -c 'NODE_ENV=production opennextjs-cloudflare preview -- --local --port 8787'",
+    "preview": "dotenvx run --env-file=.env.local --overload -- sh -c 'NODE_ENV=production opennextjs-cloudflare preview -- --local --port 8787'",
     "preview:prod": "dotenvx run --convention=nextjs -- sh -c 'NODE_ENV=production opennextjs-cloudflare preview'",
     "build": "bun run sync:soul && dotenvx run --convention=nextjs -- sh -c 'NODE_ENV=production next build'",
     "build:cf:local": "bun run sync:soul && bun run clean:opennext && dotenvx run --env-file=.env.local --overload -- sh -c 'NODE_ENV=production opennextjs-cloudflare build'",

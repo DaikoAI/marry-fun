@@ -109,7 +109,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
 
-  if (!context.xProfileImageUrl) {
+  const xProfileImageUrl = context.xProfileImageUrl;
+  if (!xProfileImageUrl) {
     logger.warn("[profile-image] missing x profile image", {
       requestId,
       userId: maskUserId(userId),
@@ -127,21 +128,40 @@ export async function POST(request: Request) {
       hasSeed: parsed.data.seed !== undefined,
       hasXUsername: Boolean(context.xUsername),
       usernameLength: context.username?.length ?? 0,
-      xProfileImage: maskImageUrl(context.xProfileImageUrl),
+      xProfileImage: maskImageUrl(xProfileImageUrl),
     });
 
     const seed = parsed.data.seed;
 
-    const [backgroundResult, characterResult] = await Promise.all([
-      generateProfileBackgroundWithRunware({ seed }),
-      generateProfileImageWithRunware({
+    const backgroundPromise = generateProfileBackgroundWithRunware({ seed }).catch((error: unknown) => {
+      logger.warn("[profile-image] background generation failed; using fallback background", {
+        requestId,
+        userId: maskUserId(userId),
         locale: parsed.data.locale,
-        seed,
-        inputFaceImageUrl: context.xProfileImageUrl,
-        displayName: context.username ?? "guest",
-        xUsername: context.xUsername,
-      }),
-    ]);
+        message: error instanceof Error ? error.message : "unknown error",
+      });
+      return null;
+    });
+
+    const characterPromise = generateProfileImageWithRunware({
+      locale: parsed.data.locale,
+      seed,
+      inputFaceImageUrl: xProfileImageUrl,
+      displayName: context.username ?? "guest",
+      xUsername: context.xUsername,
+    }).catch((error: unknown) => {
+      logger.warn("[profile-image] character generation failed; using x profile image fallback", {
+        requestId,
+        userId: maskUserId(userId),
+        locale: parsed.data.locale,
+        message: error instanceof Error ? error.message : "unknown error",
+      });
+      return {
+        imageUrl: xProfileImageUrl,
+      };
+    });
+
+    const [backgroundResult, characterResult] = await Promise.all([backgroundPromise, characterPromise]);
 
     const sessionName = typeof session.user.name === "string" ? session.user.name.trim() : "";
     const displayName = context.username?.trim() || sessionName || "Guest";
@@ -155,10 +175,19 @@ export async function POST(request: Request) {
       tagsCount: decorations.tags.length,
     });
 
-    const [backgroundDataUrl, characterDataUrl] = await Promise.all([
-      fetchGeneratedImageAsDataUrl(backgroundResult.imageUrl),
-      fetchGeneratedImageAsDataUrl(characterResult.imageUrl),
-    ]);
+    const characterDataUrl = await fetchGeneratedImageAsDataUrl(characterResult.imageUrl);
+    const backgroundDataUrl =
+      backgroundResult ?
+        await fetchGeneratedImageAsDataUrl(backgroundResult.imageUrl).catch((error: unknown) => {
+          logger.warn("[profile-image] background fetch failed; using fallback background", {
+            requestId,
+            userId: maskUserId(userId),
+            locale: parsed.data.locale,
+            message: error instanceof Error ? error.message : "unknown error",
+          });
+          return undefined;
+        })
+      : undefined;
 
     const compositeImage = createTinderProfileCompositeImage({
       backgroundImageUrl: backgroundDataUrl,

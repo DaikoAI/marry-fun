@@ -15,6 +15,13 @@
 - For third-party API routes, add request-scoped structured logs (start, validation, external call start/result, failure, duration) so 4xx/5xx root causes are identifiable without reproducing locally.
 - When users ask for module-level verification, add direct unit tests for outbound request payloads and storage adapters (not only route-level integration tests).
 - For Runware `imageInference` with X profile references, normalize `pbs.twimg.com/profile_images` URLs (`_normal`/`_bigger`/`name=normal`) to `400x400` before request; raw X icon URLs can be below Runware's minimum reference width and cause deterministic 400s.
+- For `/api/profile-image/generate`, treat Runware 400 responses containing transient inference messages (e.g. "Inference error occurred... Please try again.") as retryable at least once before returning 502.
+- For Tinder-style composite rendering, avoid placing full-bleed child layers directly on the bordered container; use an inset inner clip layer so frame borders remain visibly rendered.
+- For profile background generation prompts, avoid hard-coding concrete textures (e.g., brick/wall) unless explicitly requested; default to neutral abstract bokeh-style backdrops.
+- For top-page profile generation UX, do not rely only on session refetch to display the new image; apply API `imageUrl` optimistically in local UI state so users see the generated preview immediately.
+- For optional AI sub-tasks (e.g., decorative background generation), degrade gracefully on timeout/failure instead of failing the entire profile generation flow.
+- For profile image generation, keep a deterministic fallback path (X profile image) when character model inference times out so onboarding can still proceed.
+- When local preview scripts need environment values, keep them in `.env.local` rather than embedding inline `--env=...` in npm scripts unless explicitly requested.
 - When the user provides a reference utility implementation (e.g., shared `r2.ts`), align project code to shared helper interfaces first, then adapt feature modules to call those helpers.
 - When profile images are stored in R2, keep user-facing URLs on the R2 public domain (via `R2_PROFILE_IMAGE_PUBLIC_BASE_URL`) and avoid API proxy URL fallbacks unless explicitly requested.
 - For top-page UI polish requests, verify readability against bright background regions first and default to layered contrast protection (background dim + content panel), not just per-text color tweaks.

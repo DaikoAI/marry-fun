@@ -3,13 +3,17 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 interface PackageJsonShape {
-  scripts?: Partial<Record<string, string>>;
+  scripts?: Record<string, unknown>;
 }
 
 function readPackageScripts(): Record<string, string> {
   const raw = readFileSync("package.json", "utf8");
   const parsed = JSON.parse(raw) as PackageJsonShape;
-  return parsed.scripts ?? {};
+  const scripts = parsed.scripts ?? {};
+
+  return Object.fromEntries(
+    Object.entries(scripts).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+  );
 }
 
 describe("package scripts", () => {

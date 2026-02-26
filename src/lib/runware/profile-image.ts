@@ -13,6 +13,7 @@ import {
 import { logger } from "@/utils/logger";
 
 const RUNWARE_REQUEST_TIMEOUT_MS = 15_000;
+const RUNWARE_REQUEST_MAX_ATTEMPTS = 2;
 
 interface RunwareTaskResult {
   imageURL?: unknown;
@@ -61,6 +62,22 @@ function readRunwareErrorMessage(payload: unknown): string | null {
   }
 
   return null;
+}
+
+function isRetryableRunwareFailure(status: number, detail: string | null): boolean {
+  if (status === 429 || status >= 500) {
+    return true;
+  }
+
+  if (status !== 400 || !detail) {
+    return false;
+  }
+
+  const normalizedDetail = detail.toLowerCase();
+  return (
+    normalizedDetail.includes("inference error occurred while processing the request") ||
+    normalizedDetail.includes("please try again")
+  );
 }
 
 export function pickRunwareImageUrlFromResponse(payload: unknown): string | null {
@@ -142,60 +159,84 @@ async function requestRunwareImageInference(options: {
     height: RUNWARE_PROFILE_IMAGE_SIZE.height,
   });
 
-  let response: Response;
-  try {
-    response = await fetch("https://api.runware.ai/v1", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(body),
-      cache: "no-store",
-      signal: AbortSignal.timeout(RUNWARE_REQUEST_TIMEOUT_MS),
-    });
-  } catch (error) {
-    logger.error(`[${logLabel}] network failure`, {
-      traceId,
-      model,
-      durationMs: Date.now() - startedAt,
-      message: error instanceof Error ? error.message : "unknown fetch error",
-    });
-    throw error;
-  }
+  for (let attempt = 1; attempt <= RUNWARE_REQUEST_MAX_ATTEMPTS; attempt += 1) {
+    let response: Response;
+    try {
+      response = await fetch("https://api.runware.ai/v1", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(body),
+        cache: "no-store",
+        signal: AbortSignal.timeout(RUNWARE_REQUEST_TIMEOUT_MS),
+      });
+    } catch (error) {
+      const canRetry = attempt < RUNWARE_REQUEST_MAX_ATTEMPTS;
+      logger[canRetry ? "warn" : "error"](`[${logLabel}] network failure`, {
+        traceId,
+        model,
+        attempt,
+        maxAttempts: RUNWARE_REQUEST_MAX_ATTEMPTS,
+        durationMs: Date.now() - startedAt,
+        message: error instanceof Error ? error.message : "unknown fetch error",
+        willRetry: canRetry,
+      });
+      if (canRetry) {
+        continue;
+      }
+      throw error;
+    }
 
-  const payload: unknown = await response.json().catch(() => null);
-  if (!response.ok) {
-    const detail = readRunwareErrorMessage(payload);
-    logger.warn(`[${logLabel}] request failed`, {
+    const payload: unknown = await response.json().catch(() => null);
+    if (!response.ok) {
+      const detail = readRunwareErrorMessage(payload);
+      const retryable = isRetryableRunwareFailure(response.status, detail);
+      const canRetry = retryable && attempt < RUNWARE_REQUEST_MAX_ATTEMPTS;
+
+      logger.warn(`[${logLabel}] request failed`, {
+        traceId,
+        model,
+        status: response.status,
+        attempt,
+        maxAttempts: RUNWARE_REQUEST_MAX_ATTEMPTS,
+        durationMs: Date.now() - startedAt,
+        detail,
+        retryable,
+        willRetry: canRetry,
+      });
+
+      if (canRetry) {
+        continue;
+      }
+      throw new Error(`Runware request failed with status ${String(response.status)}${detail ? `: ${detail}` : ""}`);
+    }
+
+    const imageUrl = pickRunwareImageUrlFromResponse(payload);
+    if (!imageUrl) {
+      logger.warn(`[${logLabel}] missing image url in response`, {
+        traceId,
+        model,
+        status: response.status,
+        attempt,
+        durationMs: Date.now() - startedAt,
+      });
+      throw new Error("Runware response does not contain image URL");
+    }
+
+    logger.info(`[${logLabel}] request success`, {
       traceId,
       model,
       status: response.status,
+      attempt,
       durationMs: Date.now() - startedAt,
-      detail,
+      imageUrl: redactImageUrl(imageUrl),
     });
-    throw new Error(`Runware request failed with status ${String(response.status)}${detail ? `: ${detail}` : ""}`);
+    return { imageUrl };
   }
 
-  const imageUrl = pickRunwareImageUrlFromResponse(payload);
-  if (!imageUrl) {
-    logger.warn(`[${logLabel}] missing image url in response`, {
-      traceId,
-      model,
-      status: response.status,
-      durationMs: Date.now() - startedAt,
-    });
-    throw new Error("Runware response does not contain image URL");
-  }
-
-  logger.info(`[${logLabel}] request success`, {
-    traceId,
-    model,
-    status: response.status,
-    durationMs: Date.now() - startedAt,
-    imageUrl: redactImageUrl(imageUrl),
-  });
-  return { imageUrl };
+  throw new Error("Runware request failed after retry attempts");
 }
 
 export interface GenerateProfileImageWithRunwareInput {
