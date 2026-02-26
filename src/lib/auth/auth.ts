@@ -6,14 +6,16 @@ import { web3 } from "better-auth-web3";
 import { PublicKey } from "@solana/web3.js";
 import nacl from "tweetnacl";
 
+import { AUTH_LOCAL_TRUSTED_ORIGIN_PATTERNS, AUTH_STATIC_TRUSTED_ORIGINS } from "@/constants/auth";
 import { env } from "@/env";
 import { getDb } from "@/infrastructure/db/client";
 import * as schema from "@/infrastructure/db/schema";
+import { resolveWeb3RequestDomain } from "@/lib/auth/web3-domain";
 import { resolveWeb3UserNameForCreation } from "@/lib/auth/web3-signup-username";
 
-let cachedAuth: Awaited<ReturnType<typeof buildAuth>> | null = null;
+const cachedAuthByDomain = new Map<string, Awaited<ReturnType<typeof buildAuth>>>();
 
-function getAuthBaseUrl(): string {
+export function getAuthBaseUrl(): string {
   return env.BETTER_AUTH_URL ?? "http://localhost:3000";
 }
 
@@ -36,11 +38,12 @@ function getTwitterConfig() {
   return {};
 }
 
-async function buildAuth() {
+async function buildAuth(web3Domain: string) {
   const db = await getDb();
+  const authBaseUrl = getAuthBaseUrl();
 
   return betterAuth({
-    baseURL: getAuthBaseUrl(),
+    baseURL: authBaseUrl,
     secret: getAuthSecret(),
     account: {
       accountLinking: {
@@ -48,14 +51,7 @@ async function buildAuth() {
         allowDifferentEmails: true,
       },
     },
-    trustedOrigins: [
-      getAuthBaseUrl(),
-      "http://localhost:*",
-      "http://127.0.0.1:*",
-      "http://192.168.*.*:*",
-      "https://marry.fun",
-      "https://marry-fun-dev.yamadaasuma.workers.dev",
-    ],
+    trustedOrigins: [authBaseUrl, ...AUTH_LOCAL_TRUSTED_ORIGIN_PATTERNS, ...AUTH_STATIC_TRUSTED_ORIGINS],
     database: drizzleAdapter(db, {
       provider: "sqlite",
       schema,
@@ -85,7 +81,7 @@ async function buildAuth() {
     socialProviders: getTwitterConfig(),
     plugins: [
       web3({
-        domain: new URL(getAuthBaseUrl()).hostname,
+        domain: web3Domain,
         anonymous: true,
         getNonce: async () => {
           const nonce = await Promise.resolve(generateRandomString(32, "a-z", "A-Z", "0-9"));
@@ -113,9 +109,14 @@ async function buildAuth() {
   });
 }
 
-export async function getAuth() {
-  if (!cachedAuth) {
-    cachedAuth = await buildAuth();
+export async function getAuth(request?: Request) {
+  const web3Domain = resolveWeb3RequestDomain(request, getAuthBaseUrl());
+  const cachedAuth = cachedAuthByDomain.get(web3Domain);
+  if (cachedAuth) {
+    return cachedAuth;
   }
-  return cachedAuth;
+
+  const auth = await buildAuth(web3Domain);
+  cachedAuthByDomain.set(web3Domain, auth);
+  return auth;
 }

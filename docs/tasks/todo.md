@@ -1,5 +1,54 @@
 # TODO
 
+- [ ] 2026-02-26 Profile Image R2 Direct URL + Top Page Display
+- [ ] Remove profile-image API proxy URL fallback and use R2 public URL directly
+- [ ] Update profile-image generate route/tests to stop passing `requestOrigin`
+- [ ] Show generated profile image on top page after generation
+- [ ] Run targeted tests for storage route/start-page
+- [ ] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [ ] Add review summary for this task
+
+- [x] 2026-02-26 Top Page Text Readability Improvements
+- [x] Improve top background readability baseline (overlay/contrast)
+- [x] Make onboarding copy areas consistently readable in all phases
+- [x] Tune top-right controls (language/BGM) contrast and visibility
+- [x] Run targeted tests for start page
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Top Page Text Readability Improvements)
+
+- ui-ux-pro-max: Applied contrast/readability guidance by adding a top-only background dim/gradient layer, unifying onboarding copy into a protected glass panel, and strengthening control contrast without changing interaction flow.
+- vercel-react-best-practices: Kept this patch purely presentational (no new data fetching/effects, no broader subscriptions), while preserving component boundaries (`Background` + `StartPageClient`) and existing render behavior.
+- web-design-guidelines: Pulled latest guideline source and reviewed changed files; icon buttons retain `aria-label` and focus-visible rings, form accessibility attributes remain present, and safe-area-aware top control placement is preserved.
+
+- [x] 2026-02-24 Fix `bun run build:cf && bun run preview` failure
+- [x] RED: add failing regression test for chat page server prerender safety
+- [x] GREEN: make chat page render path compatible with Next.js build prerender
+- [x] Run `bun run build:cf`
+- [x] Run `bun run preview` boot check
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Build/Preview Failure Fix)
+
+- ui-ux-pro-max: Added explicit keyboard focus styles on new global error retry actions, keeping fallback UI interaction discoverable and accessible in both root/locale error boundaries.
+- vercel-react-best-practices: Marked `/[locale]/chat` as `force-dynamic` to avoid invalid build-time prerendering of client/store-driven chat state while keeping runtime rendering intact.
+- web-design-guidelines: Checked updated UI files against current guidelines (interactive focus state visibility, clear fallback copy, semantic button usage); no blocking findings remain in changed files.
+
+- [x] 2026-02-24 Fix start-page sound button size regression (`h-11` -> compact)
+- [x] RED: update `start-page-client` test to expect compact sound button size
+- [x] GREEN: remove oversized class override from start-page `BgmController`
+- [x] Run targeted test for `start-page-client`
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Sound Button Size Regression)
+
+- ui-ux-pro-max: Re-checked icon-button guidance; top-right controls now share consistent compact sizing (`h-8 w-8`) with visible focus states and no layout-shift interaction changes.
+- vercel-react-best-practices: Change is presentational only (single class override adjustment) and keeps component isolation intact; no new data fetching, effects, or render hotspots.
+- web-design-guidelines: Reviewed updated start-page control code against latest guideline source; icon controls keep accessible labels and keyboard focus rings, with safe-area top-right placement preserved.
+
 - [x] RED: add failing integration tests for `GET /api/auth/x/link-status`
 - [x] RED: add failing unit tests for `SolanaAuthPanel` X button states
 - [x] Implement DB schema extension (`xAccount`) and relations
@@ -129,3 +178,132 @@
 - ui-ux-pro-max: Verified this keeps onboarding status feedback explicit; linked-X state now shows clear success copy while preserving existing spacing/contrast.
 - vercel-react-best-practices: Change is render-only copy branching via a pure helper (`getOnboardingHeadlineCopy`) with no added data fetching, effects, or rerender hotspots.
 - web-design-guidelines: Reviewed updated panel content against the latest guideline source (clarity, status communication, accessibility semantics); no new violations introduced in this patch.
+
+## 2026-02-24 Top Page 3-Phase + Runware Profile Share
+
+- [x] RED: add failing unit tests for new onboarding phase resolver (`connect` / `username` / `profile` / `ready`)
+- [x] RED: add failing integration tests for `POST /api/profile-image/generate`
+- [x] RED: add failing tests for profile share token + OG helpers
+- [x] Add Runware env + client utility and prompt constants
+- [x] Implement profile image generation API route (Runware -> `user.image`)
+- [x] Implement profile share token route + OG page/image endpoints
+- [x] Refactor `StartPageClient` to 3-phase flow with view transitions and resume
+- [x] Update i18n messages for new phase labels/buttons/errors
+- [x] GREEN: run targeted tests and fix regressions
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Top Page 3-Phase + Runware Profile Share)
+
+- ui-ux-pro-max: Applied onboarding and form UX checks (status clarity, focus-visible controls, async feedback); phase cards keep clear progression and mobile-safe spacing while preserving fixed bottom auth controls.
+- vercel-react-best-practices: Kept data reads localized and lightweight (session + `/api/auth/x/link-status`), no heavy client dependencies added, and API responsibilities split into focused routes (`generate`, `share-token`, `og`).
+- web-design-guidelines: Fetched latest guideline source (`vercel-labs/web-interface-guidelines`) and reviewed touched UI routes/components; interactive elements keep labels/focus rings, async errors are surfaced, and share surface uses explicit metadata paths.
+
+## 2026-02-24 ViewTransition Illegal Invocation Fix
+
+- [x] Add task plan/checklist for this fix
+- [x] RED: add regression test for `startViewTransition` invocation context binding
+- [x] GREEN: refactor transition invocation to preserve `document` binding (no illegal invocation)
+- [x] Align `next.config.ts` with Next.js `experimental.viewTransition` docs
+- [x] Run targeted tests
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (ViewTransition Illegal Invocation Fix)
+
+- ui-ux-pro-max: Confirmed the onboarding phase animation path now degrades safely (transition API unavailable -> immediate update), avoiding broken UX while keeping motion behavior intact.
+- vercel-react-best-practices: Kept the effect dependency surface narrow (`displayOnboardingPhase`, `onboardingPhase`) and isolated transition invocation in a small helper for stable client rendering behavior.
+- web-design-guidelines: Retrieved the latest guideline source and reviewed touched UI code path; no new semantic/accessibility violations introduced by this fix.
+
+## 2026-02-24 Runware 400 During Profile Image Generation
+
+- [x] RED: add/update unit test to assert Runware payload uses `imageInference` + `runware:400@1` compatible shape
+- [x] GREEN: switch profile image generation request from `photoMaker` payload to `imageInference` payload (`inputs.referenceImages`)
+- [x] GREEN: set Runware default model to `runware:400@1` and keep env override support
+- [x] Run targeted unit + integration tests for profile-image generation route/lib
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Runware 400 During Profile Image Generation)
+
+- ui-ux-pro-max: No UI layer changes in this patch; reviewed impact scope and confirmed no visual or interaction regressions are introduced.
+- vercel-react-best-practices: API/image-generation flow remains minimal and dependency-safe; the fix only changes provider payload shape and default model while preserving existing request lifecycle and fallback behavior.
+- web-design-guidelines: Pulled latest `web-interface-guidelines` source (`command.md`) and checked touched surface; no UI guideline findings because this task only modified server constants/lib/tests.
+
+## 2026-02-24 Runware Reference Image Width 400 Fix
+
+- [x] RED: add failing unit tests for X profile image URL normalization (`_normal` / `name=normal`)
+- [x] GREEN: normalize `pbs.twimg.com/profile_images` reference URL to 400x400 variant before Runware request
+- [x] Run targeted tests for runware profile-image lib + generation route
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Runware Reference Image Width 400 Fix)
+
+- ui-ux-pro-max: No UI component/layout changes in this fix; verified impact is server-side request shaping only with no UX regressions.
+- vercel-react-best-practices: Updated logic stays in server utility scope, keeps API flow simple, and avoids additional client-side fetch/render work.
+- web-design-guidelines: Pulled latest guideline source and reviewed touched scope; this patch changes only runware constants/lib/tests, so no UI guideline findings.
+
+## 2026-02-24 R2 Profile Image Path + Public URL Fallback
+
+- [x] RED: update storage tests for `profile-image/` key prefix and missing-public-base fallback
+- [x] GREEN: change R2 object key prefix from `profile-images/` to `profile-image/`
+- [x] GREEN: support fallback URL generation via `requestOrigin` when `R2_PROFILE_IMAGE_PUBLIC_BASE_URL` is not configured
+- [x] GREEN: add public read route `/api/profile-image/object/[...key]` backed by `PROFILE_IMAGES_BUCKET`
+- [x] GREEN: pass request origin from `POST /api/profile-image/generate` to R2 uploader
+- [x] Run targeted tests + lint + typecheck
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (R2 Profile Image Path + Public URL Fallback)
+
+- ui-ux-pro-max: No UI component changes; this update is storage and API plumbing only, so visual/accessibility behavior remains unchanged.
+- vercel-react-best-practices: Kept server flow simple by adding a single origin fallback path and a focused R2 object read route, without introducing new client waterfalls.
+- web-design-guidelines: Pulled latest guideline source and checked touched scope; no guideline findings because only backend routes/storage/tests were modified.
+
+## 2026-02-24 Tinder Composite + R2 Persist for Profile Image
+
+- [x] Implement Tinder-style composite image renderer as reusable server module
+- [x] Implement R2 upload module for profile composite images
+- [x] Wire `/api/profile-image/generate` to Runware -> composite -> R2 -> DB (`user.image`)
+- [x] Update share metadata path to prefer saved composite image URL
+- [x] Add/Update integration and unit tests for route + R2 storage module
+- [x] Run targeted tests + lint + typecheck
+
+## 2026-02-24 R2 Helper Alignment (`doom-index` style)
+
+- [x] Introduce reusable `src/lib/r2.ts` helpers (`joinR2Key`, context/bucket resolve, image put/get wrappers)
+- [x] Refactor profile-image storage adapter to consume `src/lib/r2.ts` helpers
+- [x] Add fallback support for both bucket bindings (`PROFILE_IMAGES_BUCKET` and `R2_BUCKET`)
+- [x] Update object proxy route to use shared R2 get helper
+- [x] Update Wrangler bindings with `R2_BUCKET` alias for compatibility
+- [x] Run targeted tests + lint + typecheck
+
+## 2026-02-26 Web3 SVM Verify `Domain not allowed` Fix
+
+- [x] RED: add failing unit tests for web3 auth domain resolution (`origin`/`host`/fallback)
+- [x] GREEN: allow request-aware domain selection for Better Auth web3 plugin (with allowlist)
+- [x] GREEN: wire auth route handlers to pass request context into auth builder
+- [x] Run targeted tests for new domain resolution behavior
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Web3 SVM Verify Domain Handling)
+
+- ui-ux-pro-max: No UI layer changes in this task; reviewed impact scope and confirmed no layout/interaction/accessibility regressions.
+- vercel-react-best-practices: Kept route/auth changes minimal and request-scoped (no client bundle impact, no new waterfalls), with pure helper extraction for deterministic domain resolution.
+- web-design-guidelines: Fetched latest guideline source and reviewed changed surface; no guideline violations introduced because updates are server/auth utility focused.
+
+## 2026-02-26 Auth Domain Constants Extraction
+
+- [x] Extract auth/web3 domain lists into constants module
+- [x] Replace hardcoded domains in auth and web3-domain utilities
+- [x] Run targeted tests and lint/typecheck
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+### Review Summary (Auth Domain Constants Extraction)
+
+- ui-ux-pro-max: No UI changes in this task; reviewed scope and confirmed no visual/interaction impact.
+- vercel-react-best-practices: Refactor is server/constants-only and preserves current request flow without adding render or fetch overhead.
+- web-design-guidelines: No guideline-relevant surface change (non-UI patch); no new findings.

@@ -16,5 +16,22 @@
   "gameOverBlocked": "ゲームオーバー！今日はもうプレイできません。明日また来てね！",
   "openLanguageMenu": "言語メニューを開く",
   "switchLanguageToEn": "英語に切り替え",
-  "switchLanguageToJa": "日本語に切り替え"
+  "switchLanguageToJa": "日本語に切り替え",
+  "connectPhaseTitle": "Phase 1: Wallet & X 連携",
+  "connectPhaseDescription": "ウォレット接続とX連携の両方が完了すると次に進みます。",
+  "walletConnectedStatus": "Wallet連携済み",
+  "walletPendingStatus": "Wallet未連携",
+  "xConnectedStatus": "X連携済み",
+  "xPendingStatus": "X未連携",
+  "xCheckingStatus": "X連携確認中",
+  "usernamePhaseTitle": "Phase 2: ユーザー名を設定",
+  "profilePhaseTitle": "Phase 3: プロフィール画像を生成",
+  "profilePhaseDescription": "Xアイコンを元にセルフィー風画像を作成し、Xにシェアできます。",
+  "generateProfileImage": "画像を生成",
+  "generatingProfileImage": "画像生成中...",
+  "profilePreviewAlt": "生成されたプロフィール画像",
+  "shareProfileOnX": "Post on X",
+  "preparingShare": "共有準備中...",
+  "profileImageGenerateError": "プロフィール画像の生成に失敗しました。",
+  "profileShareError": "共有リンクの生成に失敗しました。"
 }

@@ -18,9 +18,9 @@
   },
   "scripts": {
     "dev": "bun run sync:soul && dotenvx run --convention=nextjs -- next dev --turbopack --port 8787",
-    "preview": "dotenvx run --convention=nextjs -- opennextjs-cloudflare preview",
-    "build": "bun run sync:soul && dotenvx run --convention=nextjs -- next build",
-    "build:cf": "bun run sync:soul && bun run clean:opennext && dotenvx run --convention=nextjs -- opennextjs-cloudflare build",
+    "preview": "dotenvx run --convention=nextjs -- sh -c 'NODE_ENV=production opennextjs-cloudflare preview'",
+    "build": "bun run sync:soul && dotenvx run --convention=nextjs -- sh -c 'NODE_ENV=production next build'",
+    "build:cf": "bun run sync:soul && bun run clean:opennext && dotenvx run --convention=nextjs -- sh -c 'NODE_ENV=production opennextjs-cloudflare build'",
     "clean:opennext": "bun run scripts/clean-opennext.ts",
     "deploy": "bun run build:cf && opennextjs-cloudflare deploy",
     "start": "dotenvx run --convention=nextjs -- next start",

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ComponentProps } from "react";
 import { useHaptic } from "use-haptic";
 import { useLocale, useTranslations } from "next-intl";
@@ -14,15 +14,31 @@ import { Link, useRouter } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { authClient } from "@/lib/auth/auth-client";
 import type { InitGameResult } from "@/lib/girl-chat";
-import { getStartOnboardingStep } from "@/lib/start/onboarding-flow";
+import { getStartOnboardingPhase } from "@/lib/start/onboarding-flow";
 import { shouldShowPrologueSkip } from "@/lib/start/prologue-skip";
+import { runWithViewTransition } from "@/lib/start/view-transition";
 import { useGameStore } from "@/store/game-store";
 
 type FormSubmitEvent = Parameters<NonNullable<ComponentProps<"form">["onSubmit"]>>[0];
 
+type StartPageUiPhase = "form" | "prologue";
+const IS_PLAY_NOW_ENABLED = false;
+
 function isValidUsername(name: string): boolean {
   const t = name.trim();
   return t.length >= 1 && t.length <= 20;
+}
+
+function readApiErrorMessage(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  if ("message" in payload && typeof payload.message === "string" && payload.message.length > 0) {
+    return payload.message;
+  }
+
+  return null;
 }
 
 export function StartPageClient() {
@@ -31,28 +47,50 @@ export function StartPageClient() {
   const session = authClient.useSession();
   const storedName = session.data?.user.name ?? "";
   const hasStoredUsername = isValidUsername(storedName);
+  const userImage = session.data?.user.image ?? null;
 
   const [username, setUsername] = useState("");
   const [isSavingUsername, setIsSavingUsername] = useState(false);
   const [profileError, setProfileError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [phase, setPhase] = useState<"form" | "prologue">("form");
+  const [phase, setPhase] = useState<StartPageUiPhase>("form");
   const [hasInitResponse, setHasInitResponse] = useState(false);
   const [initError, setInitError] = useState(false);
   const [gameOverBlocked, setGameOverBlocked] = useState(false);
   const [isLocaleMenuOpen, setIsLocaleMenuOpen] = useState(false);
+  const [isXLinked, setIsXLinked] = useState(false);
+  const [isCheckingXLink, setIsCheckingXLink] = useState(false);
+  const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
+  const [isPreparingShare, setIsPreparingShare] = useState(false);
+  const [profileActionError, setProfileActionError] = useState<string | null>(null);
   const t = useTranslations("start");
   const locale = useLocale();
-  const nextLocale: Locale = locale === "ja" ? "en" : "ja";
-  const languageToggleLabel = nextLocale === "ja" ? t("switchLanguageToJa") : t("switchLanguageToEn");
   const localeMenuRef = useRef<HTMLDivElement | null>(null);
 
   const effectiveUsername = hasStoredUsername ? storedName.trim() : username.trim();
   const isValid = isValidUsername(effectiveUsername);
+  const isWalletAuthenticated = Boolean(session.data?.session);
+
+  const onboardingPhase = getStartOnboardingPhase({
+    isWalletAuthenticated,
+    isXLinked,
+    username: storedName,
+    profileImage: userImage,
+  });
+  const [displayOnboardingPhase, setDisplayOnboardingPhase] = useState(onboardingPhase);
+
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler */
+  useEffect(() => {
+    if (displayOnboardingPhase === onboardingPhase) return;
+
+    runWithViewTransition(document, () => {
+      setDisplayOnboardingPhase(onboardingPhase);
+    });
+  }, [displayOnboardingPhase, onboardingPhase]);
+  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   useEffect(() => {
     if (hasStoredUsername) {
-      // Sync session name to local state for pre-fill when user later disconnects
       // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect, react-hooks-extra/no-direct-set-state-in-use-effect -- intentional sync from external session
       setUsername(storedName.trim());
     }
@@ -61,6 +99,43 @@ export function StartPageClient() {
   useEffect(() => {
     router.prefetch("/chat");
   }, [router]);
+
+  const refreshXLinkStatus = useCallback(async () => {
+    if (!isWalletAuthenticated) {
+      setIsXLinked(false);
+      return;
+    }
+
+    setIsCheckingXLink(true);
+
+    try {
+      const response = await fetch("/api/auth/x/link-status", {
+        method: "GET",
+        cache: "no-store",
+      });
+      const payload: unknown = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setIsXLinked(false);
+        return;
+      }
+
+      if (payload && typeof payload === "object" && "linked" in payload && typeof payload.linked === "boolean") {
+        setIsXLinked(payload.linked);
+        return;
+      }
+
+      setIsXLinked(false);
+    } catch {
+      setIsXLinked(false);
+    } finally {
+      setIsCheckingXLink(false);
+    }
+  }, [isWalletAuthenticated]);
+
+  useEffect(() => {
+    void refreshXLinkStatus();
+  }, [refreshXLinkStatus]);
 
   const apiResultRef = useRef<InitGameResult | null>(null);
   const apiErrorRef = useRef<boolean>(false);
@@ -96,13 +171,15 @@ export function StartPageClient() {
     };
   }, [isLocaleMenuOpen]);
 
-  const isWalletAuthenticated = Boolean(session.data?.session);
-  const onboardingStep = getStartOnboardingStep({
-    isWalletAuthenticated,
-    requiresUsername: isWalletAuthenticated && !hasStoredUsername,
-  });
-  const canStart = isValid && isWalletAuthenticated && !isSubmitting && phase === "form" && !gameOverBlocked;
-  const canSubmitUsername = isValid && onboardingStep === "name" && !isSavingUsername;
+  const canStart =
+    IS_PLAY_NOW_ENABLED &&
+    isValid &&
+    isWalletAuthenticated &&
+    !isSubmitting &&
+    phase === "form" &&
+    !gameOverBlocked &&
+    onboardingPhase === "ready";
+  const canSubmitUsername = isValid && onboardingPhase === "username" && !isSavingUsername;
   const canSkipPrologue = shouldShowPrologueSkip({ phase, hasInitResponse });
 
   const setupStoreAndNavigate = (result: InitGameResult) => {
@@ -201,11 +278,82 @@ export function StartPageClient() {
       });
   };
 
+  const handleGenerateProfileImage = () => {
+    if (onboardingPhase !== "profile" || isGeneratingProfile) return;
+
+    setProfileActionError(null);
+    setIsGeneratingProfile(true);
+
+    void (async () => {
+      try {
+        const response = await fetch("/api/profile-image/generate", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ locale }),
+        });
+
+        const payload: unknown = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(readApiErrorMessage(payload) ?? t("profileImageGenerateError"));
+        }
+
+        await session.refetch();
+      } catch (error) {
+        const message = error instanceof Error ? error.message : t("profileImageGenerateError");
+        setProfileActionError(message);
+      } finally {
+        setIsGeneratingProfile(false);
+      }
+    })();
+  };
+
+  const handleShareOnX = () => {
+    if (!userImage || isPreparingShare) return;
+
+    setProfileActionError(null);
+    setIsPreparingShare(true);
+
+    void (async () => {
+      try {
+        const response = await fetch("/api/profile-share/token", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ locale }),
+        });
+
+        const payload: unknown = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(readApiErrorMessage(payload) ?? t("profileShareError"));
+        }
+
+        const intentUrl =
+          payload && typeof payload === "object" && "intentUrl" in payload && typeof payload.intentUrl === "string" ?
+            payload.intentUrl
+          : null;
+
+        if (!intentUrl) {
+          throw new Error(t("profileShareError"));
+        }
+
+        window.open(intentUrl, "_blank", "noopener,noreferrer");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : t("profileShareError");
+        setProfileActionError(message);
+      } finally {
+        setIsPreparingShare(false);
+      }
+    })();
+  };
+
   return (
     <div className="relative h-dvh overflow-hidden text-white">
       <Background />
       <div className="absolute top-[max(env(safe-area-inset-top),1.5rem)] right-[max(env(safe-area-inset-right),1.5rem)] z-20 flex items-center gap-2">
-        <BgmController />
+        <BgmController className="h-8 w-8" />
         <div ref={localeMenuRef} className="relative">
           <button
             type="button"
@@ -216,7 +364,7 @@ export function StartPageClient() {
             onClick={() => {
               setIsLocaleMenuOpen(prev => !prev);
             }}
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/35 bg-white/10 text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md transition-colors hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/50 bg-black/45 text-white shadow-[0_8px_24px_rgba(0,0,0,0.55)] backdrop-blur-md transition-colors hover:bg-black/60 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none"
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-2">
               <circle cx="12" cy="12" r="9" />
@@ -229,7 +377,7 @@ export function StartPageClient() {
             <div
               id="language-menu"
               role="menu"
-              className="absolute top-10 right-0 flex min-w-[132px] flex-col gap-1 rounded-2xl border border-white/35 bg-black/45 p-1 shadow-[0_10px_28px_rgba(0,0,0,0.45)] backdrop-blur-md"
+              className="absolute top-10 right-0 flex min-w-[132px] flex-col gap-1 rounded-2xl border border-white/50 bg-black/70 p-1 shadow-[0_12px_30px_rgba(0,0,0,0.6)] backdrop-blur-md"
             >
               {(
                 [
@@ -266,7 +414,7 @@ export function StartPageClient() {
         canSkip={canSkipPrologue}
         onSkip={handlePrologueComplete}
       />
-      <div className="relative z-10 mx-auto flex h-full max-w-md flex-col items-center justify-center px-6">
+      <div className="relative z-10 mx-auto flex h-full max-w-md flex-col items-center justify-center px-6 [text-shadow:0_1px_6px_rgba(0,0,0,0.75)]">
         <form
           onSubmit={handleSubmit}
           className="flex h-full w-full animate-[fadeIn_1200ms_cubic-bezier(0.22,1,0.36,1)_both] flex-col items-center gap-8 motion-reduce:animate-none"
@@ -279,61 +427,133 @@ export function StartPageClient() {
             height={240}
             className="mt-[max(env(safe-area-inset-top),3.5rem)] mb-4 h-auto w-[min(320px,65vw)] drop-shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
           />
-          {onboardingStep === "name" && (
-            <>
-              <div className="w-full">
-                <input
-                  type="text"
-                  name="username"
-                  aria-label={t("placeholder")}
-                  value={username}
-                  onChange={e => {
-                    setUsername(e.target.value);
-                  }}
-                  placeholder={t("placeholder")}
-                  maxLength={20}
-                  autoComplete="off"
-                  spellCheck={false}
-                  autoFocus
-                  className="w-full rounded-xl border-2 border-pink-200/50 bg-white/20 px-5 py-3.5 text-center text-lg font-(--font-ephemeral) tracking-wider text-white shadow-[0_0_20px_rgba(255,255,255,0.08)] backdrop-blur-md transition-colors duration-200 placeholder:text-white/50 focus:border-pink-200/80 focus:bg-white/25 focus:outline-none"
-                />
+
+          <div className="w-full rounded-2xl border border-white/30 bg-black/50 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.5)] backdrop-blur-md [view-transition-name:onboarding-phase-panel] sm:p-5">
+            {displayOnboardingPhase === "connect" && (
+              <div className="space-y-3 text-center">
+                <p className="text-base font-semibold text-white">{t("connectPhaseTitle")}</p>
+                <p className="text-sm text-white/95">{t("connectPhaseDescription")}</p>
+                <p className="text-xs font-medium text-white/90" role="status" aria-live="polite">
+                  {isWalletAuthenticated ? t("walletConnectedStatus") : t("walletPendingStatus")} /{" "}
+                  {isXLinked ?
+                    t("xConnectedStatus")
+                  : isCheckingXLink ?
+                    t("xCheckingStatus")
+                  : t("xPendingStatus")}
+                </p>
               </div>
-              {profileError && (
-                <p className="text-sm text-red-200" role="alert">
-                  {t("profileError")}
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={handleNameStepSubmit}
-                disabled={!canSubmitUsername}
-                className="rounded-full border-2 border-pink-200/40 bg-white/10 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-              >
-                {isSavingUsername ? t("saving") : t("next")}
-              </button>
-            </>
-          )}
-          {onboardingStep === "start" && (
-            <>
-              {gameOverBlocked && (
-                <p className="text-sm text-red-200" role="alert">
-                  {t("gameOverBlocked")}
-                </p>
-              )}
-              {initError && (
-                <p className="text-sm text-red-200" role="alert">
-                  {t("initError")}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={!canStart}
-                className="rounded-full border-2 border-pink-200/40 bg-white/10 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-              >
-                {t("submit")}
-              </button>
-            </>
-          )}
+            )}
+
+            {displayOnboardingPhase === "username" && (
+              <>
+                <p className="mb-3 text-center text-base font-semibold text-white">{t("usernamePhaseTitle")}</p>
+                <div className="w-full">
+                  <input
+                    type="text"
+                    name="username"
+                    aria-label={t("placeholder")}
+                    value={username}
+                    onChange={e => {
+                      setUsername(e.target.value);
+                    }}
+                    placeholder={t("placeholder")}
+                    maxLength={20}
+                    autoComplete="off"
+                    spellCheck={false}
+                    autoFocus
+                    className="w-full rounded-lg border-2 border-pink-200/60 bg-black/55 px-4 py-2.5 text-center text-base font-(--font-ephemeral) tracking-wider text-white shadow-[0_0_20px_rgba(255,255,255,0.08)] backdrop-blur-md transition-colors duration-200 placeholder:text-white/75 focus:border-pink-200/80 focus:bg-black/65 focus:outline-none"
+                  />
+                </div>
+                {profileError && (
+                  <p className="mt-2 text-sm text-red-200" role="alert">
+                    {t("profileError")}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleNameStepSubmit}
+                  disabled={!canSubmitUsername}
+                  className="mt-4 rounded-full border-2 border-pink-200/50 bg-black/55 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                >
+                  {isSavingUsername ? t("saving") : t("next")}
+                </button>
+              </>
+            )}
+
+            {displayOnboardingPhase === "profile" && (
+              <div className="space-y-3 text-center">
+                <div className="rounded-xl border border-white/25 bg-black/60 px-4 py-3 backdrop-blur-sm">
+                  <p className="text-base font-semibold text-white">
+                    {t("profilePhaseTitle")}
+                  </p>
+                  <p className="mt-1 text-sm leading-snug text-white/95">
+                    {t("profilePhaseDescription")}
+                  </p>
+                </div>
+
+                {userImage && (
+                  <div className="mx-auto mt-3 w-[180px] overflow-hidden rounded-2xl border border-white/60 bg-black/60 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={userImage} alt={t("profilePreviewAlt")} className="h-[225px] w-full object-cover" />
+                  </div>
+                )}
+
+                <div className="mt-2 flex flex-col items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleGenerateProfileImage}
+                    disabled={isGeneratingProfile}
+                    className="rounded-full border-2 border-pink-200/50 bg-black/55 px-6 py-2.5 text-sm font-semibold tracking-wide text-pink-100 transition-all hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-45"
+                  >
+                    {isGeneratingProfile ? t("generatingProfileImage") : t("generateProfileImage")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleShareOnX}
+                    disabled={!userImage || isPreparingShare}
+                    className="rounded-full border border-sky-200/70 bg-sky-500/40 px-6 py-2.5 text-sm font-semibold tracking-wide text-sky-50 transition-colors hover:bg-sky-500/50 focus-visible:ring-2 focus-visible:ring-sky-200/80 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-45"
+                  >
+                    {isPreparingShare ? t("preparingShare") : t("shareProfileOnX")}
+                  </button>
+                </div>
+
+                {profileActionError && (
+                  <p className="text-sm text-red-200" role="alert">
+                    {profileActionError}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {displayOnboardingPhase === "ready" && (
+              <>
+                {userImage && (
+                  <div className="mx-auto mb-3 w-[180px] overflow-hidden rounded-2xl border border-white/50 bg-black/45 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={userImage} alt={t("profilePreviewAlt")} className="h-[225px] w-full object-cover" />
+                  </div>
+                )}
+                {gameOverBlocked && (
+                  <p className="text-sm text-red-200" role="alert">
+                    {t("gameOverBlocked")}
+                  </p>
+                )}
+                {initError && (
+                  <p className="text-sm text-red-200" role="alert">
+                    {t("initError")}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={!canStart}
+                  className="mx-auto block rounded-full border-2 border-pink-200/50 bg-black/55 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                >
+                  {t("submit")}
+                </button>
+              </>
+            )}
+          </div>
+
           <div className="mt-auto w-full pb-[max(env(safe-area-inset-bottom),1.5rem)]">
             <SolanaAuthPanel variant="onboarding" />
           </div>
