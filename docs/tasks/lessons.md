@@ -1,0 +1,38 @@
+# Lessons
+
+- When a request mentions "top" in this project, treat `/{locale}` as the onboarding entry and `/{locale}/start` as a legacy redirect before finalizing implementation assumptions.
+- When OAuth callback URL is already confirmed correct, investigate Better Auth account-linking trust policy (`account.accountLinking.trustedProviders`) before re-attributing failures to callback URL mismatch.
+- For top-page profile previews, preserve the Tinder card aspect ratio (`217/367`) in the frame (`aspect-*` + bounded width) to avoid clipping generated portrait cards.
+- On the start screen, keep `SolanaAuthPanel` anchored to the bottom across all onboarding states (`wallet`, `name`, `start`) so post-connect transitions do not shift the primary auth controls upward.
+- For wallet/X connected states, preserve the same button shells and only swap inner labels (e.g., shortened wallet + `✅`, `@username ✅`) instead of replacing controls with separate text elements.
+- For language switching UX requests, confirm whether the user wants one-click toggle or a menu with explicit language choices before finalizing the interaction.
+- For UI refinement follow-ups, treat layout direction and iconography details (e.g., vertical tabs, emoji usage) as strict requirements and reflect them exactly.
+- When adjusting size parity between adjacent controls, check for per-instance `className` overrides before assuming component defaults are applied.
+- For local D1 debugging, verify schema with `wrangler d1 execute ... --local` first; `drizzle-kit studio` can point at a stale `.wrangler` sqlite when multiple files exist.
+- Keep DB table names consistently `snake_case` (including auth-related tables): use `wallet_address` and `x_account` instead of mixed-case names.
+- When the user specifies exact replacement copy tied to a completion state (e.g., after X link), implement the exact strings and trigger condition directly in that state source instead of adding parallel display logic elsewhere.
+- When a user clarifies third-party provider choice after planning (e.g., image generation provider), immediately switch implementation to that provider and keep prompt/config in constants for future edits.
+- For DOM APIs like `document.startViewTransition`, avoid unbound method calls; call through `document` (or `Function.prototype.call`) and align feature flags with official Next.js config docs.
+- For repeated top-page UI tweaks, keep `BgmController` size aligned with neighboring icon controls (`h-8 w-8`) and lock it with a unit test expectation to prevent regressions.
+- For third-party API routes, add request-scoped structured logs (start, validation, external call start/result, failure, duration) so 4xx/5xx root causes are identifiable without reproducing locally.
+- When users ask for module-level verification, add direct unit tests for outbound request payloads and storage adapters (not only route-level integration tests).
+- For Runware `imageInference` with X profile references, normalize `pbs.twimg.com/profile_images` URLs (`_normal`/`_bigger`/`name=normal`) to `400x400` before request; raw X icon URLs can be below Runware's minimum reference width and cause deterministic 400s.
+- For `/api/profile-image/generate`, treat Runware 400 responses containing transient inference messages (e.g. "Inference error occurred... Please try again.") as retryable at least once before returning 502.
+- For Tinder-style composite rendering, avoid placing full-bleed child layers directly on the bordered container; use an inset inner clip layer so frame borders remain visibly rendered.
+- For profile background generation prompts, avoid hard-coding concrete textures (e.g., brick/wall) unless explicitly requested; default to neutral abstract bokeh-style backdrops.
+- For top-page profile generation UX, do not rely only on session refetch to display the new image; apply API `imageUrl` optimistically in local UI state so users see the generated preview immediately.
+- For optional AI sub-tasks (e.g., decorative background generation), degrade gracefully on timeout/failure instead of failing the entire profile generation flow.
+- For profile image generation, keep a deterministic fallback path (X profile image) when character model inference times out so onboarding can still proceed.
+- When local preview scripts need environment values, keep them in `.env.local` rather than embedding inline `--env=...` in npm scripts unless explicitly requested.
+- When debugging image rendering/composition issues, provide a direct scriptable path that bypasses client/API orchestration so visual output can be reproduced from fixed inputs.
+- For `next/og` composition, avoid relying on CSS transforms for centering critical card layers; use explicit numeric `left/top` positioning to prevent off-canvas rendering.
+- When users provide visual sample cards, iterate generation multiple times and compare actual outputs against sample typography/layout before finalizing styles.
+- For profile-image quality validation, distinguish `reference image fetch success` from `Runware character merge success`; verify both by inspecting generated artifacts, not logs alone.
+- Before tuning prompts for identity mismatch, inspect the actual reference image bytes/content (not only URL shape); an incorrect source image makes any prompt tuning ineffective.
+- When users require strict reference reflection (even for non-human images), add deterministic post-composition face projection of the reference image instead of relying only on model prompt adherence.
+- For Runware `referenceImages` using X profile URLs, never pass `_normal` icon URLs directly; normalize to `*_400x400.*` (or `name=400x400`) first to satisfy minimum width constraints.
+- When users explicitly request model-level reference control, do not apply post-generation overlays; enforce `referenceImages` at inference time and verify payload/logs.
+- When the user provides a reference utility implementation (e.g., shared `r2.ts`), align project code to shared helper interfaces first, then adapt feature modules to call those helpers.
+- When profile images are stored in R2, keep user-facing URLs on the R2 public domain (via `R2_PROFILE_IMAGE_PUBLIC_BASE_URL`) and avoid API proxy URL fallbacks unless explicitly requested.
+- For top-page UI polish requests, verify readability against bright background regions first and default to layered contrast protection (background dim + content panel), not just per-text color tweaks.
+- For `next/og` composite rendering, avoid feeding raw WEBP URLs directly; fetch assets first and pass image data URLs (prefer PNG output) to prevent black/failed profile renders.

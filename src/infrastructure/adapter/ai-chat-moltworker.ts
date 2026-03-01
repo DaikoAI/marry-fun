@@ -5,7 +5,7 @@ import type { Emotion } from "@/domain/values/emotion";
 import type { Locale } from "@/domain/values/locale";
 import { CHAT_SYSTEM_PROMPT } from "@/lib/soul-prompt.generated";
 import { extractJson } from "@/lib/extract-json";
-import { NGWORD_SYSTEM_PROMPT } from "@/infrastructure/prompts/openclaw-prompts";
+import { NGWORD_SYSTEM_PROMPT } from "@/constants/openclaw-prompts";
 import { logger } from "@/utils/logger";
 import OpenAI from "openai";
 import { z } from "zod";

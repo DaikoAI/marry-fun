@@ -29,6 +29,16 @@ migrations_dir = "migrations"
 binding = "WORKER_SELF_REFERENCE"
 service = "marry-fun"
 
+[[r2_buckets]]
+binding = "PROFILE_IMAGES_BUCKET"
+bucket_name = "marry-fun"
+preview_bucket_name = "marry-fun"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "marry-fun"
+preview_bucket_name = "marry-fun"
+
 # [[routes]]
 # pattern = "marry.fun"
 # custom_domain = true

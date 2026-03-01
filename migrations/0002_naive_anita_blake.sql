@@ -1,1 +1,0 @@
-CREATE INDEX `point_transaction_created_user_idx` ON `point_transaction` (`created_at`,`user_id`);

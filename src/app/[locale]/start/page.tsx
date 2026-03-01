@@ -1,12 +1,10 @@
-import { StartPageClient } from "./start-page-client";
+import { permanentRedirect } from "next/navigation";
 
 interface StartPageProps {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function StartPage({ params, searchParams }: StartPageProps) {
-  await params;
-  await searchParams;
-  return <StartPageClient />;
+export default async function StartPage({ params }: StartPageProps) {
+  const { locale } = await params;
+  permanentRedirect(`/${locale}`);
 }
