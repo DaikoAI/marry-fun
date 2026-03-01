@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { authClient } from "@/lib/auth/auth-client";
+import { logger } from "@/utils/logger";
 
 function toBase64(bytes: Uint8Array): string {
   let binary = "";
@@ -188,6 +189,9 @@ export function SolanaAuthPanel({ variant = "default" }: SolanaAuthPanelProps) {
       const payload: unknown = await response.json().catch(() => null);
 
       if (!response.ok) {
+        logger.warn("[auth/x-link] failed to refresh link status", {
+          status: response.status,
+        });
         setIsXLinked(false);
         setXUsername(null);
         setXProfileImageUrl(null);
@@ -195,10 +199,19 @@ export function SolanaAuthPanel({ variant = "default" }: SolanaAuthPanelProps) {
       }
 
       const status = readXLinkStatus(payload);
+      logger.info("[auth/x-link] refreshed link status", {
+        linked: Boolean(status?.linked),
+        hasUsername: Boolean(status?.username),
+        hasProfileImage: Boolean(status?.profileImageUrl),
+        providerAccountId: status?.providerAccountId ?? null,
+      });
       setIsXLinked(Boolean(status?.linked));
       setXUsername(status?.username ?? null);
       setXProfileImageUrl(status?.profileImageUrl ?? null);
-    } catch {
+    } catch (error) {
+      logger.warn("[auth/x-link] exception while refreshing link status", {
+        message: error instanceof Error ? error.message : "unknown refresh exception",
+      });
       setIsXLinked(false);
       setXUsername(null);
       setXProfileImageUrl(null);
@@ -291,26 +304,50 @@ export function SolanaAuthPanel({ variant = "default" }: SolanaAuthPanelProps) {
 
   const handleLinkX = async () => {
     if (!isAuthenticated || isXLinked || isLinkingX || isCheckingXLink) {
+      logger.info("[auth/x-link] linkSocial skipped", {
+        reason: {
+          isAuthenticated,
+          isXLinked,
+          isLinkingX,
+          isCheckingXLink,
+          isSessionPending: session.isPending,
+        },
+      });
       return;
     }
 
+    const callbackURL = window.location.href;
     setIsLinkingX(true);
     setErrorMessage(null);
+    logger.info("[auth/x-link] start linkSocial", {
+      callbackURL,
+      isAuthenticated,
+    });
 
     try {
       // linkSocial navigates to OAuth provider on success; status is refreshed on callback return.
       const result = await authClient.linkSocial({
         provider: "twitter",
-        callbackURL: window.location.href,
+        callbackURL,
       });
 
       if (result.error) {
+        logger.error("[auth/x-link] linkSocial returned error", {
+          message: result.error.message ?? "unknown linkSocial error",
+        });
         throw new Error(result.error.message ?? "Failed to link X account");
       }
 
+      logger.info("[auth/x-link] linkSocial accepted, waiting for callback redirect", {
+        callbackURL,
+      });
       await refreshXLinkStatus();
     } catch (error) {
       const message = error instanceof Error ? error.message : t("xLinkError");
+      logger.error("[auth/x-link] linkSocial failed", {
+        callbackURL,
+        message,
+      });
       setErrorMessage(message);
     } finally {
       setIsLinkingX(false);

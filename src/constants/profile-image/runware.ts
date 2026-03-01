@@ -12,17 +12,8 @@ export const RUNWARE_PROFILE_STEPS = 28;
 export const RUNWARE_PROFILE_CFG = 6.5;
 export const RUNWARE_PROFILE_PROMPT_MAX_LENGTH = 300;
 
-export const RUNWARE_PROFILE_NEGATIVE_PROMPT = [
-  "low quality",
-  "blurry",
-  "deformed face",
-  "extra faces",
-  "bad anatomy",
-  "distorted body",
-  "watermark",
-  "text artifacts",
-  "logo",
-].join(", ");
+// FLUX.2 guidance: avoid negative prompting and describe target output directly.
+export const RUNWARE_PROFILE_NEGATIVE_PROMPT = "";
 
 export const RUNWARE_PROFILE_PROMPT_BASE = `Anime-style profile avatar, vertical composition (4:5 aspect ratio), optimized for smartphone display.
 
@@ -41,7 +32,7 @@ If face detection fails or is incomplete, reconstruct minimally while preserving
 // Keep prompt compact to avoid provider-side validation errors.
 // Keep core constraints compact while preserving composition/identity requirements.
 export const RUNWARE_PROFILE_PROMPT_CORE =
-  "rwre, anime-style selfie portrait, black suit, white shirt, black tie, smartphone selfie, upper torso centered, slight high-angle camera, confident relaxed expression, luxury high-rise apartment night bokeh, warm cinematic lighting, preserve exact reference face identity";
+  "rwre, anime-style selfie portrait, black suit, white shirt, black tie, smartphone selfie, upper torso centered, slight high-angle camera, confident relaxed expression, luxury high-rise apartment night bokeh, warm cinematic lighting, high face resemblance to reference person";
 
 /** Background-only prompt used behind the Tinder-style card. Keep it abstract and non-distracting. */
 export const RUNWARE_PROFILE_BACKGROUND_PROMPT =
@@ -84,10 +75,9 @@ export function buildRunwareProfilePrompt(input: {
   displayName: string;
   xUsername: string | null;
 }): string {
-  const safeDisplayName = input.displayName.trim().slice(0, 24) || "guest";
-  const safeUsername = (input.xUsername ?? "unknown").trim().replace(/^@+/, "").slice(0, 16) || "unknown";
-  const localeHint = input.locale === "ja" ? "jp" : "en";
+  void input;
 
-  const prompt = `${RUNWARE_PROFILE_PROMPT_CORE}, id:${safeDisplayName}, x:@${safeUsername}, locale:${localeHint}`;
+  const prompt =
+    "Single man, smartphone selfie, upper torso centered, slight high-angle, tailored matte black suit, white shirt, black tie, anime portrait style, luxury high-rise night bokeh, warm cinematic light. Use reference image only for face merge; keep pose/suit/frame fixed. If reference is non-human, map its key traits to face.";
   return prompt.slice(0, RUNWARE_PROFILE_PROMPT_MAX_LENGTH);
 }

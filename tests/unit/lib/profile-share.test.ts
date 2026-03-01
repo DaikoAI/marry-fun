@@ -19,6 +19,9 @@ describe("profile share helpers", () => {
     });
 
     expect(first).toEqual(second);
+    expect(first.age).toBeTypeOf("number");
+    expect(first.university).toBeTypeOf("string");
+    expect(first.distanceKm).toBeTypeOf("number");
   });
 
   it("トークンは round-trip できる", () => {

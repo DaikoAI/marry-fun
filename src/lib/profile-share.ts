@@ -1,7 +1,14 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 import { buildXIntentUrl } from "@/lib/result-share";
-import { TINDER_PROFILE_BADGES, TINDER_PROFILE_LOCATIONS, TINDER_PROFILE_TAGS } from "@/constants/profile-share/tinder";
+import {
+  TINDER_PROFILE_AGES,
+  TINDER_PROFILE_BADGES,
+  TINDER_PROFILE_DISTANCE_KM,
+  TINDER_PROFILE_LOCATIONS,
+  TINDER_PROFILE_TAGS,
+  TINDER_PROFILE_UNIVERSITIES,
+} from "@/constants/profile-share/tinder";
 
 interface ProfileShareTokenPayload {
   userId: string;
@@ -26,6 +33,9 @@ export interface DailyProfileDecorations {
   location: string;
   tags: string[];
   badge: string;
+  age: number;
+  university: string;
+  distanceKm: number;
 }
 
 function hashToUint32(input: string): number {
@@ -39,11 +49,17 @@ export function pickDailyProfileDecorations(input: { userId: string; dateKey: st
   const tag1 = TINDER_PROFILE_TAGS[seed % TINDER_PROFILE_TAGS.length];
   const tag2 = TINDER_PROFILE_TAGS[(seed + 3) % TINDER_PROFILE_TAGS.length];
   const badge = TINDER_PROFILE_BADGES[seed % TINDER_PROFILE_BADGES.length];
+  const age = TINDER_PROFILE_AGES[seed % TINDER_PROFILE_AGES.length];
+  const university = TINDER_PROFILE_UNIVERSITIES[seed % TINDER_PROFILE_UNIVERSITIES.length];
+  const distanceKm = TINDER_PROFILE_DISTANCE_KM[seed % TINDER_PROFILE_DISTANCE_KM.length];
 
   return {
     location,
     tags: [tag1, tag2],
     badge,
+    age,
+    university,
+    distanceKm,
   };
 }
 
@@ -52,11 +68,17 @@ export function pickRandomProfileDecorations(): DailyProfileDecorations {
   const tag1 = TINDER_PROFILE_TAGS[Math.floor(Math.random() * TINDER_PROFILE_TAGS.length)];
   const tag2 = TINDER_PROFILE_TAGS[Math.floor(Math.random() * TINDER_PROFILE_TAGS.length)];
   const badge = TINDER_PROFILE_BADGES[Math.floor(Math.random() * TINDER_PROFILE_BADGES.length)];
+  const age = TINDER_PROFILE_AGES[Math.floor(Math.random() * TINDER_PROFILE_AGES.length)];
+  const university = TINDER_PROFILE_UNIVERSITIES[Math.floor(Math.random() * TINDER_PROFILE_UNIVERSITIES.length)];
+  const distanceKm = TINDER_PROFILE_DISTANCE_KM[Math.floor(Math.random() * TINDER_PROFILE_DISTANCE_KM.length)];
 
   return {
     location,
     tags: [tag1, tag2],
     badge,
+    age,
+    university,
+    distanceKm,
   };
 }
 

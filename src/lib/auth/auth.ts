@@ -49,6 +49,7 @@ async function buildAuth(web3Domain: string) {
       accountLinking: {
         enabled: true,
         allowDifferentEmails: true,
+        trustedProviders: ["twitter"],
       },
     },
     trustedOrigins: [authBaseUrl, ...AUTH_LOCAL_TRUSTED_ORIGIN_PATTERNS, ...AUTH_STATIC_TRUSTED_ORIGINS],

@@ -294,7 +294,7 @@ export function StartPageClient() {
 
     void authClient
       .updateUser({ name: nextUsername })
-      .then(({ error }) => {
+      .then(({ error }: { error?: unknown | null }) => {
         if (error) {
           setProfileError(true);
           return;
@@ -535,12 +535,12 @@ export function StartPageClient() {
                 </div>
 
                 {profilePreviewImage && (
-                  <div className="mx-auto mt-3 w-[180px] overflow-hidden rounded-2xl border border-white/60 bg-black/60 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+                  <div className="mx-auto mt-3 aspect-[217/367] w-full max-w-[180px] overflow-hidden rounded-2xl border border-white/60 bg-black/60 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={profilePreviewImage}
                       alt={t("profilePreviewAlt")}
-                      className="h-[225px] w-full object-cover"
+                      className="h-full w-full object-cover"
                       onLoad={event => {
                         logger.info("[start] profile preview loaded", {
                           phase: "profile",
@@ -587,12 +587,12 @@ export function StartPageClient() {
             {displayOnboardingPhase === "ready" && (
               <>
                 {userImage && (
-                  <div className="mx-auto mb-3 w-[180px] overflow-hidden rounded-2xl border border-white/50 bg-black/45 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+                  <div className="mx-auto mb-3 aspect-[217/367] w-full max-w-[180px] overflow-hidden rounded-2xl border border-white/50 bg-black/45 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={userImage}
                       alt={t("profilePreviewAlt")}
-                      className="h-[225px] w-full object-cover"
+                      className="h-full w-full object-cover"
                       onLoad={event => {
                         logger.info("[start] profile preview loaded", {
                           phase: "ready",

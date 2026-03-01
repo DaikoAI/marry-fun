@@ -34,4 +34,21 @@ describe("package scripts", () => {
     expect(preview).toContain(".env.local");
     expect(preview).toContain("opennextjs-cloudflare preview");
   });
+
+  it("build runs with NODE_ENV=production", () => {
+    const scripts = readPackageScripts();
+    const build = scripts.build;
+
+    expect(build).toBeDefined();
+    expect(build).toContain("NODE_ENV=production");
+    expect(build).toContain("next build");
+  });
+
+  it("composite-only debug script exists", () => {
+    const scripts = readPackageScripts();
+    const composite = scripts["test:profile-composite"];
+
+    expect(composite).toBeDefined();
+    expect(composite).toContain("scripts/test-profile-image-composite.ts");
+  });
 });

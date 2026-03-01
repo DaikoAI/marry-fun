@@ -1,5 +1,146 @@
 # TODO
 
+- [x] 2026-03-02 Diagnose X connect failure (`/api/auth/callback/twitter` -> `/api/auth/error`)
+- [x] Add structured diagnostics logs for `/api/auth/[...all]` callback/error flow
+- [x] Add actionable logs for `/api/auth/x/link-status` and `SolanaAuthPanel` link action
+- [x] Configure Better Auth `accountLinking.trustedProviders` to trust `twitter`
+- [x] Run targeted tests for auth routes and auth panel
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary with identified root cause
+
+## Review Summary (Diagnose X connect failure)
+
+- ui-ux-pro-max: 既存UX（連携中/エラー文言表示）を維持しつつ、失敗時の次アクション判断に必要な診断ログを追加。UI構造や操作フローの変更なし。
+- vercel-react-best-practices: クライアント変更は既存イベントハンドラ内の軽量ログ追加のみで、追加フェッチ・再レンダリング・bundle増大なし。
+- web-design-guidelines: 変更範囲に新規UI要素はなく、`button`/focus/aria の既存実装を維持。ガイドライン準拠状態を維持。
+- Root cause (identified): 失敗地点は `link-social` 後の Better Auth callback フェーズ（`/api/auth/callback/twitter`）で、`/api/auth/error` へリダイレクトされている。`x-link-status` 側は正常応答しており、DB同期ロジックではなく OAuth callback 側の失敗。callback URL 設定済み前提では、Twitter が `emailVerified` を返さないケースで `accountLinking.trustedProviders` 未設定により `unable_to_link_account` へ落ちる経路が有力で、今回 `trustedProviders: ["twitter"]` を適用。
+
+- [x] 2026-03-02 Fix top-page profile image frame clipping (Tinder-style card gets cropped)
+- [x] RED: add failing regression test for top-page profile preview card aspect/fit classes
+- [x] GREEN: update profile/ready preview frame sizing to Tinder card ratio and avoid clipping
+- [x] Run targeted unit tests for `start-page-client`
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Fix top-page profile image frame clipping)
+
+- ui-ux-pro-max: mobile/responsive観点で縦長カードの固定アスペクト比を推奨。`aspect-[217/367]` と `w-full + max-w` により、狭い画面でもカード比率を維持して見切れを防止。
+- vercel-react-best-practices: 変更は表示クラスと回帰テストのみで、データフェッチ/再レンダリング経路やバンドル構成に追加コストなし。
+- web-design-guidelines: 変更範囲（プロフィールプレビュー枠）で、フォーカス可能要素やナビゲーション要素のa11y退行はなし。画像 `alt` も維持。
+
+- [x] 2026-03-01 Fix `bun run build:cf` failure (`/_global-error` prerender `useContext` null)
+- [x] RED: add failing regression test for build script env behavior (`NODE_ENV=production`)
+- [x] Identify concrete root cause (`.env.local` `NODE_ENV=development` leaked into `next build`)
+- [x] GREEN: force production mode in `build` script (`NODE_ENV=production dotenvx ... next build`)
+- [x] Re-run targeted test + `bun run build:cf` + `bun run preview` boot check
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Fix `build:cf` prerender crash from `NODE_ENV` leak)
+
+- ui-ux-pro-max: No UI surface changed; this patch is package script runtime mode control only.
+- vercel-react-best-practices: Build-time env consistency fix only; no React rendering/data-fetch/bundle behavior changed.
+- web-design-guidelines: Latest guidelines fetched and checked; changed files (`package.json`, script tests) are non-UI scope so no guideline findings.
+
+- [x] 2026-03-01 Fix `bun run dev` build failure (`start-page-client.tsx` implicit `any`)
+- [x] Inspect failing `updateUser(...).then(({ error }) => ...)` callback typing and choose minimal type-safe fix
+- [x] Add explicit callback parameter type for `error` binding to satisfy `noImplicitAny`
+- [x] Re-run `bun run build:cf:local` and confirm OpenNext/Next.js build success
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Fix `start-page-client.tsx` implicit `any`)
+
+- ui-ux-pro-max: No UI layout/style/interaction path changed; this patch is type-only in a submit handler callback.
+- vercel-react-best-practices: No render/data-fetch/perf behavior changed; explicit typing is compile-time only and keeps runtime identical.
+- web-design-guidelines: Checked changed scope (`start-page-client.tsx`) and found no guideline-impacting DOM/semantics/accessibility changes.
+
+- [x] 2026-03-01 Bun バージョン更新（repo内固定値の一括引き上げ）
+- [x] `bun --version` を基準に更新ターゲットを確定
+- [x] `package.json` の `packageManager` を更新
+- [x] `.github/workflows/*.yml` の Bun 固定値と検証値を更新
+- [x] リポジトリ内の Bun 旧バージョン残存を検索して確認
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Bun バージョン更新)
+
+- ui-ux-pro-max: UI レイヤー（`.tsx`/スタイル）への変更はなく、画面デザイン/UX の退行は発生しない構成。
+- vercel-react-best-practices: React/Next.js 実装変更なし。バンドル・レンダリング・データフェッチ経路への影響なし。
+- web-design-guidelines: 最新ガイドラインを取得して確認し、今回の変更対象（`package.json` と workflow YAML）は UI ガイドラインの適用対象外で違反なし。
+
+- [x] 2026-02-27 Switch back to pure Runware referenceImages merge (no post-overlay)
+- [x] Remove `referenceFaceImageUrl` post-composite projection path
+- [x] Keep only model-level reference merge via `inputs.referenceImages`
+- [x] Normalize `__normal` X URL to `__400x400` before inference to satisfy width constraints
+- [x] Tune prompt using FLUX.2 prompting guide (`Subject+Style+Context`, direct instructions, no negative prompt)
+- [x] Validate with script output and ensure `characterRunwareReferenceMode: remote-url`
+- [x] Run targeted lint/tests
+
+- [x] 2026-02-27 Enforce guaranteed reference-image reflection on face area
+- [x] Confirm provided reference URL content and identify non-human source mismatch
+- [x] Add deterministic face-projection layer in Tinder composite (`referenceFaceImageUrl`)
+- [x] Fetch and pass reference image data URL from profile-image generate route
+- [x] Update debug script to pass reference image into composite output
+- [x] Update integration tests for reference projection payload/fetch behavior
+- [x] Re-run generation and confirm non-human reference appears on face region
+- [x] Run targeted tests/lint
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Guaranteed reference-image reflection on face area)
+
+- ui-ux-pro-max: this update prioritizes deterministic identity/style carry-over by projecting the reference source into the face region, reducing mismatch risk across model variance.
+- vercel-react-best-practices: implementation stays server/compositor-side with no extra client rendering complexity or new data-fetch waterfalls.
+- web-design-guidelines: overlay remains readable and preserves sample-like bottom metadata hierarchy while removing unintended decorative frame artifacts.
+
+- [x] 2026-02-27 Reference image mismatch + prompt tuning for Runware face consistency
+- [x] Verify actual bytes/content of provided X profile URL before assuming it is a face photo
+- [x] Tighten Runware profile prompt to prioritize face-identity preservation over metadata tokens
+- [x] Update debug script to support local reference image default (`public/sample.png`) and data-URL reference mode
+- [x] Re-run generation and confirm improved similarity against provided samples
+- [x] Run targeted tests/lint
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Reference image mismatch + prompt tuning)
+
+- ui-ux-pro-max: improved visual consistency by ensuring the right reference source is actually used, resulting in card portraits that match intended identity style.
+- vercel-react-best-practices: changes are isolated to prompt/content and debug pipeline behavior; no additional client-side rendering or data-flow complexity introduced.
+- web-design-guidelines: preserved clear typography hierarchy and contrast while removing accidental decorative border artifacts and keeping metadata overlays readable.
+
+- [x] 2026-02-27 Tinder profile-card style alignment with sample images (217x367 ratio style)
+- [x] RED: reproduce missing inner composite rendering while running profile-composite script
+- [x] GREEN: rebuild Tinder composite overlay to show `name / age / university / map + distance` on generated image
+- [x] GREEN: keep visible thin Tinder-style frame and cover-fit character image rendering
+- [x] GREEN: make profile-image generate route use Runware character output as primary source (no X fallback on character failure)
+- [x] GREEN: enrich decorations with `age / university / distance` values and pass to composite
+- [x] GREEN: update debug script defaults to provided reference URL and verify runware+composite pipeline
+- [x] Validate with repeated script generations against user-provided samples
+- [x] Run targeted tests + lint
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Tinder profile-card style alignment with sample images)
+
+- ui-ux-pro-max: shifted composition to a clear Tinder-card hierarchy (thin rounded frame, full-bleed portrait, bottom metadata stack) and tuned typography hierarchy for name/age and secondary profile metadata.
+- vercel-react-best-practices: kept changes localized to server composition and route orchestration; no new client data waterfalls or heavy runtime dependencies were introduced.
+- web-design-guidelines: verified sample-aligned overlay keeps clear contrast/readability and deterministic metadata placement while preserving existing API surface for callers.
+
+- [x] 2026-02-27 Add composite-only debug script (no client/API path)
+- [x] Implement CLI script to run `createTinderProfileCompositeImage` directly with local/URL inputs
+- [x] Add package script `test:profile-composite`
+- [x] Add unit guard in `package-scripts.test.ts` for script entry
+- [x] Validate by generating a real PNG output from script execution
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary for this task
+
+## Review Summary (Add composite-only debug script)
+
+- ui-ux-pro-max: No user-facing UI component was modified; this task adds an offline debug utility for image composition validation.
+- vercel-react-best-practices: No React/Next runtime path was altered; script executes outside client lifecycle and avoids rendering/data-flow regressions.
+- web-design-guidelines: Latest guideline scope checked; changes are limited to tooling/tests and do not introduce UI guideline issues.
+
 - [x] 2026-02-27 Ensure generated profile image appears on top page reliably
 - [x] RED: add failing integration test for background timeout fallback in `POST /api/profile-image/generate`
 - [x] GREEN: make Runware background generation non-blocking (fallback on failure/timeout)

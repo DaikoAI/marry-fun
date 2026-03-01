@@ -12,7 +12,7 @@ import {
 } from "@/constants/profile-image/runware";
 import { logger } from "@/utils/logger";
 
-const RUNWARE_REQUEST_TIMEOUT_MS = 15_000;
+const RUNWARE_REQUEST_TIMEOUT_MS = 25_000;
 const RUNWARE_REQUEST_MAX_ATTEMPTS = 2;
 
 interface RunwareTaskResult {
@@ -136,7 +136,6 @@ async function requestRunwareImageInference(options: {
     taskUUID: crypto.randomUUID(),
     model,
     positivePrompt: task.positivePrompt,
-    negativePrompt: RUNWARE_PROFILE_NEGATIVE_PROMPT,
     width: RUNWARE_PROFILE_IMAGE_SIZE.width,
     height: RUNWARE_PROFILE_IMAGE_SIZE.height,
     numberResults: RUNWARE_PROFILE_NUM_RESULTS,
@@ -145,6 +144,9 @@ async function requestRunwareImageInference(options: {
     CFGScale: RUNWARE_PROFILE_CFG,
     seed: task.seed,
   };
+  if (RUNWARE_PROFILE_NEGATIVE_PROMPT.trim().length > 0) {
+    taskPayload.negativePrompt = RUNWARE_PROFILE_NEGATIVE_PROMPT;
+  }
   if (task.referenceImages?.length) {
     taskPayload.inputs = { referenceImages: task.referenceImages };
   }
@@ -157,6 +159,9 @@ async function requestRunwareImageInference(options: {
     taskType: "imageInference",
     width: RUNWARE_PROFILE_IMAGE_SIZE.width,
     height: RUNWARE_PROFILE_IMAGE_SIZE.height,
+    referenceImageCount: task.referenceImages?.length ?? 0,
+    referenceImage:
+      task.referenceImages?.[0] ? redactImageUrl(task.referenceImages[0]) : null,
   });
 
   for (let attempt = 1; attempt <= RUNWARE_REQUEST_MAX_ATTEMPTS; attempt += 1) {
@@ -267,6 +272,11 @@ export async function generateProfileImageWithRunware(
       xUsername: input.xUsername,
     });
     const normalizedFaceImageUrl = normalizeRunwareReferenceImageUrl(input.inputFaceImageUrl);
+    logger.debug("[runware] normalized reference image", {
+      traceId,
+      model,
+      referenceImage: redactImageUrl(normalizedFaceImageUrl),
+    });
 
     return requestRunwareImageInference({
       apiKey,

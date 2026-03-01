@@ -10,7 +10,11 @@ const updateGeneratedProfileImageMock = vi.fn();
 const fetchMock = vi.fn();
 const originalFetch = globalThis.fetch;
 
-function readCompositeInput(): { backgroundImageUrl: string; characterImageUrl: string; name: string | undefined } {
+function readCompositeInput(): {
+  backgroundImageUrl: string;
+  characterImageUrl: string;
+  name: string | undefined;
+} {
   const input = mockCreateTinderProfileCompositeImage.mock.calls.at(-1)?.[0];
   if (!input || typeof input !== "object") {
     throw new TypeError("composite input is missing");
@@ -222,7 +226,7 @@ describe("POST /api/profile-image/generate", () => {
     expect(json).toEqual({ imageUrl: "https://cdn.example.com/profile-image/u1/2026-02-24/uuid.png" });
   });
 
-  it("キャラ生成がタイムアウトしてもXプロフィール画像にフォールバックして保存する", async () => {
+  it("キャラ生成がタイムアウトした場合は 502 を返しフォールバックしない", async () => {
     mockGenerateProfileImageWithRunware.mockRejectedValueOnce(new Error("TimeoutError: aborted"));
 
     const req = new Request("http://localhost:8787/api/profile-image/generate", {
@@ -234,13 +238,8 @@ describe("POST /api/profile-image/generate", () => {
     const res = await POST(req);
     const json = await res.json();
 
-    expect(res.status).toBe(200);
-    expect(fetchMock).toHaveBeenCalledWith("https://pbs.twimg.com/profile_images/123/avatar.jpg", {
-      cache: "no-store",
-    });
-
-    const compositeInput = readCompositeInputRecord();
-    expect(compositeInput.characterImageUrl).toMatch(/^data:image\/webp;base64,/);
-    expect(json).toEqual({ imageUrl: "https://cdn.example.com/profile-image/u1/2026-02-24/uuid.png" });
+    expect(res.status).toBe(502);
+    expect(mockCreateTinderProfileCompositeImage).not.toHaveBeenCalled();
+    expect(json).toEqual({ message: "TimeoutError: aborted" });
   });
 });

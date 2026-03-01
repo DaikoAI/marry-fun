@@ -39,7 +39,7 @@ describe("pickRunwareImageUrlFromResponse", () => {
 });
 
 describe("buildRunwareProfilePrompt", () => {
-  it("Runware prompt 上限長以内で rwre を含む", () => {
+  it("Runware prompt 上限長以内で Subject/Style/Reference merge を含む", () => {
     const prompt = buildRunwareProfilePrompt({
       locale: "ja",
       displayName: "a".repeat(200),
@@ -47,7 +47,9 @@ describe("buildRunwareProfilePrompt", () => {
     });
 
     expect(prompt.length).toBeLessThanOrEqual(RUNWARE_PROFILE_PROMPT_MAX_LENGTH);
-    expect(prompt).toContain("rwre");
+    expect(prompt).toContain("Single man");
+    expect(prompt).toContain("anime portrait style");
+    expect(prompt).toContain("Use reference image only for face merge");
   });
 });
 
@@ -57,6 +59,13 @@ describe("normalizeRunwareReferenceImageUrl", () => {
       "https://pbs.twimg.com/profile_images/19260958/avatar_normal.jpg",
     );
     expect(normalized).toBe("https://pbs.twimg.com/profile_images/19260958/avatar_400x400.jpg");
+  });
+
+  it("pbs.twimg.com の __normal 画像URLを __400x400 に変換する", () => {
+    const normalized = normalizeRunwareReferenceImageUrl(
+      "https://pbs.twimg.com/profile_images/1926095842227666944/vMqdpOz__normal.jpg",
+    );
+    expect(normalized).toBe("https://pbs.twimg.com/profile_images/1926095842227666944/vMqdpOz__400x400.jpg");
   });
 
   it("pbs.twimg.com の name=normal クエリを name=400x400 に変換する", () => {
@@ -147,6 +156,7 @@ describe("generateProfileImageWithRunware", () => {
       },
       seed: 42,
     });
+    expect(body[0]?.negativePrompt).toBeUndefined();
     expect(typeof body[0].positivePrompt).toBe("string");
     expect(String(body[0].positivePrompt).length).toBeLessThanOrEqual(RUNWARE_PROFILE_PROMPT_MAX_LENGTH);
   });

@@ -1,6 +1,8 @@
 # Lessons
 
 - When a request mentions "top" in this project, treat `/{locale}` as the onboarding entry and `/{locale}/start` as a legacy redirect before finalizing implementation assumptions.
+- When OAuth callback URL is already confirmed correct, investigate Better Auth account-linking trust policy (`account.accountLinking.trustedProviders`) before re-attributing failures to callback URL mismatch.
+- For top-page profile previews, preserve the Tinder card aspect ratio (`217/367`) in the frame (`aspect-*` + bounded width) to avoid clipping generated portrait cards.
 - On the start screen, keep `SolanaAuthPanel` anchored to the bottom across all onboarding states (`wallet`, `name`, `start`) so post-connect transitions do not shift the primary auth controls upward.
 - For wallet/X connected states, preserve the same button shells and only swap inner labels (e.g., shortened wallet + `✅`, `@username ✅`) instead of replacing controls with separate text elements.
 - For language switching UX requests, confirm whether the user wants one-click toggle or a menu with explicit language choices before finalizing the interaction.
@@ -22,6 +24,14 @@
 - For optional AI sub-tasks (e.g., decorative background generation), degrade gracefully on timeout/failure instead of failing the entire profile generation flow.
 - For profile image generation, keep a deterministic fallback path (X profile image) when character model inference times out so onboarding can still proceed.
 - When local preview scripts need environment values, keep them in `.env.local` rather than embedding inline `--env=...` in npm scripts unless explicitly requested.
+- When debugging image rendering/composition issues, provide a direct scriptable path that bypasses client/API orchestration so visual output can be reproduced from fixed inputs.
+- For `next/og` composition, avoid relying on CSS transforms for centering critical card layers; use explicit numeric `left/top` positioning to prevent off-canvas rendering.
+- When users provide visual sample cards, iterate generation multiple times and compare actual outputs against sample typography/layout before finalizing styles.
+- For profile-image quality validation, distinguish `reference image fetch success` from `Runware character merge success`; verify both by inspecting generated artifacts, not logs alone.
+- Before tuning prompts for identity mismatch, inspect the actual reference image bytes/content (not only URL shape); an incorrect source image makes any prompt tuning ineffective.
+- When users require strict reference reflection (even for non-human images), add deterministic post-composition face projection of the reference image instead of relying only on model prompt adherence.
+- For Runware `referenceImages` using X profile URLs, never pass `_normal` icon URLs directly; normalize to `*_400x400.*` (or `name=400x400`) first to satisfy minimum width constraints.
+- When users explicitly request model-level reference control, do not apply post-generation overlays; enforce `referenceImages` at inference time and verify payload/logs.
 - When the user provides a reference utility implementation (e.g., shared `r2.ts`), align project code to shared helper interfaces first, then adapt feature modules to call those helpers.
 - When profile images are stored in R2, keep user-facing URLs on the R2 public domain (via `R2_PROFILE_IMAGE_PUBLIC_BASE_URL`) and avoid API proxy URL fallbacks unless explicitly requested.
 - For top-page UI polish requests, verify readability against bright background regions first and default to layered contrast protection (background dim + content panel), not just per-text color tweaks.

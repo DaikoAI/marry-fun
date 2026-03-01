@@ -133,7 +133,22 @@ export async function POST(request: Request) {
 
     const seed = parsed.data.seed;
 
-    const backgroundPromise = generateProfileBackgroundWithRunware({ seed }).catch((error: unknown) => {
+    const characterResult = await generateProfileImageWithRunware({
+      locale: parsed.data.locale,
+      seed,
+      inputFaceImageUrl: xProfileImageUrl,
+      displayName: context.username ?? "guest",
+      xUsername: context.xUsername,
+    });
+
+    logger.info("[profile-image] character generation ready", {
+      requestId,
+      userId: maskUserId(userId),
+      source: "runware",
+      characterImage: maskImageUrl(characterResult.imageUrl),
+    });
+
+    const backgroundResult = await generateProfileBackgroundWithRunware({ seed }).catch((error: unknown) => {
       logger.warn("[profile-image] background generation failed; using fallback background", {
         requestId,
         userId: maskUserId(userId),
@@ -142,26 +157,6 @@ export async function POST(request: Request) {
       });
       return null;
     });
-
-    const characterPromise = generateProfileImageWithRunware({
-      locale: parsed.data.locale,
-      seed,
-      inputFaceImageUrl: xProfileImageUrl,
-      displayName: context.username ?? "guest",
-      xUsername: context.xUsername,
-    }).catch((error: unknown) => {
-      logger.warn("[profile-image] character generation failed; using x profile image fallback", {
-        requestId,
-        userId: maskUserId(userId),
-        locale: parsed.data.locale,
-        message: error instanceof Error ? error.message : "unknown error",
-      });
-      return {
-        imageUrl: xProfileImageUrl,
-      };
-    });
-
-    const [backgroundResult, characterResult] = await Promise.all([backgroundPromise, characterPromise]);
 
     const sessionName = typeof session.user.name === "string" ? session.user.name.trim() : "";
     const displayName = context.username?.trim() || sessionName || "Guest";
@@ -172,6 +167,9 @@ export async function POST(request: Request) {
       displayNameLength: displayName.length,
       badge: decorations.badge,
       location: decorations.location,
+      age: decorations.age,
+      university: decorations.university,
+      distanceKm: decorations.distanceKm,
       tagsCount: decorations.tags.length,
     });
 
@@ -196,6 +194,9 @@ export async function POST(request: Request) {
       location: decorations.location,
       tags: decorations.tags,
       badge: decorations.badge,
+      age: decorations.age,
+      university: decorations.university,
+      distanceKm: decorations.distanceKm,
       frame: parsed.data.frame,
     });
 

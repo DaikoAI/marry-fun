@@ -125,6 +125,25 @@ describe("StartPageClient", () => {
     expect(html).toContain('alt="profilePreviewAlt"');
   });
 
+  it("プロフィールプレビューはTinder比率フレームで見切れを防ぐ", async () => {
+    getStartOnboardingPhaseMock.mockReturnValue("ready");
+    getSessionMock.mockReturnValue({
+      data: {
+        session: { id: "s1" },
+        user: {
+          name: "alice",
+          image: "https://cdn.example.com/profile-image/u1/2026-02-26/a.png",
+        },
+      },
+      refetch: vi.fn(),
+    });
+
+    const html = await renderStartPageClient();
+
+    expect(html).toContain("aspect-[217/367]");
+    expect(html).toContain('class="h-full w-full object-cover"');
+  });
+
   it("プロフィール画像生成APIレスポンスから imageUrl を抽出できる", async () => {
     const pageModule = await import("@/app/[locale]/start/start-page-client");
     const readGeneratedProfileImageUrl = (
