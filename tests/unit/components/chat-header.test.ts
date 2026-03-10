@@ -46,10 +46,11 @@ describe("ChatHeader", () => {
     expect(html).not.toContain("absolute -top-1 -right-1");
   });
 
-  it("soonバッジに$MARRYが表示される", () => {
+  it("soonバッジに$TOKENが表示され、$MARRYを出さない", () => {
     const html = renderToStaticMarkup(React.createElement(ChatHeader));
 
-    expect(html).toContain("$MARRY");
+    expect(html).toContain("$TOKEN");
+    expect(html).not.toContain("$MARRY");
   });
 
   it("ヘッダーに獲得ポイントの浮遊演出を持たない", () => {

@@ -5,7 +5,6 @@ import { Background } from "@/components/background";
 import { BgmController } from "@/components/bgm-controller";
 import { FooterLinks } from "@/components/footer-links";
 import { HomeCtaLink } from "@/components/home-cta-link";
-import { ThreeViewer } from "@/components/three-viewer";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -19,14 +18,7 @@ export default async function Home({ params, searchParams }: HomePageProps) {
 
   return (
     <div className="relative h-dvh overflow-hidden text-white">
-      <Background />
-
-      {/* 3D Viewer - 画面全体 */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="pointer-events-auto h-full w-full">
-          <ThreeViewer />
-        </div>
-      </div>
+      <Background mobileSrc="/bg/top_sp.png" desktopSrc="/bg/top_pc.png" showSparkles={false} />
 
       {/* Content */}
       <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col px-4 py-5 sm:px-8 sm:py-7">
@@ -48,7 +40,7 @@ export default async function Home({ params, searchParams }: HomePageProps) {
           {/* Spacer for layout */}
           <div className="min-h-0 flex-1" />
 
-          <HomeCtaLink label={t("cta")} />
+          <HomeCtaLink label={t("cta")} disabled />
         </main>
 
         <FooterLinks />

@@ -73,7 +73,7 @@ export function ChatHeader() {
           className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[10px] text-white/40 ring-1 ring-white/10"
         >
           <span className="tracking-wider uppercase">soon</span>
-          <span className="font-semibold text-pink-200/80">$MARRY</span>
+          <span className="font-semibold text-pink-200/80">$TOKEN</span>
           <PumpFunIcon className="h-3.5 w-3.5" />
         </span>
 
