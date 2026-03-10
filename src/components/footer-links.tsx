@@ -9,7 +9,7 @@ export function FooterLinks() {
 
   return (
     <>
-      <footer className="flex flex-col items-center justify-between gap-3 pb-1 text-sm text-white/90 sm:flex-row">
+      <footer className="flex flex-col items-center justify-center gap-3 pb-1 text-sm text-white/90 sm:flex-row sm:justify-center">
         <nav aria-label="footer links" className="flex items-center gap-2">
           <a
             href="https://x.com/Marrydotfun"

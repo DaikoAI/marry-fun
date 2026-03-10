@@ -27,4 +27,11 @@ describe("FooterLinks", () => {
     expect(html).toContain('aria-label="Game Rules"');
     expect(html).toContain("<button");
   });
+
+  it("PC表示でもアイコン群は中央寄せを維持する", () => {
+    const html = renderToStaticMarkup(React.createElement(FooterLinks));
+
+    expect(html).toContain("sm:justify-center");
+    expect(html).not.toContain("sm:justify-between");
+  });
 });
