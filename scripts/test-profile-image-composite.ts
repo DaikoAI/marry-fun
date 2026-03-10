@@ -220,10 +220,12 @@ async function runRunwareImageInference(options: {
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const detail =
-      payload &&
-      typeof payload === "object" &&
-      "message" in payload &&
-      typeof (payload as Record<string, unknown>).message === "string" ?
+      (
+        payload &&
+        typeof payload === "object" &&
+        "message" in payload &&
+        typeof (payload as Record<string, unknown>).message === "string"
+      ) ?
         ((payload as Record<string, unknown>).message as string)
       : null;
     throw new Error(`Runware request failed (${String(response.status)})${detail ? `: ${detail}` : ""}`);
@@ -302,7 +304,9 @@ async function resolveCharacterDataUrl(options: CliOptions): Promise<{
   };
 }
 
-async function resolveBackgroundDataUrl(options: CliOptions): Promise<{ dataUrl?: string; source?: string; runwareImageUrl?: string }> {
+async function resolveBackgroundDataUrl(
+  options: CliOptions,
+): Promise<{ dataUrl?: string; source?: string; runwareImageUrl?: string }> {
   if (options.background) {
     const dataUrl = await sourceToDataUrl(options.background);
     return { dataUrl, source: options.background };

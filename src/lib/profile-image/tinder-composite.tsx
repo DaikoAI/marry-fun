@@ -190,9 +190,13 @@ export function createTinderProfileCompositeImage(input: TinderProfileCompositeI
             >
               <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
                 <div style={{ display: "flex", fontSize: 62, fontWeight: 700, lineHeight: 1 }}>{input.name}</div>
-                <div style={{ display: "flex", fontSize: 48, fontWeight: 600, lineHeight: 1, opacity: 0.92 }}>{age}</div>
+                <div style={{ display: "flex", fontSize: 48, fontWeight: 600, lineHeight: 1, opacity: 0.92 }}>
+                  {age}
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 18, fontWeight: 500, opacity: 0.96 }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 18, fontWeight: 500, opacity: 0.96 }}
+              >
                 <div
                   style={{
                     width: 22,
@@ -216,7 +220,9 @@ export function createTinderProfileCompositeImage(input: TinderProfileCompositeI
                 </div>
                 <div style={{ display: "flex" }}>{university}</div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 18, fontWeight: 500, opacity: 0.96 }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 18, fontWeight: 500, opacity: 0.96 }}
+              >
                 <div
                   style={{
                     width: 20,

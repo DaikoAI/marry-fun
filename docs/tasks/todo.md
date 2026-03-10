@@ -1,5 +1,35 @@
 # TODO
 
+- [x] 2026-03-02 Investigate current X callback failure (`unable_to_get_user_info`) and pin root cause
+- [x] Add provider-level diagnostics for Twitter `getUserInfo` HTTP failure details
+- [x] Reproduce callback flow and capture concrete API failure signal (status/body/error code)
+- [x] Apply minimal fix for confirmed root cause and validate with targeted checks
+- [ ] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary and lessons update
+
+## Review Summary (Investigate X `unable_to_get_user_info`)
+
+- Root cause (confirmed): `2026-03-02T09:35:29Z` の callback 失敗は `api.x.com/2/users/me` が `503 Service Unavailable` を返したため。OAuth callback URL/Client ID/Client Secret の不整合ではなく、X 側 userinfo API の一時障害。
+- Mitigation: `src/lib/auth/auth.ts` の Twitter `getUserInfo` をカスタム化し、`users/me` 取得に 5xx/429 リトライと `api.x.com` → `api.twitter.com` フォールバックを追加。confirmed_email 取得失敗時は警告ログに留め、プロフィール取得成功時は連携継続。
+- Validation: `bunx eslint src/lib/auth/auth.ts` を実行し、エラーなしを確認。
+
+- [x] 2026-03-02 Refactor temporary/debug-heavy X auth implementation to clean production shape
+- [x] Reduce `/api/auth/[...all]` to minimal callback/error logging (remove oversized debug metadata helpers)
+- [x] Remove noisy per-request diagnostics from `/api/auth/x/link-status`
+- [x] Remove excessive client-side X-link debug logs from `SolanaAuthPanel`
+- [x] Preserve actual behavioral fix only (`accountLinking.trustedProviders: ["twitter"]`)
+- [x] Run targeted tests/lint
+- [x] Run post-implementation reviews (`ui-ux-pro-max`, `vercel-react-best-practices`, `web-design-guidelines`)
+- [x] Add review summary with root cause and rollback rationale
+
+## Review Summary (Refactor temporary/debug-heavy X auth implementation)
+
+- ui-ux-pro-max: UI構造/文言/導線は変更せず、診断ログのみ削減。ユーザー操作体験への影響なし。
+- vercel-react-best-practices: クライアント側は不要ログを削除したのみで、追加フェッチ・再レンダリング増加はなし。
+- web-design-guidelines: UI要素の追加・変更はなく、既存のボタン/アクセシビリティ実装を維持。
+- Root cause (confirmed): `invalid_code` の直接原因は OAuth callback 中の `api.x.com` 接続タイムアウト (`UND_ERR_CONNECT_TIMEOUT`)。設定不整合というより外部疎通の断続失敗。
+- Rollback rationale: デバッグ時に追加した過剰ログは常時運用でノイズが大きいため削除し、callback/error の最小ログだけ残して再調査可能性と可読性を両立。
+
 - [x] 2026-03-02 Diagnose X connect failure (`/api/auth/callback/twitter` -> `/api/auth/error`)
 - [x] Add structured diagnostics logs for `/api/auth/[...all]` callback/error flow
 - [x] Add actionable logs for `/api/auth/x/link-status` and `SolanaAuthPanel` link action

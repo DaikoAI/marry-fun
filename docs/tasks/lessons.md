@@ -1,7 +1,9 @@
 # Lessons
 
 - When a request mentions "top" in this project, treat `/{locale}` as the onboarding entry and `/{locale}/start` as a legacy redirect before finalizing implementation assumptions.
+- For X OAuth callback failures with `unable_to_get_user_info`, confirm the provider response first; `api.x.com/2/users/me` can return transient `503 Service Unavailable`, so add retry + endpoint fallback before assuming local config is broken.
 - When OAuth callback URL is already confirmed correct, investigate Better Auth account-linking trust policy (`account.accountLinking.trustedProviders`) before re-attributing failures to callback URL mismatch.
+- When adding auth debug instrumentation, keep it narrowly scoped and easy to roll back; after root-cause confirmation, reduce logs to callback/error essentials to avoid permanent noise in normal flows.
 - For top-page profile previews, preserve the Tinder card aspect ratio (`217/367`) in the frame (`aspect-*` + bounded width) to avoid clipping generated portrait cards.
 - On the start screen, keep `SolanaAuthPanel` anchored to the bottom across all onboarding states (`wallet`, `name`, `start`) so post-connect transitions do not shift the primary auth controls upward.
 - For wallet/X connected states, preserve the same button shells and only swap inner labels (e.g., shortened wallet + `✅`, `@username ✅`) instead of replacing controls with separate text elements.

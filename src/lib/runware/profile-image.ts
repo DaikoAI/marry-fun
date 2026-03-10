@@ -160,8 +160,7 @@ async function requestRunwareImageInference(options: {
     width: RUNWARE_PROFILE_IMAGE_SIZE.width,
     height: RUNWARE_PROFILE_IMAGE_SIZE.height,
     referenceImageCount: task.referenceImages?.length ?? 0,
-    referenceImage:
-      task.referenceImages?.[0] ? redactImageUrl(task.referenceImages[0]) : null,
+    referenceImage: task.referenceImages?.[0] ? redactImageUrl(task.referenceImages[0]) : null,
   });
 
   for (let attempt = 1; attempt <= RUNWARE_REQUEST_MAX_ATTEMPTS; attempt += 1) {

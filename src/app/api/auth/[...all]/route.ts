@@ -7,48 +7,8 @@ import { logger } from "@/utils/logger";
 // Note: export const runtime = "edge" is not supported by @opennextjs/cloudflare
 export const dynamic = "force-dynamic";
 
-function truncate(value: string | null, maxLength = 180): string | null {
-  if (!value) {
-    return null;
-  }
-
-  return value.length > maxLength ? `${value.slice(0, maxLength)}…` : value;
-}
-
-function parseHost(value: string | null): string | null {
-  if (!value) {
-    return null;
-  }
-
-  try {
-    return new URL(value).host;
-  } catch {
-    return null;
-  }
-}
-
-function readOAuthDebugQuery(url: URL) {
-  const code = url.searchParams.get("code");
-  const state = url.searchParams.get("state");
-
-  return {
-    error: url.searchParams.get("error"),
-    errorDescription: truncate(url.searchParams.get("error_description")),
-    hasCode: Boolean(code),
-    codeLength: code?.length ?? 0,
-    hasState: Boolean(state),
-    stateLength: state?.length ?? 0,
-    callbackURLHost: parseHost(url.searchParams.get("callbackURL")),
-  };
-}
-
-function shouldLogAuthTrace(pathname: string): boolean {
-  return (
-    pathname.endsWith("/link-social") ||
-    pathname.endsWith("/callback/twitter") ||
-    pathname.endsWith("/error") ||
-    pathname.endsWith("/x/link-status")
-  );
+function shouldTraceAuthRequest(pathname: string): boolean {
+  return pathname.endsWith("/callback/twitter") || pathname.endsWith("/error");
 }
 
 async function runAuthHandler(request: Request, method: "GET" | "POST") {
@@ -57,16 +17,14 @@ async function runAuthHandler(request: Request, method: "GET" | "POST") {
   const authBaseUrl = getAuthBaseUrl();
   const authBaseHost = new URL(authBaseUrl).host;
   const web3Domain = resolveWeb3RequestDomain(request, getAuthBaseUrl());
-  const shouldTrace = shouldLogAuthTrace(url.pathname);
+  const shouldTrace = shouldTraceAuthRequest(url.pathname);
   const requestMeta = {
     method,
     path: url.pathname,
     host: url.host,
-    origin: request.headers.get("origin"),
-    referer: request.headers.get("referer"),
-    authBaseHost,
-    web3Domain,
-    query: readOAuthDebugQuery(url),
+    hasCode: url.searchParams.has("code"),
+    hasState: url.searchParams.has("state"),
+    error: url.searchParams.get("error"),
   };
 
   if (shouldTrace) {
@@ -89,7 +47,6 @@ async function runAuthHandler(request: Request, method: "GET" | "POST") {
         durationMs,
         redirectPath: redirectUrl?.pathname ?? null,
         redirectError: redirectUrl?.searchParams.get("error") ?? null,
-        redirectErrorDescription: truncate(redirectUrl?.searchParams.get("error_description") ?? null),
       });
     }
 
@@ -106,8 +63,8 @@ async function runAuthHandler(request: Request, method: "GET" | "POST") {
         logger.error("[auth] twitter callback redirected to auth error", {
           path: url.pathname,
           callbackError: redirectUrl.searchParams.get("error"),
-          callbackErrorDescription: truncate(redirectUrl.searchParams.get("error_description")),
-          requestQuery: readOAuthDebugQuery(url),
+          hasCode: url.searchParams.has("code"),
+          hasState: url.searchParams.has("state"),
         });
       }
     }

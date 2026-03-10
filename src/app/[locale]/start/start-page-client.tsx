@@ -292,18 +292,22 @@ export function StartPageClient() {
     setProfileError(false);
     setIsSavingUsername(true);
 
-    void authClient
-      .updateUser({ name: nextUsername })
-      .then(({ error }: { error?: unknown | null }) => {
-        if (error) {
+    void (async () => {
+      try {
+        const updateUser = authClient.updateUser as (opts: { name: string }) => Promise<{
+          data?: unknown;
+          error?: unknown;
+        }>;
+        const result = await updateUser({ name: nextUsername });
+        if (result.error) {
           setProfileError(true);
           return;
         }
         void session.refetch();
-      })
-      .finally(() => {
+      } finally {
         setIsSavingUsername(false);
-      });
+      }
+    })();
   };
 
   const handleGenerateProfileImage = () => {

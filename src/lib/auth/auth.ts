@@ -12,8 +12,127 @@ import { getDb } from "@/infrastructure/db/client";
 import * as schema from "@/infrastructure/db/schema";
 import { resolveWeb3RequestDomain } from "@/lib/auth/web3-domain";
 import { resolveWeb3UserNameForCreation } from "@/lib/auth/web3-signup-username";
+import { logger } from "@/utils/logger";
 
 const cachedAuthByDomain = new Map<string, Awaited<ReturnType<typeof buildAuth>>>();
+
+const X_PROFILE_URLS = [
+  "https://api.x.com/2/users/me?user.fields=profile_image_url",
+  "https://api.twitter.com/2/users/me?user.fields=profile_image_url",
+] as const;
+
+const X_EMAIL_URLS = [
+  "https://api.x.com/2/users/me?user.fields=confirmed_email",
+  "https://api.twitter.com/2/users/me?user.fields=confirmed_email",
+] as const;
+
+const X_RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
+const X_MAX_RETRIES = 2;
+
+interface XProfileResponse {
+  data?: {
+    id?: string;
+    name?: string;
+    username?: string;
+    email?: string;
+    profile_image_url?: string;
+  };
+  [key: string]: unknown;
+}
+
+interface XFetchResponse {
+  endpoint: string;
+  status: number;
+  statusText: string;
+  body: string;
+  ok: boolean;
+}
+
+function truncateForLog(value: string, limit = 300): string {
+  if (value.length <= limit) {
+    return value;
+  }
+  return `${value.slice(0, limit)}...`;
+}
+
+function parseJsonResponse(raw: string): unknown {
+  if (!raw) {
+    return null;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isRetryableStatus(status: number): boolean {
+  return X_RETRYABLE_STATUS.has(status);
+}
+
+async function fetchXWithFallback(
+  endpoints: readonly string[],
+  accessToken: string,
+  logLabel: string,
+): Promise<XFetchResponse | null> {
+  for (const endpoint of endpoints) {
+    for (let attempt = 1; attempt <= X_MAX_RETRIES; attempt += 1) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const body = await response.text();
+        const result: XFetchResponse = {
+          endpoint,
+          status: response.status,
+          statusText: response.statusText,
+          body,
+          ok: response.ok,
+        };
+
+        if (result.ok) {
+          return result;
+        }
+
+        logger.warn("[auth/twitter] provider API response error", {
+          label: logLabel,
+          endpoint,
+          attempt,
+          status: result.status,
+          statusText: result.statusText,
+          responseBody: truncateForLog(result.body),
+        });
+
+        if (!isRetryableStatus(result.status) || attempt >= X_MAX_RETRIES) {
+          break;
+        }
+
+        await sleep(250 * attempt);
+      } catch (error) {
+        logger.warn("[auth/twitter] provider API request exception", {
+          label: logLabel,
+          endpoint,
+          attempt,
+          message: error instanceof Error ? error.message : "unknown error",
+        });
+
+        if (attempt >= X_MAX_RETRIES) {
+          break;
+        }
+        await sleep(250 * attempt);
+      }
+    }
+  }
+
+  return null;
+}
 
 export function getAuthBaseUrl(): string {
   return env.BETTER_AUTH_URL ?? "http://localhost:3000";
@@ -32,6 +151,79 @@ function getTwitterConfig() {
       twitter: {
         clientId: env.AUTH_TWITTER_CLIENT_ID,
         clientSecret: env.AUTH_TWITTER_CLIENT_SECRET,
+        async getUserInfo(token: { accessToken?: string }) {
+          const accessToken = token.accessToken;
+          if (!accessToken) return null;
+          try {
+            const profileResponse = await fetchXWithFallback(X_PROFILE_URLS, accessToken, "profile");
+            if (!profileResponse) {
+              logger.error("[auth/twitter] failed to fetch user profile", {
+                note: "all profile endpoints failed or returned retryable errors",
+              });
+              return null;
+            }
+            const profile = parseJsonResponse(profileResponse.body) as XProfileResponse | null;
+
+            if (!profileResponse.ok) {
+              logger.error("[auth/twitter] failed to fetch user profile", {
+                endpoint: profileResponse.endpoint,
+                status: profileResponse.status,
+                statusText: profileResponse.statusText,
+                responseBody: truncateForLog(profileResponse.body),
+              });
+              return null;
+            }
+
+            if (!profile?.data?.id) {
+              logger.error("[auth/twitter] profile response missing user id", {
+                endpoint: profileResponse.endpoint,
+                responseBody: truncateForLog(profileResponse.body),
+              });
+              return null;
+            }
+
+            const emailResponse = await fetchXWithFallback(X_EMAIL_URLS, accessToken, "confirmed_email");
+            let emailVerified = false;
+            let confirmedEmail: string | undefined;
+
+            if (emailResponse?.ok) {
+              const emailData = parseJsonResponse(emailResponse.body) as { data?: { confirmed_email?: string } } | null;
+              confirmedEmail = emailData?.data?.confirmed_email;
+            }
+
+            if (confirmedEmail) {
+              profile.data.email = confirmedEmail;
+              emailVerified = true;
+            } else if (emailResponse && !emailResponse.ok) {
+              logger.warn("[auth/twitter] failed to fetch confirmed email", {
+                endpoint: emailResponse.endpoint,
+                status: emailResponse.status,
+                statusText: emailResponse.statusText,
+                responseBody: truncateForLog(emailResponse.body),
+              });
+            } else if (!emailResponse) {
+              logger.warn("[auth/twitter] failed to fetch confirmed email", {
+                note: "all confirmed_email endpoints failed",
+              });
+            }
+
+            return {
+              user: {
+                id: profile.data.id,
+                name: profile.data.name ?? "",
+                email: profile.data.email || profile.data.username || null,
+                image: profile.data.profile_image_url,
+                emailVerified,
+              },
+              data: profile,
+            };
+          } catch (error) {
+            logger.error("[auth/twitter] exception while fetching user info", {
+              message: error instanceof Error ? error.message : "unknown error",
+            });
+            return null;
+          }
+        },
       },
     };
   }

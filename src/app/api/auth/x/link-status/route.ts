@@ -61,13 +61,8 @@ async function fetchXProfile(accessToken: string): Promise<XProfile | null> {
 }
 
 export async function GET(_request: Request) {
-  const startedAt = Date.now();
   const session = await getServerSession();
   const userId = session?.user.id;
-  logger.info("[auth/x-link-status] request start", {
-    hasSession: Boolean(session),
-    hasUserId: Boolean(userId),
-  });
 
   if (!userId) {
     logger.warn("[auth/x-link-status] unauthorized: no userId in session");
@@ -79,10 +74,6 @@ export async function GET(_request: Request) {
     repository.hasSvmWallet(userId),
     repository.findTwitterAccountByUserId(userId),
   ]);
-  logger.info("[auth/x-link-status] repository lookup", {
-    hasWallet,
-    hasTwitterAccount: Boolean(twitterAccount),
-  });
 
   if (!hasWallet) {
     logger.warn("[auth/x-link-status] wallet authentication required", { userId });
@@ -90,10 +81,6 @@ export async function GET(_request: Request) {
   }
 
   if (!twitterAccount) {
-    logger.info("[auth/x-link-status] no linked twitter account", {
-      userId,
-      durationMs: Date.now() - startedAt,
-    });
     return NextResponse.json({ linked: false });
   }
 
@@ -108,13 +95,6 @@ export async function GET(_request: Request) {
     username: linkedAccount.username,
     profileImageUrl: linkedAccount.profileImageUrl,
   };
-  logger.info("[auth/x-link-status] linked account upserted", {
-    userId,
-    providerAccountId: linkedAccount.providerAccountId,
-    hasUsername: Boolean(profile.username),
-    hasProfileImage: Boolean(profile.profileImageUrl),
-    hasAccessToken: Boolean(twitterAccount.accessToken),
-  });
 
   if (hasMissingProfileData && twitterAccount.accessToken) {
     const latestProfile = await fetchXProfile(twitterAccount.accessToken);
@@ -131,23 +111,9 @@ export async function GET(_request: Request) {
         username: hydratedAccount.username,
         profileImageUrl: hydratedAccount.profileImageUrl,
       };
-      logger.info("[auth/x-link-status] hydrated profile from X API", {
-        userId,
-        hasUsername: Boolean(profile.username),
-        hasProfileImage: Boolean(profile.profileImageUrl),
-      });
-    } else {
-      logger.warn("[auth/x-link-status] could not hydrate missing profile data from X API", {
-        userId,
-      });
     }
   }
 
-  logger.info("[auth/x-link-status] request complete", {
-    userId,
-    linked: true,
-    durationMs: Date.now() - startedAt,
-  });
   return NextResponse.json({
     linked: true,
     providerAccountId: linkedAccount.providerAccountId,
