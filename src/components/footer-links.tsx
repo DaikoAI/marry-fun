@@ -13,7 +13,9 @@ export function FooterLinks() {
       <footer className="flex flex-col items-center justify-between gap-3 pb-1 text-sm text-white/90 sm:flex-row">
         <nav aria-label="footer links" className="flex items-center gap-2">
           <a
-            href="#"
+            href="https://x.com/Marrydotfun"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="X (Twitter)"
             className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white/70 ring-1 ring-white/20 backdrop-blur-md transition hover:bg-white/20 hover:text-white"
           >

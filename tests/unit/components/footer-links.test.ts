@@ -13,6 +13,12 @@ vi.mock("@/components/help-modal", () => ({
 }));
 
 describe("FooterLinks", () => {
+  it("X リンクは公式アカウントを指す", () => {
+    const html = renderToStaticMarkup(React.createElement(FooterLinks));
+
+    expect(html).toContain('href="https://x.com/Marrydotfun"');
+  });
+
   it("pump.funは非活性表示になる", () => {
     const html = renderToStaticMarkup(React.createElement(FooterLinks));
 
