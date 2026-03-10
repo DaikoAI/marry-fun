@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { HelpModal } from "./help-modal";
-import { PumpFunIcon } from "./icons/pump-fun-icon";
 
 export function FooterLinks() {
   const [showHelp, setShowHelp] = useState(false);
@@ -24,14 +23,7 @@ export function FooterLinks() {
             </svg>
           </a>
 
-          <span
-            aria-label="pump.fun (coming soon)"
-            aria-disabled="true"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/35 ring-1 ring-white/10 backdrop-blur-md"
-          >
-            <PumpFunIcon className="h-5 w-5" />
-            <span className="pointer-events-none absolute h-px w-7 rotate-[-35deg] bg-white/75" aria-hidden="true" />
-          </span>
+          {/* pump.fun icon is intentionally hidden for the pre-launch LP */}
 
           <button
             type="button"

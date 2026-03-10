@@ -4,10 +4,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import { FooterLinks } from "@/components/footer-links";
 
-vi.mock("@/components/icons/pump-fun-icon", () => ({
-  PumpFunIcon: (props: { className?: string }) => React.createElement("svg", props),
-}));
-
 vi.mock("@/components/help-modal", () => ({
   HelpModal: () => React.createElement("div", { "data-testid": "help-modal" }),
 }));
@@ -19,11 +15,10 @@ describe("FooterLinks", () => {
     expect(html).toContain('href="https://x.com/Marrydotfun"');
   });
 
-  it("pump.funは非活性表示になる", () => {
+  it("pump.funはLPでは表示しない", () => {
     const html = renderToStaticMarkup(React.createElement(FooterLinks));
 
-    expect(html).toContain('aria-label="pump.fun (coming soon)"');
-    expect(html).toContain('aria-disabled="true"');
+    expect(html).not.toContain("pump.fun");
   });
 
   it("ゲームルールを開くDocsボタンを描画する", () => {
