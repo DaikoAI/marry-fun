@@ -18,7 +18,7 @@ export default async function Home({ params, searchParams }: HomePageProps) {
 
   return (
     <div className="relative h-dvh overflow-hidden text-white">
-      <Background src="/bg/top.png" showSparkles={false} />
+      <Background mobileSrc="/bg/top_sp.png" desktopSrc="/bg/top_pc.png" showSparkles={false} />
 
       {/* Content */}
       <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col px-4 py-5 sm:px-8 sm:py-7">
