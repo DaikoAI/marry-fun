@@ -156,26 +156,24 @@ export function StartPageClient() {
     pollingRef.current = id;
   };
 
-  const handleNameStepSubmit = () => {
+  const handleNameStepSubmit = async () => {
     if (!canSubmitUsername) return;
     const nextUsername = username.trim();
     if (!isValidUsername(nextUsername)) return;
 
     setProfileError(false);
     setIsSavingUsername(true);
-
-    void authClient
-      .updateUser({ name: nextUsername })
-      .then(({ error }) => {
-        if (error) {
-          setProfileError(true);
-          return;
-        }
-        void session.refetch();
-      })
-      .finally(() => {
-        setIsSavingUsername(false);
-      });
+    try {
+      const updateUser = authClient.updateUser as (opts: { name: string }) => Promise<{ error?: unknown }>;
+      const result = await updateUser({ name: nextUsername });
+      if (result.error) {
+        setProfileError(true);
+        return;
+      }
+      void session.refetch();
+    } finally {
+      setIsSavingUsername(false);
+    }
   };
 
   return (
@@ -247,7 +245,9 @@ export function StartPageClient() {
               )}
               <button
                 type="button"
-                onClick={handleNameStepSubmit}
+                onClick={() => {
+                  void handleNameStepSubmit();
+                }}
                 disabled={!canSubmitUsername}
                 className="rounded-full border-2 border-pink-200/40 bg-white/10 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100/80 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-150 ease-out hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
               >
