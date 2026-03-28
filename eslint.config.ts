@@ -34,7 +34,6 @@ const config = defineConfig([
       "eslint.config.ts",
       ".agents/**",
       ".codex/**",
-      ".moltworker/**",
       ".open-next/**",
       ".wrangler/**",
       ".claude/**",

@@ -2,8 +2,8 @@
 
 ## Game Overview
 
-marry.fun is an AI-powered dating simulation game built for the OpenClaw Hackathon.
-Players chat with "Claw-chan," an AI heroine powered by OpenClaw (Moltworker on Cloudflare Workers),
+marry.fun is an AI-powered dating simulation game built for an agent hackathon.
+Players chat with "Claw-chan," an AI heroine powered by Vercel AI SDK + OpenAI API on Cloudflare Workers,
 and compete for the highest score to win her heart — and real prizes.
 
 ### How It Works
@@ -34,9 +34,9 @@ and compete for the highest score to win her heart — and real prizes.
 
 ## Project Context
 
-- **Hackathon**: OpenClaw Hackathon
-- **Required Infra**: Cloudflare Workers Paid + Moltworker + OpenClaw agent
-- **Architecture**: Next.js (Cloudflare) → OpenAI SDK → Moltworker (CF Workers) → Anthropic API
+- **Hackathon**: Agent Hackathon
+- **Required Infra**: Cloudflare Workers Paid + OpenAI API
+- **Architecture**: Next.js (Cloudflare) → Vercel AI SDK → OpenAI API
 - **Core Features**: 5 character types, NG word game over, scoring system
 
 ## Post-Implementation Review
@@ -49,10 +49,9 @@ After completing an implementation, always run the following 3 skills for review
 
 ## Documentation-First Rules
 
-For infra setup and OpenClaw-related work, always refer to existing docs before making changes.
+For AI and infra setup work, always refer to existing docs before making changes.
 
-- Infra setup: treat `openclaw/README.md` as the primary reference
-- Moltworker / container: refer to `.moltworker/README.md` and `.moltworker/AGENTS.md`
+- AI setup: treat `docs/development/ai.md` as the primary reference
 - **Server development**: follow `docs/development/server.md` for architecture, layer rules, and conventions
 
 ---

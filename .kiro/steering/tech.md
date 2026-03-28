@@ -20,7 +20,7 @@ Next.js App Router をベースとした SPA/SSR ハイブリッド。Cloudflare
 - **Tailwind CSS 4**: スタイリング
 - **better-auth + Solana Web3**: ウォレット認証（Web3 サインアップ）
 - **Drizzle + Cloudflare D1**: ORM と SQLite 互換 DB
-- **Moltworker + OpenClaw**: AI チャット（Anthropic API 経由）
+- **Vercel AI SDK + OpenAI API**: AI チャット基盤
 
 ## Development Standards
 
@@ -68,4 +68,4 @@ Next.js App Router をベースとした SPA/SSR ハイブリッド。Cloudflare
 
 _Document standards and patterns, not every dependency_
 
-<!-- updated_at: 2025-02-14 | Sync: Drizzle/D1, better-auth/Solana, Moltworker, React Compiler, Clean Architecture -->
+<!-- updated_at: 2026-03-28 | Sync: Drizzle/D1, better-auth/Solana, Vercel AI SDK, React Compiler, Clean Architecture -->

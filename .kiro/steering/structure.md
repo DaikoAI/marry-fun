@@ -40,8 +40,8 @@
 ### Infrastructure
 
 **Location**: `src/infrastructure/`  
-**Purpose**: domain ポートの実装。adapter（Moltworker 等）、repositories（D1）、container  
-**Example**: `src/infrastructure/adapter/ai-chat-moltworker.ts`, `src/infrastructure/repositories/d1/`  
+**Purpose**: domain ポートの実装。adapter（AI SDK / OpenAI 等）、repositories（D1）、container  
+**Example**: `src/infrastructure/adapter/ai-chat-vercel-agent.ts`, `src/infrastructure/repositories/d1/`  
 **Rule**: domain の port を実装、use case からは注入で受け取る
 
 ### Components
