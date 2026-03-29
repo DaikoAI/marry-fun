@@ -1,50 +1,15 @@
 import { handleSendMessage, handleStartGame } from "@/interfaces/api/chat-handler";
+import { persistChatMessageResponse, persistGameOverResponse } from "@/interfaces/api/chat-persistence";
 import { handleApiError } from "@/interfaces/errors/api-error-handler";
 import type { ErrorResponse } from "@/interfaces/schemas/chat";
 import { chatRequestSchema, chatSuccessResponseSchema } from "@/interfaces/schemas/chat";
-import { messageService } from "@/infrastructure/messages-container";
-import { pointService } from "@/infrastructure/points-container";
 import { getServerSession } from "@/lib/auth/server-session";
 import { logger } from "@/utils/logger";
 import { after, NextResponse } from "next/server";
 
-const POINT_PERSIST_SYNC_RETRY_COUNT = 1;
-const POINT_PERSIST_BACKGROUND_RETRY_COUNT = 3;
-
 function maskUserId(userId: string): string {
   if (userId.length <= 10) return userId;
   return `${userId.slice(0, 6)}...${userId.slice(-4)}`;
-}
-
-async function addPointsWithRetry(
-  input: { userId: string; amount: number; idempotencyKey: string },
-  retryCount: number,
-) {
-  let lastError: unknown;
-
-  for (let attempt = 1; attempt <= retryCount; attempt++) {
-    try {
-      const pointsView = await pointService.addMyPoints({
-        userId: input.userId,
-        amount: input.amount,
-        reason: "chat",
-        idempotencyKey: input.idempotencyKey,
-      });
-      logger.debug("[chat] point persist success", {
-        attempt,
-        retryCount,
-        amount: input.amount,
-      });
-      return pointsView;
-    } catch (error) {
-      lastError = error;
-      if (attempt < retryCount) {
-        logger.warn(`[chat] point persist retry ${String(attempt)} failed`, error);
-      }
-    }
-  }
-
-  throw lastError;
 }
 
 export async function POST(request: Request) {
@@ -116,57 +81,17 @@ export async function POST(request: Request) {
         emotion: response.emotion,
       });
 
-      const idempotencyKey = `chat:${userId}:${body.sessionId}:${body.clientMessageId}`;
-      const persistMessagePromise = messageService
-        .saveUserAndAiMessages({
-          userId,
-          sessionId: body.sessionId,
-          userMessage: body.message,
-          aiMessage: response.reply,
-          aiPoint: response.score.adjusted,
-          aiEmotion: response.emotion,
-        })
-        .catch((error: unknown) => {
-          logger.error("[chat] failed to persist chat messages", error);
-        });
-
-      let balance: number;
-      try {
-        const pointsView = await addPointsWithRetry(
-          {
-            userId,
-            amount: response.score.adjusted,
-            idempotencyKey,
-          },
-          POINT_PERSIST_SYNC_RETRY_COUNT,
-        );
-        balance = pointsView.balance;
-      } catch (error) {
-        logger.error("[chat] failed to persist points after retries", error);
-
-        after(
-          addPointsWithRetry(
-            {
-              userId,
-              amount: response.score.adjusted,
-              idempotencyKey,
-            },
-            POINT_PERSIST_BACKGROUND_RETRY_COUNT,
-          ).catch((retryError: unknown) => {
-            logger.error("[chat] failed to persist points in background retry", retryError);
-          }),
-        );
-
-        const snapshot = await pointService.getMyPoints(userId);
-        balance = snapshot.balance;
-      }
-
-      await persistMessagePromise;
-
-      logger.info("[chat] message persisted and points reflected", {
+      const balance = await persistChatMessageResponse({
+        userId,
         sessionId: body.sessionId,
-        balance,
+        userMessage: body.message,
+        clientMessageId: body.clientMessageId,
+        response,
+        scheduleInBackground: task => {
+          after(task());
+        },
       });
+
       return NextResponse.json(chatSuccessResponseSchema.parse({ ...response, balance }));
     }
 
@@ -174,18 +99,12 @@ export async function POST(request: Request) {
       sessionId: body.sessionId,
       hitWord: response.hitWord,
     });
-    await messageService
-      .saveUserAndAiMessages({
-        userId,
-        sessionId: body.sessionId,
-        userMessage: body.message,
-        aiMessage: response.reply,
-        aiPoint: null,
-        aiEmotion: null,
-      })
-      .catch((error: unknown) => {
-        logger.error("[chat] failed to persist game-over messages", error);
-      });
+    await persistGameOverResponse({
+      userId,
+      sessionId: body.sessionId,
+      userMessage: body.message,
+      response,
+    });
 
     return NextResponse.json(chatSuccessResponseSchema.parse(response));
   } catch (error) {

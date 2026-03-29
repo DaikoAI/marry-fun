@@ -1,6 +1,5 @@
 # Agent Guidelines
 
-
 ## Steering (Project Context)
 
 Load `docs/` as project memory at session start or when context is needed.
@@ -69,6 +68,6 @@ Use steering to align decisions with product goals, tech stack, and structure.
 ## Core Principles
 
 - Always prefer simplicity over pathological correctness. YAGNI, KISS, DRY. No backward-compat shims or fallback paths unless they come free without adding cyclomatic complexity.
-- **Simplicity First**: Make every change as simple as possible. Impact minimal code. 
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
 - **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
 - **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
