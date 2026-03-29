@@ -44,6 +44,7 @@ export function StartPageClient() {
   const [submissionState, dispatch] = useReducer(startGameFlowReducer, initialStartGameFlowState);
   const t = useTranslations("start");
   const locale = useLocale();
+  const authIdentity = session.data?.user.id ?? null;
 
   const effectiveUsername = hasStoredUsername ? storedName.trim() : username.trim();
   const isValid = isValidUsername(effectiveUsername);
@@ -62,6 +63,12 @@ export function StartPageClient() {
 
   const initPromiseRef = useRef<Promise<InitGameResult> | null>(null);
   const submitSequenceRef = useRef(0);
+
+  useEffect(() => {
+    submitSequenceRef.current += 1;
+    initPromiseRef.current = null;
+    dispatch({ type: "RESET" });
+  }, [authIdentity]);
 
   const isWalletAuthenticated = Boolean(session.data?.session);
   const onboardingStep = getStartOnboardingStep({
@@ -126,6 +133,7 @@ export function StartPageClient() {
     if (!initPromise) {
       return;
     }
+    initPromiseRef.current = null;
     const submitSequence = submitSequenceRef.current;
 
     void initPromise

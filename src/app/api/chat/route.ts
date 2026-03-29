@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         clientMessageId: body.clientMessageId,
         response,
         scheduleInBackground: task => {
-          after(task());
+          after(task);
         },
       });
 

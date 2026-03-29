@@ -17,6 +17,7 @@ export const initialStartGameFlowState: StartGameFlowState = {
 };
 
 export type StartGameFlowAction =
+  | { type: "RESET" }
   | { type: "BEGIN_SUBMISSION" }
   | { type: "INIT_READY" }
   | { type: "INIT_BLOCKED" }
@@ -25,6 +26,8 @@ export type StartGameFlowAction =
 
 export function startGameFlowReducer(state: StartGameFlowState, action: StartGameFlowAction): StartGameFlowState {
   switch (action.type) {
+    case "RESET":
+      return initialStartGameFlowState;
     case "BEGIN_SUBMISSION":
       return {
         ...state,

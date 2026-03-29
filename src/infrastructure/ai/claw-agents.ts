@@ -11,7 +11,7 @@ const chatResponseSchema = z.object({
 });
 
 const ngWordsResponseSchema = z.object({
-  words: z.array(z.string().min(1)).min(25).max(35),
+  words: z.array(z.string().min(1)).length(30),
 });
 
 export const clawChatAgent = new ToolLoopAgent({

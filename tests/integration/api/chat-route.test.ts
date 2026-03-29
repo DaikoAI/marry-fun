@@ -47,16 +47,18 @@ const mockGetMyPoints = vi.fn(async () => {
   return snapshot;
 });
 const mockSaveUserAndAiMessages = vi.fn(async () => {});
+const mockAfter = vi.fn((taskOrCb: (() => void | Promise<void>) | Promise<unknown>) => {
+  if (typeof taskOrCb === "function") {
+    void taskOrCb();
+  }
+});
 
 // Mock next/server after() to execute the callback immediately
 vi.mock("next/server", async importOriginal => {
   const actual = await importOriginal<typeof import("next/server")>();
   return {
     ...actual,
-    after: (taskOrCb: Promise<unknown> | (() => void)) => {
-      if (typeof taskOrCb === "function") taskOrCb();
-      // For promises, just let them resolve naturally
-    },
+    after: mockAfter,
   };
 });
 
@@ -253,6 +255,7 @@ describe("POST /api/chat", () => {
   it("point 保存失敗でも message レスポンスを返す", async () => {
     const initRes = await POST(createRequest({ isInit: true, username: "テスト", locale: "ja" }));
     const initJson = await jsonBody(initRes);
+    mockAfter.mockClear();
     mockAddMyPoints.mockRejectedValue(new Error("point write failed"));
     mockGetMyPoints.mockResolvedValueOnce({
       userId: "u1",
@@ -277,6 +280,8 @@ describe("POST /api/chat", () => {
     expect(json.balance).toBe(42);
     expect(mockGetMyPoints).toHaveBeenCalledTimes(1);
     expect(mockSaveUserAndAiMessages).toHaveBeenCalledTimes(1);
+    expect(mockAfter).toHaveBeenCalledTimes(1);
+    expect(typeof mockAfter.mock.calls[0]?.[0]).toBe("function");
   });
 
   it("messages 保存失敗でも message レスポンスを返す", async () => {

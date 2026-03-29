@@ -3,6 +3,14 @@ import { describe, expect, it } from "vitest";
 import { initialStartGameFlowState, isGameOverBlockedError, startGameFlowReducer } from "@/lib/start/start-game-flow";
 
 describe("startGameFlowReducer", () => {
+  it("RESET で初期状態に戻す", () => {
+    const ready = startGameFlowReducer(startGameFlowReducer(initialStartGameFlowState, { type: "BEGIN_SUBMISSION" }), {
+      type: "INIT_READY",
+    });
+
+    expect(startGameFlowReducer(ready, { type: "RESET" })).toEqual(initialStartGameFlowState);
+  });
+
   it("BEGIN_SUBMISSION で prologue 開始状態になる", () => {
     expect(startGameFlowReducer(initialStartGameFlowState, { type: "BEGIN_SUBMISSION" })).toEqual({
       isSubmitting: true,

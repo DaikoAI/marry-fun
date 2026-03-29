@@ -5,12 +5,67 @@
 Load `docs/` as project memory at session start or when context is needed.
 
 - **Path**: `docs/`
-- **Default files**: `PRD.md`, `TECH.md`, `STRUCTURE.md`
+- **Default files**: `PRODUCT.md`, `TECH.md`, `STRUCTURE.md`
 - **Other docs**: Add or manage as needed (e.g. `.agents/memory/`, domain-specific .md)
 
 Use steering to align decisions with product goals, tech stack, and structure.
 
 ---
+
+## Agent Catalog
+
+### Planner
+
+- **Purpose**: 非自明タスクを分解し、実行計画と検証観点を整理する
+- **Inputs**: ユーザー要求、`docs/`、現在の差分と PR 状態
+- **Outputs**: `.agents/memory/todo.md` のチェックリストと review メモ
+- **Usage**: 3 ステップ以上の作業、設計判断、PR 対応で最初に起動する
+- **Memory**: `.agents/memory/todo.md`, `.agents/memory/lessons.md`
+
+### Executor
+
+- **Purpose**: 計画に沿ってコード・設定・テストを更新する
+- **Inputs**: Planner が確定した作業項目、対象ファイル、既存テスト
+- **Outputs**: 最小差分の実装、必要な追従テスト、commit-ready な変更
+- **Usage**: `src/`, `tests/`, 設定ファイルの修正全般
+- **Code Surface**: `src/`, `tests/`, `.github/`, `scripts/`
+
+### Verifier
+
+- **Purpose**: 変更が壊していないことをローカル検証と PR 状態で証明する
+- **Inputs**: 変更差分、CI 結果、レビュー指摘、各種 quality gate
+- **Outputs**: 実行済みコマンド、残リスク、必要なら追加修正
+- **Usage**: `format` / `lint` / `typecheck` / `test:run` と PR の再監視
+- **Memory**: `.agents/memory/todo.md`
+
+### AiChatVercelAgent
+
+- **Purpose**: ドメインの `AiChatAdapter` 実装として OpenAI へのチャット入出力を提供する
+- **Inputs**: `sessionId`, `characterType`, `username`, `message`, `locale`
+- **Outputs**: `message`, `score`, `emotion` と NG-word 用の補助結果
+- **Usage**: `src/infrastructure/adapter/ai-chat-vercel-agent.ts`
+- **Dependencies**: `clawChatAgent`, `clawNgWordAgent`, `clawShockAgent`, `src/constants/prompts/agent-prompts.generated.ts`
+
+### clawChatAgent
+
+- **Purpose**: 通常会話の structured output を 1 step で生成する
+- **Inputs**: chat prompt
+- **Outputs**: `marry_fun_chat_response`
+- **Usage**: `src/infrastructure/ai/claw-agents.ts`
+
+### clawNgWordAgent
+
+- **Purpose**: NG word 候補 30 件を structured output で返す
+- **Inputs**: NG-word prompt
+- **Outputs**: `marry_fun_ngwords_response`
+- **Usage**: `src/infrastructure/ai/claw-agents.ts`
+
+### clawShockAgent
+
+- **Purpose**: NG word 命中時のショック返答を生成する
+- **Inputs**: shock prompt
+- **Outputs**: plain text response
+- **Usage**: `src/infrastructure/ai/claw-agents.ts`
 
 ## Workflow Orchestration
 
