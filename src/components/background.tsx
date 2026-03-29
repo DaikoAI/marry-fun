@@ -19,7 +19,10 @@ export function Background({
   imageClassName = "object-cover object-center",
   variant,
 }: BackgroundProps) {
-  const variantSrc = variant === "chat" ? "/bg/chat.webp" : variant === "top" ? "/bg/top.webp" : undefined;
+  const variantSrc =
+    variant === "chat" ? "/bg/chat.webp"
+    : variant === "top" ? "/bg/top.webp"
+    : undefined;
   const baseSrc = variantSrc ?? src;
   const mobileImageSrc = mobileSrc ?? baseSrc;
   const desktopImageSrc = desktopSrc ?? baseSrc;
