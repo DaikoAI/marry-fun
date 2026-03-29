@@ -1,2 +1,9 @@
-/** Allow side-effect imports of CSS files (e.g. globals.css, library styles). */
-declare module "*.css";
+declare module "*.css" {
+  const href: string;
+  export default href;
+}
+
+declare module "@solana/wallet-adapter-react-ui/styles.css" {
+  const href: string;
+  export default href;
+}

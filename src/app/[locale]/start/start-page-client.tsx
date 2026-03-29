@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
 import type { ComponentProps } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useHaptic } from "use-haptic";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -17,12 +17,12 @@ import type { InitGameResult } from "@/lib/girl-chat";
 import { getStartOnboardingPhase } from "@/lib/start/onboarding-flow";
 import { shouldShowPrologueSkip } from "@/lib/start/prologue-skip";
 import { runWithViewTransition } from "@/lib/start/view-transition";
+import { initialStartGameFlowState, isGameOverBlockedError, startGameFlowReducer } from "@/lib/start/start-game-flow";
 import { useGameStore } from "@/store/game-store";
 import { logger } from "@/utils/logger";
 
 type FormSubmitEvent = Parameters<NonNullable<ComponentProps<"form">["onSubmit"]>>[0];
 
-type StartPageUiPhase = "form" | "prologue";
 const IS_PLAY_NOW_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PLAY_NOW === "true";
 
 function isValidUsername(name: string): boolean {
@@ -72,11 +72,7 @@ export function StartPageClient() {
   const [username, setUsername] = useState("");
   const [isSavingUsername, setIsSavingUsername] = useState(false);
   const [profileError, setProfileError] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [phase, setPhase] = useState<StartPageUiPhase>("form");
-  const [hasInitResponse, setHasInitResponse] = useState(false);
-  const [initError, setInitError] = useState(false);
-  const [gameOverBlocked, setGameOverBlocked] = useState(false);
+  const [submissionState, dispatch] = useReducer(startGameFlowReducer, initialStartGameFlowState);
   const [isLocaleMenuOpen, setIsLocaleMenuOpen] = useState(false);
   const [isXLinked, setIsXLinked] = useState(false);
   const [isCheckingXLink, setIsCheckingXLink] = useState(false);
@@ -86,6 +82,7 @@ export function StartPageClient() {
   const [generatedProfileImageUrl, setGeneratedProfileImageUrl] = useState<string | null>(null);
   const t = useTranslations("start");
   const locale = useLocale();
+  const authIdentity = session.data?.user.id ?? null;
   const localeMenuRef = useRef<HTMLDivElement | null>(null);
 
   const effectiveUsername = hasStoredUsername ? storedName.trim() : username.trim();
@@ -106,6 +103,8 @@ export function StartPageClient() {
     profileImage: profilePreviewImage,
   });
   const [displayOnboardingPhase, setDisplayOnboardingPhase] = useState(onboardingPhase);
+
+  const { gameOverBlocked, hasInitResponse, initError, isSubmitting, phase } = submissionState;
 
   /* eslint-disable react-you-might-not-need-an-effect/no-event-handler */
   useEffect(() => {
@@ -165,15 +164,14 @@ export function StartPageClient() {
     void refreshXLinkStatus();
   }, [refreshXLinkStatus]);
 
-  const apiResultRef = useRef<InitGameResult | null>(null);
-  const apiErrorRef = useRef<boolean>(false);
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const initPromiseRef = useRef<Promise<InitGameResult> | null>(null);
+  const submitSequenceRef = useRef(0);
 
   useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, []);
+    submitSequenceRef.current += 1;
+    initPromiseRef.current = null;
+    dispatch({ type: "RESET" });
+  }, [authIdentity]);
 
   useEffect(() => {
     if (!isLocaleMenuOpen) return;
@@ -222,66 +220,66 @@ export function StartPageClient() {
     router.push("/chat");
   };
 
-  const handleSubmit = (e: FormSubmitEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: FormSubmitEvent) => {
+    event.preventDefault();
     if (!canStart) return;
     triggerHaptic();
-    setInitError(false);
-    apiErrorRef.current = false;
-    apiResultRef.current = null;
-    setHasInitResponse(false);
-    setIsSubmitting(true);
-    setPhase("prologue");
+    const submitSequence = submitSequenceRef.current + 1;
+    submitSequenceRef.current = submitSequence;
+    dispatch({ type: "BEGIN_SUBMISSION" });
+    initPromiseRef.current = null;
 
     const nameToUse = effectiveUsername;
+    const initPromise = (async () => {
+      const { initGameSession } = await import("@/lib/girl-chat");
+      return initGameSession(nameToUse, locale);
+    })();
+    initPromiseRef.current = initPromise;
 
-    void (async () => {
-      try {
-        const { initGameSession } = await import("@/lib/girl-chat");
-        apiResultRef.current = await initGameSession(nameToUse, locale);
-        setHasInitResponse(true);
-      } catch (err) {
-        if ((err as Error & { code?: string }).code === "GAME_OVER_BLOCKED") {
-          setGameOverBlocked(true);
-          setIsSubmitting(false);
-          setPhase("form");
+    void initPromise
+      .then(() => {
+        if (submitSequenceRef.current !== submitSequence) {
           return;
         }
-        apiErrorRef.current = true;
-        setHasInitResponse(false);
-      }
-    })();
+        dispatch({ type: "INIT_READY" });
+      })
+      .catch((error: unknown) => {
+        if (submitSequenceRef.current !== submitSequence) {
+          return;
+        }
+        if (isGameOverBlockedError(error)) {
+          initPromiseRef.current = null;
+          dispatch({ type: "INIT_BLOCKED" });
+          return;
+        }
+        dispatch({ type: "INIT_FAILED" });
+      });
   };
 
   const handlePrologueComplete = () => {
-    if (apiErrorRef.current) {
-      setInitError(true);
-      setIsSubmitting(false);
-      setHasInitResponse(false);
-      setPhase("form");
+    const initPromise = initPromiseRef.current;
+    if (!initPromise) {
       return;
     }
-    if (apiResultRef.current) {
-      setupStoreAndNavigate(apiResultRef.current);
-      return;
-    }
-    const id = setInterval(() => {
-      if (apiErrorRef.current) {
-        clearInterval(id);
-        pollingRef.current = null;
-        setInitError(true);
-        setIsSubmitting(false);
-        setHasInitResponse(false);
-        setPhase("form");
-        return;
-      }
-      if (apiResultRef.current) {
-        clearInterval(id);
-        pollingRef.current = null;
-        setupStoreAndNavigate(apiResultRef.current);
-      }
-    }, 200);
-    pollingRef.current = id;
+    initPromiseRef.current = null;
+    const submitSequence = submitSequenceRef.current;
+
+    void initPromise
+      .then(result => {
+        if (submitSequenceRef.current !== submitSequence) {
+          return;
+        }
+        setupStoreAndNavigate(result);
+      })
+      .catch((error: unknown) => {
+        if (submitSequenceRef.current !== submitSequence) {
+          return;
+        }
+        if (isGameOverBlockedError(error)) {
+          return;
+        }
+        dispatch({ type: "PROLOGUE_FAILED" });
+      });
   };
 
   const handleNameStepSubmit = () => {
@@ -459,12 +457,14 @@ export function StartPageClient() {
           )}
         </div>
       </div>
+
       <PrologueOverlay
         isVisible={phase === "prologue"}
         onComplete={handlePrologueComplete}
         canSkip={canSkipPrologue}
         onSkip={handlePrologueComplete}
       />
+
       <div className="relative z-10 mx-auto flex h-full max-w-md flex-col items-center justify-center px-6 [text-shadow:0_1px_6px_rgba(0,0,0,0.75)]">
         <form
           onSubmit={handleSubmit}
@@ -504,8 +504,8 @@ export function StartPageClient() {
                     name="username"
                     aria-label={t("placeholder")}
                     value={username}
-                    onChange={e => {
-                      setUsername(e.target.value);
+                    onChange={event => {
+                      setUsername(event.target.value);
                     }}
                     placeholder={t("placeholder")}
                     maxLength={20}
@@ -590,11 +590,11 @@ export function StartPageClient() {
 
             {displayOnboardingPhase === "ready" && (
               <>
-                {userImage && (
+                {profilePreviewImage && (
                   <div className="mx-auto mb-3 aspect-[217/367] w-full max-w-[180px] overflow-hidden rounded-2xl border border-white/50 bg-black/45 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={userImage}
+                      src={profilePreviewImage}
                       alt={t("profilePreviewAlt")}
                       className="h-full w-full object-cover"
                       onLoad={event => {
@@ -623,6 +623,13 @@ export function StartPageClient() {
                     {t("initError")}
                   </p>
                 )}
+                <button
+                  type="submit"
+                  disabled={!canStart}
+                  className="mt-4 rounded-full border-2 border-pink-200/50 bg-black/55 px-8 py-3 text-[clamp(0.9rem,2.5vw,1.25rem)] font-(--font-ephemeral) tracking-[0.28em] text-pink-100 drop-shadow-[0_8px_22px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-150 ease-out hover:scale-105 focus-visible:ring-2 focus-visible:ring-pink-200/70 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                >
+                  {t("submit")}
+                </button>
               </>
             )}
           </div>

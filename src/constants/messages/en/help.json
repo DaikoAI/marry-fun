@@ -2,7 +2,7 @@
   "title": "Game Rules",
   "sendMessage": "💬 Message Claw-chan to chat.",
   "earnFromChat": "✨ Earn points from your conversations.",
-  "marryBoost": "🚀 $MARRY boosts your score.",
-  "bonusNote": "※ Bonus points are added to your score based on the amount of $MARRY you hold and how long you've held it.",
+  "marryBoost": "🚀 $TOKEN boosts your score.",
+  "bonusNote": "※ Bonus points are added to your score based on the amount of $TOKEN you hold and how long you've held it.",
   "close": "Close"
 }

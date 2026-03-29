@@ -17,38 +17,38 @@ function readPackageScripts(): Record<string, string> {
 }
 
 describe("package scripts", () => {
-  it("dev is Wrangler-based local flow (not plain next dev)", () => {
+  it("dev syncs prompts and starts next dev on port 8787", () => {
     const scripts = readPackageScripts();
     const dev = scripts.dev;
 
     expect(dev).toBeDefined();
-    expect(dev).toContain("build:cf:local");
-    expect(dev).not.toContain("next dev");
+    expect(dev).toContain("sync:prompts");
+    expect(dev).toContain("next dev");
+    expect(dev).toContain("--port 8787");
   });
 
-  it("preview uses .env.local for local Wrangler run", () => {
+  it("preview uses opennextjs-cloudflare preview", () => {
     const scripts = readPackageScripts();
     const preview = scripts.preview;
 
     expect(preview).toBeDefined();
-    expect(preview).toContain(".env.local");
     expect(preview).toContain("opennextjs-cloudflare preview");
   });
 
-  it("build runs with NODE_ENV=production", () => {
+  it("build syncs prompts before next build", () => {
     const scripts = readPackageScripts();
     const build = scripts.build;
 
     expect(build).toBeDefined();
-    expect(build).toContain("NODE_ENV=production");
+    expect(build).toContain("sync:prompts");
     expect(build).toContain("next build");
   });
 
-  it("composite-only debug script exists", () => {
+  it("sync:prompts script exists", () => {
     const scripts = readPackageScripts();
-    const composite = scripts["test:profile-composite"];
+    const syncPrompts = scripts["sync:prompts"];
 
-    expect(composite).toBeDefined();
-    expect(composite).toContain("scripts/test-profile-image-composite.ts");
+    expect(syncPrompts).toBeDefined();
+    expect(syncPrompts).toContain("scripts/sync-prompts.ts");
   });
 });
