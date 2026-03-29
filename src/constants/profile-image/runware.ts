@@ -1,0 +1,83 @@
+export const RUNWARE_PROFILE_MODEL_DEFAULT = "runware:400@1";
+
+export const RUNWARE_PROFILE_IMAGE_SIZE = {
+  // Keep output dimensions aligned with FLUX-friendly multiples.
+  width: 768,
+  height: 960,
+} as const;
+
+export const RUNWARE_PROFILE_NUM_RESULTS = 1;
+export const RUNWARE_PROFILE_OUTPUT_FORMAT = "PNG";
+export const RUNWARE_PROFILE_STEPS = 28;
+export const RUNWARE_PROFILE_CFG = 6.5;
+export const RUNWARE_PROFILE_PROMPT_MAX_LENGTH = 300;
+
+// FLUX.2 guidance: avoid negative prompting and describe target output directly.
+export const RUNWARE_PROFILE_NEGATIVE_PROMPT = "";
+
+export const RUNWARE_PROFILE_PROMPT_BASE = `Anime-style profile avatar, vertical composition (4:5 aspect ratio), optimized for smartphone display.
+
+A man wearing a tailored matte black business suit, crisp white dress shirt, slim black tie, taking a smartphone selfie. Framing: upper torso to head, centered composition, camera slightly above eye level, confident relaxed expression. Suit details, pose, framing, and camera angle must remain identical across generations.
+
+Background: modern luxury high-rise apartment interior at night, large floor-to-ceiling window with soft city lights bokeh, warm ambient lighting, minimalistic premium interior, shallow depth of field, sophisticated and attractive atmosphere.
+
+Lighting: soft cinematic lighting, warm highlights, natural skin shadows, subtle rim light from window.
+
+Use the uploaded image strictly and directly as the face. Do NOT redraw or stylize the face. Preserve exact facial structure, proportions, skin tone, lighting, hairstyle, and expression. Do not apply color correction to the face.
+
+Seamlessly merge the original face onto the illustrated body. Only the face should vary. Body, suit, background, and framing must remain consistent.
+
+If face detection fails or is incomplete, reconstruct minimally while preserving maximum resemblance and original color tone.`;
+
+// Keep prompt compact to avoid provider-side validation errors.
+// Keep core constraints compact while preserving composition/identity requirements.
+export const RUNWARE_PROFILE_PROMPT_CORE =
+  "rwre, anime-style selfie portrait, black suit, white shirt, black tie, smartphone selfie, upper torso centered, slight high-angle camera, confident relaxed expression, luxury high-rise apartment night bokeh, warm cinematic lighting, high face resemblance to reference person";
+
+/** Background-only prompt used behind the Tinder-style card. Keep it abstract and non-distracting. */
+export const RUNWARE_PROFILE_BACKGROUND_PROMPT =
+  "soft cinematic gradient backdrop, amber and navy tones, city lights bokeh, abstract luxury ambiance, shallow depth of field, smooth texture, no people, no characters, no text, seamless background, vertical composition 4:5";
+
+const X_PROFILE_SIZE_NAMES = new Set(["mini", "normal", "bigger", "small", "thumb"]);
+
+export function normalizeRunwareReferenceImageUrl(imageUrl: string): string {
+  let parsed: URL;
+  try {
+    parsed = new URL(imageUrl);
+  } catch {
+    return imageUrl;
+  }
+
+  if (parsed.hostname !== "pbs.twimg.com" || !parsed.pathname.includes("/profile_images/")) {
+    return imageUrl;
+  }
+
+  const segments = parsed.pathname.split("/");
+  const fileName = segments.at(-1);
+  if (fileName) {
+    const replaced = fileName.replace(/_(normal|bigger|mini|small|thumb)(\.[a-zA-Z0-9]+)$/u, "_400x400$2");
+    if (replaced !== fileName) {
+      segments[segments.length - 1] = replaced;
+      parsed.pathname = segments.join("/");
+    }
+  }
+
+  const nameParam = parsed.searchParams.get("name");
+  if (nameParam && X_PROFILE_SIZE_NAMES.has(nameParam)) {
+    parsed.searchParams.set("name", "400x400");
+  }
+
+  return parsed.toString();
+}
+
+export function buildRunwareProfilePrompt(input: {
+  locale: "ja" | "en";
+  displayName: string;
+  xUsername: string | null;
+}): string {
+  void input;
+
+  const prompt =
+    "Single man, smartphone selfie, upper torso centered, slight high-angle, tailored matte black suit, white shirt, black tie, anime portrait style, luxury high-rise night bokeh, warm cinematic light. Use reference image only for face merge; keep pose/suit/frame fixed. If reference is non-human, map its key traits to face.";
+  return prompt.slice(0, RUNWARE_PROFILE_PROMPT_MAX_LENGTH);
+}

@@ -13,7 +13,7 @@
 #### Acceptance Criteria
 
 1.1 When トップページにアクセスしたとき, the LP shall 1画面で完結するファーストビューを表示する
-1.2 The LP shall 主要コンテンツとして `public/logo.png` を視認できる位置（画面中央付近）に表示する
+1.2 The LP shall 主要コンテンツとして `public/logo.webp` を視認できる位置（画面中央付近）に表示する
 1.3 The LP shall モバイル/デスクトップの両方でレイアウト崩れが発生しない（主要要素が画面外にはみ出さない）
 
 ### Requirement 2: BGM（use-sound）ループ再生
@@ -33,7 +33,7 @@
 
 #### Acceptance Criteria
 
-3.1 When トップページが表示されたとき, the LP shall `public/logo.png` をフェードイン/浮遊感のあるアニメーションで表示する
+3.1 When トップページが表示されたとき, the LP shall `public/logo.webp` をフェードイン/浮遊感のあるアニメーションで表示する
 3.2 The LP shall ロゴのアニメーションが初回表示時に不自然にカクつかない（視覚的に滑らかに見える）
 3.3 Where OS/ブラウザで「動きを減らす（prefers-reduced-motion）」が有効な場合, the LP shall アニメーションを抑制する（例: フェードのみ、または即時表示）
 

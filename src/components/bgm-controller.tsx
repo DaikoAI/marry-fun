@@ -8,7 +8,11 @@ type BgmStatus = "idle" | "trying" | "playing" | "stopped" | "blocked" | "error"
 
 const BGM_SRC = "/sound/Kirameki Summer Memory.mp3";
 
-export function BgmController() {
+interface BgmControllerProps {
+  className?: string;
+}
+
+export function BgmController({ className }: BgmControllerProps) {
   const triedAutoPlayRef = useRef(false);
   const t = useTranslations("common.bgm");
 
@@ -81,7 +85,7 @@ export function BgmController() {
       aria-label={isPlaying ? t("stop") : t("play")}
       disabled={status === "error"}
       onClick={toggle}
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white/70 ring-1 ring-white/20 backdrop-blur-md transition hover:bg-white/20 hover:text-white focus-visible:ring-2 focus-visible:ring-pink-300 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      className={`flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white/70 ring-1 ring-white/20 backdrop-blur-md transition hover:bg-white/20 hover:text-white focus-visible:ring-2 focus-visible:ring-pink-300 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${className ?? ""}`}
     >
       {isPlaying ?
         <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">

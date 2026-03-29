@@ -20,14 +20,12 @@ export default async function Home({ params, searchParams }: HomePageProps) {
     <div className="relative h-dvh overflow-hidden text-white">
       <Background mobileSrc="/bg/top_sp.png" desktopSrc="/bg/top_pc.png" showSparkles={false} />
 
-      {/* Content */}
       <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col px-4 py-5 sm:px-8 sm:py-7">
         <header className="flex shrink-0 items-center justify-end">
           <BgmController />
         </header>
 
         <main className="flex min-h-0 flex-1 flex-col items-center gap-4 py-3 sm:gap-5 sm:py-4">
-          {/* Logo */}
           <Image
             src="/logo.png"
             alt="marry.fun"
@@ -37,7 +35,6 @@ export default async function Home({ params, searchParams }: HomePageProps) {
             className="relative -top-8 h-auto w-[min(540px,78vw)] shrink-0 animate-[logoIn_2800ms_cubic-bezier(0.22,1,0.36,1)_both] drop-shadow-[0_18px_60px_rgba(0,0,0,0.55)] motion-reduce:animate-none sm:-top-14"
           />
 
-          {/* Spacer for layout */}
           <div className="min-h-0 flex-1" />
 
           <HomeCtaLink label={t("cta")} disabled />

@@ -10,7 +10,8 @@
 ## 備考（better-auth）
 
 - 以下は `better-auth` の基本テーブルです: `user`, `session`, `account`, `verification`
-- `walletAddress` は `better-auth-web3` の default schema テーブルです（Mermaid 図では `wallet_address` 表記）
+- `wallet_address` は `better-auth-web3` wallet 情報テーブルです
+- `x_account` は wallet ユーザーに紐づく X 連携情報テーブルです
 - 以下はアプリ独自テーブルです: `game_sessions`, `messages`, `user_point_balance`, `point_transaction`
 - `user.email` はアプリ表示用ではなく、`better-auth` / `better-auth-web3` の内部互換のため保持します（削除しない）
 
@@ -102,6 +103,18 @@ erDiagram
         timestamp_ms createdAt
     }
 
+    x_account {
+        text id PK
+        text userId FK "x_account_user_id_unique"
+        text accountId FK "x_account_account_id_unique"
+        text providerAccountId "x_account_provider_account_id_idx"
+        text username
+        text profileImageUrl
+        timestamp_ms linkedAt
+        timestamp_ms createdAt
+        timestamp_ms updatedAt
+    }
+
     user_point_balance {
         text user_id PK "FK -> user.id"
         int balance
@@ -142,6 +155,8 @@ erDiagram
     user ||--o{ account : userId
     user ||--o{ wallet_address : userId
     account ||--o{ wallet_address : accountId
+    user ||--o| x_account : userId
+    account ||--o| x_account : accountId
     user ||--o| user_point_balance : user_id
     user ||--o{ point_transaction : user_id
     user ||--o{ game_sessions : user_id
@@ -204,7 +219,7 @@ erDiagram
 | `createdAt`  | `integer(timestamp_ms)` | YES  | -   | -   | -                                   |
 | `updatedAt`  | `integer(timestamp_ms)` | YES  | -   | -   | -                                   |
 
-### `walletAddress`
+### `wallet_address`
 
 | Column      | Type                    | NULL | PK  | FK           | Index/Constraint                   |
 | ----------- | ----------------------- | ---- | --- | ------------ | ---------------------------------- |
@@ -216,6 +231,20 @@ erDiagram
 | `chainId`   | `integer`               | YES  | -   | -            | `UNIQUE(wallet_address_unique)`    |
 | `isPrimary` | `integer(boolean)`      | NO   | -   | -            | `DEFAULT false`                    |
 | `createdAt` | `integer(timestamp_ms)` | NO   | -   | -            | -                                  |
+
+### `x_account`
+
+| Column              | Type                    | NULL | PK  | FK           | Index/Constraint                          |
+| ------------------- | ----------------------- | ---- | --- | ------------ | ----------------------------------------- |
+| `id`                | `text`                  | NO   | YES | -            | -                                         |
+| `userId`            | `text`                  | NO   | -   | `user.id`    | `UNIQUE x_account_user_id_unique`         |
+| `accountId`         | `text`                  | NO   | -   | `account.id` | `UNIQUE x_account_account_id_unique`      |
+| `providerAccountId` | `text`                  | NO   | -   | -            | `INDEX x_account_provider_account_id_idx` |
+| `username`          | `text`                  | YES  | -   | -            | -                                         |
+| `profileImageUrl`   | `text`                  | YES  | -   | -            | -                                         |
+| `linkedAt`          | `integer(timestamp_ms)` | NO   | -   | -            | -                                         |
+| `createdAt`         | `integer(timestamp_ms)` | NO   | -   | -            | -                                         |
+| `updatedAt`         | `integer(timestamp_ms)` | NO   | -   | -            | -                                         |
 
 ### `game_sessions`
 
@@ -271,8 +300,11 @@ erDiagram
 | `account`           | `account_provider_account_unique`          | UNIQUE | `providerId`, `accountId`             |
 | `account`           | `account_user_id_idx`                      | INDEX  | `userId`                              |
 | `verification`      | `verification_identifier_idx`              | INDEX  | `identifier`                          |
-| `walletAddress`     | `wallet_address_unique`                    | UNIQUE | `address`, `type`, `chainId`          |
-| `walletAddress`     | `wallet_address_user_id_idx`               | INDEX  | `userId`                              |
+| `wallet_address`    | `wallet_address_unique`                    | UNIQUE | `address`, `type`, `chainId`          |
+| `wallet_address`    | `wallet_address_user_id_idx`               | INDEX  | `userId`                              |
+| `x_account`         | `x_account_user_id_unique`                 | UNIQUE | `userId`                              |
+| `x_account`         | `x_account_account_id_unique`              | UNIQUE | `accountId`                           |
+| `x_account`         | `x_account_provider_account_id_idx`        | INDEX  | `providerAccountId`                   |
 | `game_sessions`     | `game_sessions_user_idx`                   | INDEX  | `user_id`                             |
 | `game_sessions`     | `game_sessions_user_created_idx`           | INDEX  | `user_id`, `created_at`               |
 | `game_sessions`     | `game_sessions_status_idx`                 | INDEX  | `status`                              |

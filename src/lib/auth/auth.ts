@@ -45,6 +45,12 @@ async function buildAuth(web3Domain: string) {
   return betterAuth({
     baseURL: authBaseUrl,
     secret: getAuthSecret(),
+    account: {
+      accountLinking: {
+        enabled: true,
+        allowDifferentEmails: true,
+      },
+    },
     trustedOrigins: [authBaseUrl, ...AUTH_LOCAL_TRUSTED_ORIGIN_PATTERNS, ...AUTH_STATIC_TRUSTED_ORIGINS],
     database: drizzleAdapter(db, {
       provider: "sqlite",

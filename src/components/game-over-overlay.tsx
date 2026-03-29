@@ -18,7 +18,7 @@ export function GameOverOverlay() {
 
   const handleRetry = () => {
     resetGame();
-    router.push("/start");
+    router.push("/");
   };
 
   const dialogRef = useModalA11y(handleRetry);

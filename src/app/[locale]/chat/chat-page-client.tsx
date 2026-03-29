@@ -23,7 +23,7 @@ export function ChatPageClient() {
 
   useEffect(() => {
     if (!username || !sessionId) {
-      router.replace("/start");
+      router.replace("/");
     }
   }, [username, sessionId, router]);
 
@@ -61,7 +61,7 @@ export function ChatPageClient() {
 
   return (
     <div className="relative flex h-dvh items-center justify-center overflow-hidden text-white">
-      <Background />
+      <Background variant="chat" />
       <PointGainToast />
       <div className="relative z-10 mx-auto flex h-full max-h-[800px] w-full max-w-md flex-col">
         <ChatHeader />
