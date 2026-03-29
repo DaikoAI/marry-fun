@@ -11,10 +11,10 @@ marry.fun の AI チャット基盤は Vercel AI SDK と OpenAI API で構成す
 
 ## Prompt Source of Truth
 
-- `prompts/SOUL.md`
-- `prompts/NGWORD_AGENT.md`
+- `src/constants/prompts/SOUL.md`
+- `src/constants/prompts/NGWORD_AGENT.md`
 
-これらの Markdown を `bun run sync:prompts` で `src/infrastructure/prompts/agent-prompts.generated.ts` に同期する。
+これらの Markdown を `bun run sync:prompts` で `src/constants/prompts/agent-prompts.generated.ts` に同期する。
 
 generated file は直接編集しないこと。
 

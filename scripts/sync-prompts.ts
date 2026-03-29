@@ -11,9 +11,10 @@ import { logger } from "../src/utils/logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const SOUL_PATH = resolve(ROOT, "prompts/SOUL.md");
-const NGWORD_PATH = resolve(ROOT, "prompts/NGWORD_AGENT.md");
-const OUT_PATH = resolve(ROOT, "src/infrastructure/prompts/agent-prompts.generated.ts");
+const PROMPTS_DIR = resolve(ROOT, "src/constants/prompts");
+const SOUL_PATH = resolve(PROMPTS_DIR, "SOUL.md");
+const NGWORD_PATH = resolve(PROMPTS_DIR, "NGWORD_AGENT.md");
+const OUT_PATH = resolve(PROMPTS_DIR, "agent-prompts.generated.ts");
 
 function escapeTemplate(content: string): string {
   return content.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
@@ -22,7 +23,7 @@ function escapeTemplate(content: string): string {
 const soulContent = escapeTemplate(readFileSync(SOUL_PATH, "utf-8"));
 const ngwordContent = escapeTemplate(readFileSync(NGWORD_PATH, "utf-8"));
 
-const output = `// Auto-generated from prompts/*.md — do not edit directly.
+const output = `// Auto-generated from src/constants/prompts/*.md — do not edit directly.
 // Run \`bun run sync:prompts\` to regenerate.
 
 export const CHAT_SYSTEM_PROMPT = \`${soulContent}\`;
@@ -33,5 +34,5 @@ export const NGWORD_SYSTEM_PROMPT = \`${ngwordContent}\`;
 const existing = existsSync(OUT_PATH) ? readFileSync(OUT_PATH, "utf-8") : null;
 if (existing !== output) {
   writeFileSync(OUT_PATH, output, "utf-8");
-  logger.log("synced prompts/*.md → src/infrastructure/prompts/agent-prompts.generated.ts");
+  logger.log("synced src/constants/prompts/*.md → src/constants/prompts/agent-prompts.generated.ts");
 }

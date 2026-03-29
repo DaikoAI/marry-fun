@@ -61,6 +61,9 @@
 **Location**: `src/constants/messages/{locale}/`  
 **Purpose**: 翻訳 JSON。ファイル名は用途別（chat.json, common.json, goal.json など）
 
+**Location**: `src/constants/prompts/`  
+**Purpose**: AI system prompt の source Markdown と generated TypeScript
+
 ### Store
 
 **Location**: `src/store/`  

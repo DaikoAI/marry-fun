@@ -123,13 +123,13 @@ POST /api/chat
 
 ## System Prompts
 
-Character personality definitions and AI instructions live in `prompts/*.md` as the source of truth. These are synced to code via:
+Character personality definitions and AI instructions live in `src/constants/prompts/*.md` as the source of truth. These are synced to code via:
 
 ```bash
 bun run sync:prompts
 ```
 
-Never edit `src/infrastructure/prompts/agent-prompts.generated.ts` directly — edit the source markdown files instead.
+Never edit `src/constants/prompts/agent-prompts.generated.ts` directly — edit the source markdown files instead.
 
 ## Testing
 

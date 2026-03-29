@@ -1,7 +1,7 @@
 import { Output, stepCountIs, ToolLoopAgent } from "ai";
 import { z } from "zod";
+import { CHAT_SYSTEM_PROMPT, NGWORD_SYSTEM_PROMPT } from "@/constants/prompts/agent-prompts.generated";
 import { EMOTIONS } from "@/domain/values/emotion";
-import { CHAT_SYSTEM_PROMPT, NGWORD_SYSTEM_PROMPT } from "@/infrastructure/prompts/agent-prompts.generated";
 import { chatModel } from "./model";
 
 const chatResponseSchema = z.object({
