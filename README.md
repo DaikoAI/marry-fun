@@ -86,8 +86,8 @@ Long term, we target community-led, token-governed IP licensing and value sharin
   <img src="docs/assets/architecture.png" alt="marry.fun architecture: fee distribution, Claw-chan, and tech stack" width="600" />
 </p>
 
-- **Core**: [pump.fun](https://x.com/Pumpfun/status/2022029057869947173?s=20) protocol & [OpenClaw](https://github.com/openclaw/openclaw) — Chat with **Claw-chan** (an agent built with OpenClaw) to earn points; top performers receive [pump.fun creator fee](https://x.com/Pumpfun/status/2022029057869947173?s=20) distribution (Boyfriend 60%, Husband jackpot).
+- **Core**: [pump.fun](https://x.com/Pumpfun/status/2022029057869947173?s=20) protocol + AI-native dating gameplay — Chat with **Claw-chan** via Vercel AI SDK and OpenAI API to earn points; top performers receive [pump.fun creator fee](https://x.com/Pumpfun/status/2022029057869947173?s=20) distribution (Boyfriend 60%, Husband jackpot).
 - Next.js 16 / React 19 / TypeScript, Bun, OpenNext + Cloudflare Workers
 - Solana smart contract + fee-sharing distribution
-- Moltworker, OpenClaw (AI chat)
+- Vercel AI SDK, OpenAI API (AI chat)
 - `@react-three/fiber` / `@react-three/drei` (3D), `next-intl` (i18n)

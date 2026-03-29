@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 import type { ComponentProps } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { useHaptic } from "use-haptic";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -16,6 +16,7 @@ import { authClient } from "@/lib/auth/auth-client";
 import type { InitGameResult } from "@/lib/girl-chat";
 import { getStartOnboardingStep } from "@/lib/start/onboarding-flow";
 import { shouldShowPrologueSkip } from "@/lib/start/prologue-skip";
+import { initialStartGameFlowState, isGameOverBlockedError, startGameFlowReducer } from "@/lib/start/start-game-flow";
 import { useGameStore } from "@/store/game-store";
 
 const localeConfig: Record<Locale, { flag: string; label: string }> = {
@@ -40,13 +41,10 @@ export function StartPageClient() {
   const [username, setUsername] = useState("");
   const [isSavingUsername, setIsSavingUsername] = useState(false);
   const [profileError, setProfileError] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [phase, setPhase] = useState<"form" | "prologue">("form");
-  const [hasInitResponse, setHasInitResponse] = useState(false);
-  const [initError, setInitError] = useState(false);
-  const [gameOverBlocked, setGameOverBlocked] = useState(false);
+  const [submissionState, dispatch] = useReducer(startGameFlowReducer, initialStartGameFlowState);
   const t = useTranslations("start");
   const locale = useLocale();
+  const authIdentity = session.data?.user.id ?? null;
 
   const effectiveUsername = hasStoredUsername ? storedName.trim() : username.trim();
   const isValid = isValidUsername(effectiveUsername);
@@ -63,21 +61,21 @@ export function StartPageClient() {
     router.prefetch("/chat");
   }, [router]);
 
-  const apiResultRef = useRef<InitGameResult | null>(null);
-  const apiErrorRef = useRef<boolean>(false);
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const initPromiseRef = useRef<Promise<InitGameResult> | null>(null);
+  const submitSequenceRef = useRef(0);
 
   useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, []);
+    submitSequenceRef.current += 1;
+    initPromiseRef.current = null;
+    dispatch({ type: "RESET" });
+  }, [authIdentity]);
 
   const isWalletAuthenticated = Boolean(session.data?.session);
   const onboardingStep = getStartOnboardingStep({
     isWalletAuthenticated,
     requiresUsername: isWalletAuthenticated && !hasStoredUsername,
   });
+  const { gameOverBlocked, hasInitResponse, initError, isSubmitting, phase } = submissionState;
   const canStart = isValid && isWalletAuthenticated && !isSubmitting && phase === "form" && !gameOverBlocked;
   const canSubmitUsername = isValid && onboardingStep === "name" && !isSavingUsername;
   const canSkipPrologue = shouldShowPrologueSkip({ phase, hasInitResponse });
@@ -98,62 +96,62 @@ export function StartPageClient() {
     e.preventDefault();
     if (!canStart) return;
     triggerHaptic();
-    setInitError(false);
-    apiErrorRef.current = false;
-    apiResultRef.current = null;
-    setHasInitResponse(false);
-    setIsSubmitting(true);
-    setPhase("prologue");
+    const submitSequence = submitSequenceRef.current + 1;
+    submitSequenceRef.current = submitSequence;
+    dispatch({ type: "BEGIN_SUBMISSION" });
+    initPromiseRef.current = null;
 
     const nameToUse = effectiveUsername;
+    const initPromise = (async () => {
+      const { initGameSession } = await import("@/lib/girl-chat");
+      return initGameSession(nameToUse, locale);
+    })();
+    initPromiseRef.current = initPromise;
 
-    void (async () => {
-      try {
-        const { initGameSession } = await import("@/lib/girl-chat");
-        apiResultRef.current = await initGameSession(nameToUse, locale);
-        setHasInitResponse(true);
-      } catch (err) {
-        if ((err as Error & { code?: string }).code === "GAME_OVER_BLOCKED") {
-          setGameOverBlocked(true);
-          setIsSubmitting(false);
-          setPhase("form");
+    void initPromise
+      .then(() => {
+        if (submitSequenceRef.current !== submitSequence) {
           return;
         }
-        apiErrorRef.current = true;
-        setHasInitResponse(false);
-      }
-    })();
+        dispatch({ type: "INIT_READY" });
+      })
+      .catch((err: unknown) => {
+        if (submitSequenceRef.current !== submitSequence) {
+          return;
+        }
+        if (isGameOverBlockedError(err)) {
+          initPromiseRef.current = null;
+          dispatch({ type: "INIT_BLOCKED" });
+          return;
+        }
+        dispatch({ type: "INIT_FAILED" });
+      });
   };
 
   const handlePrologueComplete = () => {
-    if (apiErrorRef.current) {
-      setInitError(true);
-      setIsSubmitting(false);
-      setHasInitResponse(false);
-      setPhase("form");
+    const initPromise = initPromiseRef.current;
+    if (!initPromise) {
       return;
     }
-    if (apiResultRef.current) {
-      setupStoreAndNavigate(apiResultRef.current);
-      return;
-    }
-    const id = setInterval(() => {
-      if (apiErrorRef.current) {
-        clearInterval(id);
-        pollingRef.current = null;
-        setInitError(true);
-        setIsSubmitting(false);
-        setHasInitResponse(false);
-        setPhase("form");
-        return;
-      }
-      if (apiResultRef.current) {
-        clearInterval(id);
-        pollingRef.current = null;
-        setupStoreAndNavigate(apiResultRef.current);
-      }
-    }, 200);
-    pollingRef.current = id;
+    initPromiseRef.current = null;
+    const submitSequence = submitSequenceRef.current;
+
+    void initPromise
+      .then(result => {
+        if (submitSequenceRef.current !== submitSequence) {
+          return;
+        }
+        setupStoreAndNavigate(result);
+      })
+      .catch((err: unknown) => {
+        if (submitSequenceRef.current !== submitSequence) {
+          return;
+        }
+        if (isGameOverBlockedError(err)) {
+          return;
+        }
+        dispatch({ type: "PROLOGUE_FAILED" });
+      });
   };
 
   const handleNameStepSubmit = async () => {
